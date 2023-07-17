@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import IntroPage from "./pages/IntroPage";
-import MainPage from "./pages/mainPage";
-import ArchivePage from "./pages/archivePage";
+import MainPage from "./pages/MainPage";
+import ArchivePage from "./pages/ArchivePage";
 
 const router = createBrowserRouter([
   {
