@@ -9,6 +9,11 @@ div#root {
 
 div#root {
   background: #000000;
+  color: white;
+
+  * {
+    box-sizing: border-box;
+  }
 }
 
 canvas {
