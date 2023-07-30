@@ -3,12 +3,6 @@ import styled from "styled-components";
 
 import LineDiv from "../../components/LineDiv";
 
-const Content = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`;
-
 const BottomText = styled.div`
   width: 300px;
   position: absolute;
@@ -43,14 +37,14 @@ const BottomText = styled.div`
 export default function MusicBasic() {
   return (
     <>
-      <Content>
+      <div className="content">
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
         <LineDiv left={{ text: "Give me yout own answer", size: 16 }} right={{ text: "08.11" }} />
         <BottomText>
           <p className="line">당신의 수심</p>
           <p>만의 음악</p>
         </BottomText>
-      </Content>
+      </div>
       <div className="footer">
         <Link to="question">시작하기</Link>
       </div>

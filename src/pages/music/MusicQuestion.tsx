@@ -2,7 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+import LineDiv from "../../components/LineDiv";
+
 import { questionList, questionType } from "../../js/Data";
+
+const LayoutCenter = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
 
 const QuestionCard = styled.div`
   width: 180px;
@@ -39,18 +48,32 @@ export default function MusicQuestion() {
   }, [level]);
 
   return (
-    <div>
-      MusicQuestion
-      {level < 0 && <div>level -1</div>}
-      {question &&
-        question.answerList.map((answer, idx) => {
-          return (
-            <QuestionCard key={idx}>
-              <p>{answer}</p>
-            </QuestionCard>
-          );
-        })}
-      {level + 1 > questionList.length && <div>end</div>}
+    <div className="content">
+      {level < 0 && (
+        <LayoutCenter>
+          <LineDiv left={{ text: "당신의 대답을 들려주세요" }} right={{ text: "0" }} />
+          <LineDiv left={{ text: "당신만의 음악으로 답해드립니다." }} right={{ text: "." }} />
+        </LayoutCenter>
+      )}
+      {question && (
+        <>
+          <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} />
+          <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} />
+          {question.answerList.map((answer, idx) => {
+            return (
+              <QuestionCard key={idx}>
+                <p>{answer}</p>
+              </QuestionCard>
+            );
+          })}
+        </>
+      )}
+      {level + 1 > questionList.length && (
+        <LayoutCenter>
+          <LineDiv left={{ text: "답변이 도착했습니다." }} right={{ text: "0" }} />
+          <LineDiv left={{ text: "당신의 선택으로 만들어진 곡입니다." }} right={{ text: "." }} />
+        </LayoutCenter>
+      )}
       <div className="footer">
         <button onClick={handleButton}>넘어가기</button>
       </div>
