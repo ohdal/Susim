@@ -1,9 +1,10 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function MainPage() {
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioSource, setAudioSource] = useState<MediaElementAudioSourceNode | null>(null);
 
   const getMediaStream = useCallback(async () => {
     // const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -19,16 +20,21 @@ export default function MainPage() {
       if (audioRef.current && mediaStream) {
         // 마이크에서 입력받은 MediaStream으로 오디오 재생
         audioRef.current.srcObject = mediaStream;
+        void audioRef.current.play();
 
-        const source = audioContext.createMediaElementSource(audioRef.current);
-        source.connect(analyser);
-        // 데이터 시각화...
+        // stricmode 때문에 에러 발생함 - connet가 이미 되어있다는 내용
+        if(!audioSource) {
+          const source = audioContext.createMediaElementSource(audioRef.current);
+          source.connect(analyser);
+          setAudioSource(source);
+        }
       }
+
       /* use the stream */
     } catch (err) {
       console.error(`에러 발생: ${String(err)}`);
     }
-  }, []);
+  }, [audioSource]);
 
   useEffect(() => {
     void getMediaStream();
@@ -36,7 +42,6 @@ export default function MainPage() {
 
   return (
     <div>
-      mainPage
       <br />
       <audio ref={audioRef}></audio>
       <button
