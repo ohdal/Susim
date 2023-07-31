@@ -6,13 +6,25 @@ import MusicLayout from "./layouts/MusicLayout";
 import MusicBasic from "./pages/music/MusicBasic";
 import MusicQuestion from "./pages/music/MusicQuestion";
 import MusicResult from "./pages/music/MusicResult";
-// import IntroPage from "./pages/IntroPage";
-// import MainPage from "./pages/MainPage";
-// import ArchivePage from "./pages/ArchivePage";
+import IntroPage from "./pages/IntroPage";
+import MainPage from "./pages/MainPage";
+import ArchivePage from "./pages/ArchivePage";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <IntroPage />,
+  },
+  {
+    path: "/main",
+    element: <MainPage />,
+  },
+  {
+    path: "/archive",
+    element: <ArchivePage />,
+  },
+  {
+    path: "/music",
     element: <MusicLayout />,
     children: [
       {
@@ -29,18 +41,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // {
-  //   path: "/",
-  //   element: <IntroPage />,
-  // },
-  // {
-  //   path: "/main",
-  //   element: <MainPage />,
-  // },
-  // {
-  //   path: "/archive",
-  //   element: <ArchivePage />,
-  // },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

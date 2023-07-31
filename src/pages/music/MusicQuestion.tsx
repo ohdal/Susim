@@ -13,11 +13,19 @@ const LayoutCenter = styled.div`
   transform: translate(-50%, -50%);
 `;
 
+const CardLayout = styled.div`
+  width: 1130px;
+  padding: 120px 0;
+  margin: 0 auto;
+`;
+
 const QuestionCard = styled.div`
+  cursor: pointer;
   width: 180px;
   height: 250px;
   display: inline-block;
   background: #ffffff;
+  transition: all 0.3s ease-out;
 
   &:not(:last-child) {
     margin-right: 10px;
@@ -28,6 +36,10 @@ const QuestionCard = styled.div`
     font-size: 14px;
     text-align: center;
   }
+
+  &:hover {
+    transform: translateY(-20px);
+  }
 `;
 
 export default function MusicQuestion() {
@@ -37,7 +49,7 @@ export default function MusicQuestion() {
 
   const handleButton = useCallback(() => {
     if (level > questionList.length - 1) {
-      navigate("/result");
+      navigate("/music/result");
     } else {
       setLevel((v) => v + 1);
     }
@@ -59,16 +71,18 @@ export default function MusicQuestion() {
         <>
           <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} />
           <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} />
-          {question.answerList.map((answer, idx) => {
-            return (
-              <QuestionCard key={idx}>
-                <p>{answer}</p>
-              </QuestionCard>
-            );
-          })}
+          <CardLayout>
+            {question.answerList.map((answer, idx) => {
+              return (
+                <QuestionCard key={idx}>
+                  <p>{answer}</p>
+                </QuestionCard>
+              );
+            })}
+          </CardLayout>
         </>
       )}
-      {level + 1 > questionList.length && (
+      {level > questionList.length - 1 && (
         <LayoutCenter>
           <LineDiv left={{ text: "답변이 도착했습니다." }} right={{ text: "0" }} />
           <LineDiv left={{ text: "당신의 선택으로 만들어진 곡입니다." }} right={{ text: "." }} />

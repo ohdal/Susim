@@ -39,7 +39,7 @@ export default function MusicBasic() {
     <>
       <div className="content">
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
-        <LineDiv left={{ text: "Give me yout own answer", size: 16 }} right={{ text: "08.11" }} />
+        <LineDiv left={{ text: "Give me your own answer", size: 16 }} right={{ text: "08.11" }} />
         <BottomText>
           <p className="line">당신의 수심</p>
           <p>만의 음악</p>
