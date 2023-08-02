@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { getRandomInt } from "../utils";
-import Canvas from "../js/Canvas";
+import Canvas from "../utils/Canvas";
 import styled from "styled-components";
 
 // import text_img from "../assets/text_test.png";
@@ -162,9 +162,8 @@ export default function ScatterCanvas(props: Props) {
     let met;
     let maxWidth = 0;
     for (let i = 0; i < text.length; i++) {
-      ctx.beginPath();
+      ctx.font = `${fontSize}px Orbit`;
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = `${fontSize}px san-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(text[i], x, y + fontSize * i);
@@ -193,7 +192,8 @@ export default function ScatterCanvas(props: Props) {
             delete particles[key];
           }
           // if (value.speed <= 0.001) {
-          // return false;
+          //   navigate("/main");
+          //   return false;
           // }
         } else {
           if (!x || !y) return false;

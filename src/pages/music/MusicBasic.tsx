@@ -1,18 +1,33 @@
-import { Link, useOutletContext } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
+
+import background_img_1 from "../../assets/images/background_1.png";
 
 import LineDiv from "../../components/LineDiv";
 
-const BottomText = styled.div`
-  width: 300px;
+const BackgroundDiv = styled.div<{$background: string}>`
+  width: 80%;
+  min-height: 50%;
   position: absolute;
-  bottom: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url(${(props) => props.$background});
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+`
+
+const BottomText = styled.div`
+  min-width: 360px;
+  position: absolute;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
 
   p {
     margin: 0;
-    font-size: 36px;
+    font-size: 42px;
     text-align: right;
 
     &.line {
@@ -22,7 +37,7 @@ const BottomText = styled.div`
 
       &::after {
         content: "";
-        width: 120px;
+        width: 100px;
         height: 1px;
         background: #ffffff;
         position: absolute;
@@ -34,15 +49,18 @@ const BottomText = styled.div`
   }
 `;
 
+// const style= {backgroundImage: `url(${background_img_1})`}
+
 export default function MusicBasic() {
   return (
     <>
       <div className="content">
+        <BackgroundDiv $background={background_img_1}/>
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
-        <LineDiv left={{ text: "Give me your own answer", size: 16 }} right={{ text: "08.11" }} />
+        <LineDiv left={{ text: "Give me your own answer", size: 19 }} right={{ text: "08.11" }} />
         <BottomText>
-          <p className="line">당신의 수심</p>
-          <p>만의 음악</p>
+          <p className="line">다섯가지 질문</p>
+          <p>당신의 대답</p>
         </BottomText>
       </div>
       <div className="footer">

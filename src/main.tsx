@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.scss";
+import "./assets/fonts/font.css"
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MusicLayout from "./layouts/MusicLayout";
 import MusicBasic from "./pages/music/MusicBasic";

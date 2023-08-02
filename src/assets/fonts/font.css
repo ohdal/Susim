@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap');
+
+@font-face {
+  font-family: "KoPubWorld Bold";
+  font-style: normal;
+  font-weight: normal;
+  src: url('./KoPubWorld_Batang_Bold.eot'); /* IE9 Compat Modes */
+  src: url("./KoPubWorld_Batang_Bold.woff") format("woff"),
+  url('./KoPubWorld Batang_Pro Bold.otf') format('opentype'),
+  url('./KoPubWorld Batang Bold.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('./KoPubWorld_Batang_Bold.svg') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: "KoPubWorld Medium";
+  font-style: normal;
+  font-weight: normal;
+  src: url('./KoPubWorld_Batang_Pro_Medium.eot'); /* IE9 Compat Modes */
+  src: url("./KoPubWorld_Batang_Pro_Medium.woff") format("woff"),
+  url('./KoPubWorld Batang_Pro Medium.otf') format('opentype'),
+  url('./KoPubWorld_Batang_Pro_Medium.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('./KoPubWorld_Batang_Pro_Medium.svg') format('svg'); /* Legacy iOS */
+}
