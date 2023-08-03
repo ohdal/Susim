@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 
+import { musicFileList } from "../constant/Data";
+
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -37,20 +39,31 @@ const Container = styled.div`
 `;
 
 type MusicListType = number[] | null;
-export type ContextType = { handleMusicList: (arr:  MusicListType) => void };
+export type ContextType = { handleMusicList: (arr: MusicListType) => void };
 
+let audioList: HTMLAudioElement[] = [];
 export default function MusicLayout() {
-  const [musicList, setMusicList] = useState< MusicListType>(null);
+  const [musicList, setMusicList] = useState<MusicListType>(null);
 
-  const handleMusicList = useCallback((arr:  MusicListType): void => {
+  const handleMusicList = useCallback((arr: MusicListType): void => {
     setMusicList(arr);
   }, []);
 
   useEffect(() => {
     if (musicList) {
-      console.log("musicList", musicList);
+      musicList.forEach((num, idx) => {
+        const audio = new Audio(musicFileList[idx][num - 1]);
+
+        audioList.push(audio);
+        void audio.play();
+      });
     } else {
-      console.log("musicList", musicList);
+      if (audioList.length > 0)
+        audioList.forEach((audio) => {
+          audio.pause();
+        });
+
+      audioList = [];
     }
   }, [musicList]);
 

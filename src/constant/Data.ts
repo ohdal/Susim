@@ -1,6 +1,8 @@
 import * as cardImg from "../assets/images/card";
+import * as musicFile from "../assets/media";
 
 const card = cardImg.default;
+const music = musicFile.default;
 
 export type questionType = {
   id: number;
@@ -42,4 +44,12 @@ export const questionList: questionType[] = [
     answerType: "img",
     answerList: [card.Q5_1, card.Q5_2, card.Q5_3, card.Q5_4, card.Q5_5, card.Q5_6],
   },
+];
+
+export const musicFileList = [
+  [music.Q1_1, music.Q1_2, music.Q1_3, music.Q1_4, music.Q1_5, music.Q1_6],
+  [music.Q2_1, music.Q2_2, music.Q2_3, music.Q2_4, music.Q2_5, music.Q2_6],
+  [music.Q3_1, music.Q3_2, music.Q3_3, music.Q3_4, music.Q3_5, music.Q3_6],
+  [music.Q4_1, music.Q4_2, music.Q4_3, music.Q4_4, music.Q4_5, music.Q4_6],
+  [music.Q5_1, music.Q5_2, music.Q5_3, music.Q5_4, music.Q5_5, music.Q5_6],
 ];
