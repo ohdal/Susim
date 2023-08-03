@@ -37,7 +37,8 @@ export default function MusicResult() {
         </BottomText>
       </div>
       <div className="footer">
-        <Link to="/music">.</Link>
+        {/* <Link to="/music">.</Link> */}
+        <Link to="/">.</Link>
       </div>
     </>
   );

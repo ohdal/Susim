@@ -11,6 +11,27 @@ import IntroPage from "./pages/IntroPage";
 import MainPage from "./pages/MainPage";
 import ArchivePage from "./pages/ArchivePage";
 
+const routerTemp = createBrowserRouter([
+  {
+    path: "/",
+    element: <MusicLayout />,
+    children: [
+      {
+        path: "",
+        element: <MusicBasic />,
+      },
+      {
+        path: "question",
+        element: <MusicQuestion />,
+      },
+      {
+        path: "result",
+        element: <MusicResult />,
+      },
+    ],
+  },
+]);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -46,6 +67,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <RouterProvider router={routerTemp} />
   </React.StrictMode>
 );

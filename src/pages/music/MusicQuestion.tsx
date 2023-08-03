@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { ContextType } from "../../layouts/MusicLayout";
 import styled from "styled-components";
 
@@ -101,7 +101,6 @@ export default function MusicQuestion() {
   const [question, setQuestion] = useState<questionType | null>(null);
   const [userChoice, setUserChoice] = useState<number | null>(null);
   const { handleMusicList } = useOutletContext<ContextType>();
-  const navigate = useNavigate();
 
   const handleCard = useCallback((v: number) => {
     setUserChoice(v);
