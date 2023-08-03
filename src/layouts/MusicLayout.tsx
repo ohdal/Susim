@@ -75,7 +75,7 @@ export default function MusicLayout() {
 
       if (long) {
         audioList[long].onended = () => {
-          navigate("/music/result");
+          navigate("/result");
         };
       }
     } else {
