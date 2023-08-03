@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useOutletContext } from "react-router-dom";
+import { ContextType } from "../../layouts/MusicLayout";
 import styled from "styled-components";
 
 import background_img_1 from "../../assets/images/background_1.png";
 
 import LineDiv from "../../components/LineDiv";
 
-const BackgroundDiv = styled.div<{$background: string}>`
+const BackgroundDiv = styled.div<{ $background: string }>`
   width: 80%;
   min-height: 50%;
   position: absolute;
@@ -16,7 +18,7 @@ const BackgroundDiv = styled.div<{$background: string}>`
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-`
+`;
 
 const BottomText = styled.div`
   min-width: 360px;
@@ -49,13 +51,19 @@ const BottomText = styled.div`
   }
 `;
 
-// const style= {backgroundImage: `url(${background_img_1})`}
-
 export default function MusicBasic() {
+  const { handleMusicList } = useOutletContext<ContextType>();
+
+  useEffect(() => {
+    return () => {
+      handleMusicList(null);
+    };
+  }, [handleMusicList]);
+
   return (
     <>
       <div className="content">
-        <BackgroundDiv $background={background_img_1}/>
+        <BackgroundDiv $background={background_img_1} />
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
         <LineDiv left={{ text: "Give me your own answer", size: 19 }} right={{ text: "08.11" }} />
         <BottomText>

@@ -111,8 +111,6 @@ export default function MusicQuestion() {
     if (level < 0) {
       userChoiceList = [];
       setLevel((v) => v + 1);
-    } else if (level > questionList.length - 1) {
-      navigate("/music/result");
     } else {
       if (!userChoice) {
         alert("카드 중 하나를 선택해주세요.");
@@ -122,7 +120,7 @@ export default function MusicQuestion() {
         setLevel((v) => v + 1);
       }
     }
-  }, [level, userChoice, navigate]);
+  }, [level, userChoice]);
 
   useEffect(() => {
     setQuestion(questionList[level]);
@@ -184,9 +182,11 @@ export default function MusicQuestion() {
             <LineDiv left={{ text: "당신의 선택으로 만들어진 곡입니다." }} right={{ text: "." }} />
           </LayoutCenter>
         )}
-        <div className="footer">
-          <button onClick={handleButton}>넘어가기</button>
-        </div>
+        {level < questionList.length && (
+          <div className="footer">
+            <button onClick={handleButton}>넘어가기</button>
+          </div>
+        )}
       </ContentInner>
     </div>
   );

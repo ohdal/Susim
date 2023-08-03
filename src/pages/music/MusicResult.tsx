@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { Link, useOutletContext } from "react-router-dom";
-import { ContextType } from "../../layouts/MusicLayout";
+import { Link } from "react-router-dom";
 import LineDiv from "../../components/LineDiv";
 import styled from "styled-components";
 
@@ -27,14 +25,6 @@ const BottomText = styled.div`
 `;
 
 export default function MusicResult() {
-  const { handleMusicList } = useOutletContext<ContextType>();
-
-  useEffect(() => {
-    return () => {
-      handleMusicList(null);
-    };
-  }, [handleMusicList]);
-
   return (
     <>
       <div className="content">

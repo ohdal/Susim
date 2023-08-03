@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { musicFileList } from "../constant/Data";
@@ -44,28 +44,52 @@ export type ContextType = { handleMusicList: (arr: MusicListType) => void };
 let audioList: HTMLAudioElement[] = [];
 export default function MusicLayout() {
   const [musicList, setMusicList] = useState<MusicListType>(null);
+  const navigate = useNavigate();
 
   const handleMusicList = useCallback((arr: MusicListType): void => {
     setMusicList(arr);
   }, []);
 
+  const pauseAllMusic = useCallback(() => {
+    if (audioList.length > 0)
+      audioList.forEach((audio) => {
+        audio.pause();
+      });
+
+    audioList = [];
+  }, []);
+
   useEffect(() => {
     if (musicList) {
+      let long: number | null = null;
       musicList.forEach((num, idx) => {
         const audio = new Audio(musicFileList[idx][num - 1]);
 
         audioList.push(audio);
+        audio.loop = false;
         void audio.play();
-      });
-    } else {
-      if (audioList.length > 0)
-        audioList.forEach((audio) => {
-          audio.pause();
-        });
 
-      audioList = [];
+        if (!long) long = idx;
+        else long = audioList[long].duration < audio.duration ? idx : long;
+      });
+
+      if (long) {
+        console.log(long, audioList);
+        audioList[long].onended = () => {
+          console.log("hihi");
+          navigate("/music/result");
+        };
+      }
+    } else {
+      pauseAllMusic();
     }
-  }, [musicList]);
+  }, [musicList, pauseAllMusic, navigate]);
+
+  useEffect(() => {
+    return () => {
+      pauseAllMusic();
+    };
+  }, []);
 
   return (
     <Container>
