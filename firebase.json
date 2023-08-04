@@ -19,11 +19,11 @@
       ]
     },
     {
-      "source": "**/*.@(jpg|jpeg|gif|png)",
+      "source": "**/*.@(jpg|jpeg|gif|png|mp3)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "max-age=3300"
+          "value": "max-age=3153600"
         }
       ]
     }
