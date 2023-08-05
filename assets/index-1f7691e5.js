@@ -100,7 +100,7 @@ Error generating stack: `+i.message+`
       color: #ffffff;
     }
   }
-`;let Sn=[],da=0;function T1(){const[e,t]=P.useState(null),n=Hp(),r=P.useCallback(i=>{t(i)},[]),o=P.useCallback((i=!1)=>{Sn.length>0&&(Sn.forEach(l=>{i?l.play():l.pause()}),i?da=0:Sn=[])},[]);return P.useEffect(()=>{if(e){let i=0;const l=e[0]-1,a=new Audio(fa[0][l]),u=()=>{da++,da===fa.length&&o(!0)};a.loop=!1,a.onloadeddata=u,a.play().then(()=>{Sn.push(a);for(let s=1;s<e.length;s++){const d=e[s]-1,m=new Audio(fa[s][d]);Sn.push(m),m.loop=!1,m.onloadeddata=u,i=Sn[i].duration<m.duration?s:i}Sn[i].onended=()=>{n("/result")}}).catch(()=>{alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요."),n("/")})}else o()},[e,o,n]),P.useEffect(()=>()=>{o()},[o]),j.jsx(N1,{children:j.jsx(iv,{context:{handleMusicList:r}})})}const gh="/Susim/assets/background_1-569e0c37.png",z1=Ze.div`
+`;let Sn=[],da=0;function T1(){const[e,t]=P.useState(null),n=Hp(),r=P.useCallback(i=>{t(i)},[]),o=P.useCallback((i=!1)=>{Sn.length>0&&(Sn.forEach(l=>{i?l.play():l.pause()}),i?da=0:Sn=[])},[]);return P.useEffect(()=>{if(e){let i=0;const l=e[0]-1,a=new Audio(fa[0][l]),u=()=>{da++,da===fa.length&&o(!0)};a.loop=!1,a.onloadeddata=u,a.play().then(()=>{Sn.push(a);for(let s=1;s<e.length;s++){const d=e[s]-1,m=new Audio(fa[s][d]);Sn.push(m),m.loop=!1,m.onloadeddata=u,i=Sn[i].duration<m.duration?s:i}Sn[i].onended=()=>{n("/Susim/result")}}).catch(()=>{alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요."),n("/Susim")})}else o()},[e,o,n]),P.useEffect(()=>()=>{o()},[o]),j.jsx(N1,{children:j.jsx(iv,{context:{handleMusicList:r}})})}const gh="/Susim/assets/background_1-569e0c37.png",z1=Ze.div`
   position: relative;
   width: 800px;
   min-height: 48px;
