@@ -100,7 +100,7 @@ export default function MusicLayout() {
           };
         })
         .catch(() => {
-          alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 사이트에 접속해주세요.");
+          alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요.");
           navigate("/");
         });
     } else {
