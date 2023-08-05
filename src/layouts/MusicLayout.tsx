@@ -42,6 +42,7 @@ type MusicListType = number[] | null;
 export type ContextType = { handleMusicList: (arr: MusicListType) => void };
 
 let audioList: HTMLAudioElement[] = [];
+let loadedCount = 0;
 export default function MusicLayout() {
   const [musicList, setMusicList] = useState<MusicListType>(null);
   const navigate = useNavigate();
@@ -50,44 +51,68 @@ export default function MusicLayout() {
     setMusicList(arr);
   }, []);
 
-  const pauseAllMusic = useCallback(() => {
-    if (audioList.length > 0)
+  const handleAllMusic = useCallback((type = false) => {
+    if (audioList.length > 0) {
       audioList.forEach((audio) => {
-        audio.pause();
+        if (type) {
+          void audio.play();
+        } else {
+          audio.pause();
+        }
       });
 
-    audioList = [];
+      if (!type) audioList = [];
+      else loadedCount = 0;
+    }
   }, []);
 
   useEffect(() => {
     if (musicList) {
-      let long: number | null = null;
-      musicList.forEach((num, idx) => {
-        const audio = new Audio(musicFileList[idx][num - 1]);
+      let long = 0;
+      const firstMusic = musicList[0] - 1;
+      const testAudio = new Audio(musicFileList[0][firstMusic]);
 
-        audioList.push(audio);
-        audio.loop = false;
-        void audio.play();
+      const loadedEvent = () => {
+        loadedCount++;
+        if (loadedCount === musicFileList.length) handleAllMusic(true);
+      };
 
-        if (!long) long = idx;
-        else long = audioList[long].duration < audio.duration ? idx : long;
-      });
+      testAudio.loop = false;
+      testAudio.onloadeddata = loadedEvent;
+      testAudio
+        .play()
+        .then(() => {
+          audioList.push(testAudio);
 
-      if (long) {
-        audioList[long].onended = () => {
-          navigate("/result");
-        };
-      }
+          for (let i = 1; i < musicList.length; i++) {
+            const num = musicList[i] - 1;
+            const audio = new Audio(musicFileList[i][num]);
+
+            audioList.push(audio);
+            audio.loop = false;
+            audio.onloadeddata = loadedEvent;
+
+            long = audioList[long].duration < audio.duration ? i : long;
+          }
+
+          audioList[long].onended = () => {
+            navigate("/result");
+          };
+        })
+        .catch(() => {
+          alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 사이트에 접속해주세요.");
+          navigate("/");
+        });
     } else {
-      pauseAllMusic();
+      handleAllMusic();
     }
-  }, [musicList, pauseAllMusic, navigate]);
+  }, [musicList, handleAllMusic, navigate]);
 
   useEffect(() => {
     return () => {
-      pauseAllMusic();
+      handleAllMusic();
     };
-  }, []);
+  }, [handleAllMusic]);
 
   return (
     <Container>

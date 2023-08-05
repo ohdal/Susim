@@ -43,13 +43,13 @@ const CardLayout = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: calc(100% - 100px);
+  width: 100%;
   padding: 120px 0;
   margin: 0 auto;
 `;
 
 const QuestionImgCard = styled.img<{ $count: number }>`
-  width: calc((100% - 100px) / ${(props) => props.$count});
+  width: ${(props) => (100 - (props.$count - 1) * 2) / props.$count}%;
   cursor: pointer;
   border-radius: 10px;
   display: inline-block;
@@ -57,7 +57,7 @@ const QuestionImgCard = styled.img<{ $count: number }>`
   box-shadow: 3px 3px 0px 3px #7c7c7c;
 
   &:not(:last-child) {
-    margin-right: 20px;
+    margin-right: 2%;
   }
 
   &:hover,
@@ -76,7 +76,7 @@ const QuestionCard = styled.div<{ $count: number }>`
   transition: all 0.3s ease-out;
 
   &:not(:last-child) {
-    margin-right: 20px;
+    margin-right: 2%;
   }
 
   p {
