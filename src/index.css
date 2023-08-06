@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body,
 div#root {
@@ -10,14 +14,14 @@ div#root {
 div#root {
   background: #000000;
   color: white;
+}
 
-  * {
-    box-sizing: border-box;
-  }
+div#root * {
+  box-sizing: border-box;
+}
 
-  p, a, button, div {
-    font-family: "KoPubWorld Medium";
-  }
+div#root p, a, button, div {
+  font-family: "KoPubWorld Medium";
 }
 
 canvas {
