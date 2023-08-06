@@ -29,7 +29,7 @@ const BottomText = styled.div`
 
   p {
     margin: 0;
-    font-size: 42px;
+    font-size: 2.625rem; // 42px
     text-align: right;
 
     &.line {
@@ -65,7 +65,7 @@ export default function MusicBasic() {
       <div className="content">
         <BackgroundDiv $background={background_img_1} />
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
-        <LineDiv left={{ text: "Give me your own answer", size: 19 }} right={{ text: "08.11" }} />
+        <LineDiv left={{ text: "Give me your own answer", size: 1.188 }} right={{ text: "08.11" }} />
         <BottomText>
           <p className="line">다섯가지 질문</p>
           <p>당신의 대답</p>

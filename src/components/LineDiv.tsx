@@ -15,13 +15,13 @@ const Container = styled.div<{ $sizeL: number; $sizeR: number }>`
     z-index: 2;
 
     &.left {
-      font-size: ${(props) => props.$sizeL}px;
+      font-size: ${(props) => props.$sizeL}rem;
       left: 0;
     }
 
     &.right {
       font-family: "Libre Baskerville", serif !important;
-      font-size: ${(props) => props.$sizeR}px;
+      font-size: ${(props) => props.$sizeR}rem;
       right: 0;
     }
   }
@@ -30,7 +30,7 @@ const Container = styled.div<{ $sizeL: number; $sizeR: number }>`
 const WhiteLine = styled.hr<{ $left: number; $right: number }>`
   width: calc(100% - ${(props) => props.$left + props.$right}px);
   position: absolute;
-  top: 30%;
+  top: 50%;
   left: ${(props) => props.$left}px;
   transform: translateY(-50%);
 `;
@@ -55,7 +55,7 @@ export default function LineDiv(props: Props) {
   }, [left, right]);
 
   return (
-    <Container $sizeL={left.size || 34} $sizeR={right.size || 34}>
+    <Container $sizeL={left.size || 2.125} $sizeR={right.size || 2.125}>
       <p className="left" ref={leftRef}>
         {left.text || "Left"}
       </p>

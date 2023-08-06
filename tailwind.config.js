@@ -10,4 +10,4 @@ export default {
   },
   plugins: [],
 }
-
+// 42, 24 , 34, 19

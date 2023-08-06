@@ -83,7 +83,7 @@ const QuestionCard = styled.div<{ $count: number }>`
     margin: 0;
     color: #000000;
     font-family: "nomal" !important;
-    font-size: 42px;
+    font-size: 2.625rem; // 42px
     font-weight: bold;
     text-align: center;
     line-height: 300px;

@@ -31,8 +31,8 @@ const Container = styled.div`
       border: none;
       padding: 0;
       text-decoration: none;
-      font-size: 24px;
-      line-height: 24px;
+      font-size: 1.5rem;
+      line-height: 1;
       color: #ffffff;
     }
   }
