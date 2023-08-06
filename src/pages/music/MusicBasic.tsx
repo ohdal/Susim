@@ -21,7 +21,6 @@ const BackgroundDiv = styled.div<{ $background: string }>`
 `;
 
 const BottomText = styled.div`
-  min-width: 360px;
   position: absolute;
   bottom: 30px;
   left: 50%;
@@ -39,7 +38,7 @@ const BottomText = styled.div`
 
       &::after {
         content: "";
-        width: 100px;
+        width: 50%;
         height: 1px;
         background: #ffffff;
         position: absolute;
@@ -66,7 +65,7 @@ export default function MusicBasic() {
         <BackgroundDiv $background={background_img_1} />
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
         <LineDiv left={{ text: "Give me your own answer", size: 1.188 }} right={{ text: "08.11" }} />
-        <BottomText>
+        <BottomText className="w-1/2">
           <p className="line">다섯가지 질문</p>
           <p>당신의 대답</p>
         </BottomText>

@@ -31,13 +31,6 @@ const ContentInner = styled.div`
   z-index: 2;
 `;
 
-const LayoutCenter = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-`;
-
 const CardLayout = styled.div`
   position: absolute;
   top: 50%;
@@ -134,16 +127,18 @@ export default function MusicQuestion() {
       <BackgroundDiv $background={background_img_2} />
       <ContentInner>
         {level < 0 && (
-          <LayoutCenter>
-            <LineDiv left={{ text: "당신의 대답을 들려주세요" }} right={{ text: "0" }} />
-            <LineDiv left={{ text: "당신만의 음악으로 답해드립니다." }} right={{ text: "." }} />
-          </LayoutCenter>
+          <div className="w-full h-full flex justify-center items-center">
+            <div className="w-full">
+              <LineDiv left={{ text: "당신의 대답을 들려주세요" }} right={{ text: "0" }} />
+              <LineDiv left={{ text: "당신만의 음악으로 답해드립니다." }} right={{ text: "." }} />
+            </div>
+          </div>
         )}
         {question && (
           <>
             <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} />
             <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} />
-            <CardLayout>
+            <CardLayout className="columns-3xl">
               {question.answerList.map((answer, idx) => {
                 if (question.answerType === "text") {
                   return (
@@ -176,10 +171,12 @@ export default function MusicQuestion() {
           </>
         )}
         {level > questionList.length - 1 && (
-          <LayoutCenter>
-            <LineDiv left={{ text: "답변이 도착했습니다." }} right={{ text: "0" }} />
-            <LineDiv left={{ text: "당신의 선택으로 만들어진 곡입니다." }} right={{ text: "." }} />
-          </LayoutCenter>
+          <div className="w-full h-full flex justify-center items-center">
+            <div className="w-full">
+              <LineDiv left={{ text: "답변이 도착했습니다." }} right={{ text: "0" }} />
+              <LineDiv left={{ text: "당신의 선택으로 만들어진 곡입니다." }} right={{ text: "." }} />
+            </div>
+          </div>
         )}
         {level < questionList.length && (
           <div className="footer">

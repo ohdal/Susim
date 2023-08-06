@@ -31,7 +31,7 @@ export default function MusicResult() {
         <BackgroundDiv $background={background_img_1} />
         <LineDiv left={{ text: "5 questioins." }} right={{ text: "08.07" }} />
         <LineDiv left={{ text: "Give me your own answer", size: 1 }} right={{ text: "08.11" }} />
-        <BottomText>
+        <BottomText className="w-full">
           <LineDiv left={{ text: "답변이 끝났습니다." }} right={{ text: "0" }} />
           <LineDiv left={{ text: "수심 적기를 정리하고 부스 밖으로 나와주세요." }} right={{ text: "." }} />
         </BottomText>

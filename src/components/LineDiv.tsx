@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div<{ $sizeL: number; $sizeR: number }>`
   position: relative;
-  width: 800px;
-  min-height: 48px;
   margin: 0 auto;
 
   p {
@@ -29,10 +27,7 @@ const Container = styled.div<{ $sizeL: number; $sizeR: number }>`
 
 const WhiteLine = styled.hr<{ $left: number; $right: number }>`
   width: calc(100% - ${(props) => props.$left + props.$right}px);
-  position: absolute;
-  top: 50%;
-  left: ${(props) => props.$left}px;
-  transform: translateY(-50%);
+  transform: translateX(${(props) => props.$left}px);
 `;
 
 type Props = {
@@ -46,16 +41,24 @@ export default function LineDiv(props: Props) {
   const rightRef = useRef<HTMLParagraphElement | null>(null);
   const [lineWidth, setLineWidth] = useState<{ left: number; right: number } | null>(null);
 
-  useEffect(() => {
+  const handleResize = useCallback(() => {
     if (leftRef.current && rightRef.current) {
       const left = leftRef.current.clientWidth;
       const right = rightRef.current.clientWidth;
       setLineWidth({ left, right });
     }
-  }, [left, right]);
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+  }, [handleResize, left, right]);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+  }, [handleResize]);
 
   return (
-    <Container $sizeL={left.size || 2.125} $sizeR={right.size || 2.125}>
+    <Container className="w-4/5 h-12 flex items-center" $sizeL={left.size || 2.125} $sizeR={right.size || 2.125}>
       <p className="left" ref={leftRef}>
         {left.text || "Left"}
       </p>
