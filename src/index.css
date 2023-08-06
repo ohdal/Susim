@@ -1,3 +1,4 @@
+@import "./assets/css/_breakpoints.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,7 +21,10 @@ div#root * {
   box-sizing: border-box;
 }
 
-div#root p, a, button, div {
+div#root p,
+a,
+button,
+div {
   font-family: "KoPubWorld Medium";
 }
 
