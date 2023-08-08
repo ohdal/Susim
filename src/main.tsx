@@ -73,5 +73,6 @@ const routerTemp = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <RouterProvider router={routerTemp} />
+    {/* <RouterProvider router={router} /> */}
   </React.StrictMode>
 );

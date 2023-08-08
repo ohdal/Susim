@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { Link, useOutletContext } from "react-router-dom";
-import { ContextType } from "../../layouts/MusicLayout";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import background_img_1 from "../../assets/images/background_1.png";
@@ -51,14 +49,6 @@ const BottomText = styled.div`
 `;
 
 export default function MusicBasic() {
-  const { handleMusicList } = useOutletContext<ContextType>();
-
-  useEffect(() => {
-    return () => {
-      handleMusicList(null);
-    };
-  }, [handleMusicList]);
-
   return (
     <>
       <div className="content">

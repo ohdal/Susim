@@ -122,6 +122,10 @@ export default function MusicQuestion() {
     }
   }, [level, handleMusicList]);
 
+  useEffect(() => {
+    handleMusicList(null);
+  }, [handleMusicList])
+
   return (
     <div className="content">
       <BackgroundDiv $background={background_img_2} />
