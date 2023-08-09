@@ -66,25 +66,28 @@ export default function MusicLayout() {
     }
   }, []);
 
+  const loadedEvent = useCallback(() => {
+    loadedCount++;
+    if (loadedCount === musicFileList.length) {
+      console.log("all loaded", audioList);
+      handleAllMusic(true);
+    }
+  }, [handleAllMusic]);
+
   useEffect(() => {
     if (musicList) {
+      console.log("musicList", musicList);
       let long = 0;
       const firstMusic = musicList[0] - 1;
       const testAudio = new Audio(musicFileList[0][firstMusic]);
 
-      const loadedEvent = () => {
-        loadedCount++;
-        if (loadedCount === musicFileList.length) handleAllMusic(true);
-      };
-
       testAudio.loop = false;
-      testAudio.onloadeddata = loadedEvent;
       testAudio
         .play()
         .then(() => {
-          audioList.push(testAudio);
+          testAudio.pause();
 
-          for (let i = 1; i < musicList.length; i++) {
+          for (let i = 0; i < musicList.length; i++) {
             const num = musicList[i] - 1;
             const audio = new Audio(musicFileList[i][num]);
 
@@ -106,7 +109,7 @@ export default function MusicLayout() {
     } else {
       handleAllMusic();
     }
-  }, [musicList, handleAllMusic, navigate]);
+  }, [musicList, loadedEvent, handleAllMusic, navigate]);
 
   useEffect(() => {
     return () => {
