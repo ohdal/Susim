@@ -1,40 +1,47 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import LinearDataCanvas from "../components/linearDataCanvas";
+
+// const AudioContext = window.AudioContext || window.webkitAudioContext;
+const AudioContext = window.AudioContext;
+let audioCtx: AudioContext;
+let bufferLength: number;
+let dataArray: Uint8Array;
 
 export default function MainPage() {
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const navigate = useNavigate();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioSource, setAudioSource] = useState<MediaElementAudioSourceNode | null>(null);
+
+  const getDomainData = useCallback(() => {
+    if (analyser) analyser.getByteTimeDomainData(dataArray);
+
+    return { bufferLength, dataArray };
+  }, [analyser]);
 
   const getMediaStream = useCallback(async () => {
-    // const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const AudioContext = window.AudioContext;
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    let mediaStream = null;
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
-    // 마이크 MediaStream 취득(audio를 true로 설정)
     try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (audioRef.current && mediaStream) {
-        // 마이크에서 입력받은 MediaStream으로 오디오 재생
-        audioRef.current.srcObject = mediaStream;
-        void audioRef.current.play();
+      // https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        // stricmode 때문에 에러 발생함 - connet가 이미 되어있다는 내용
-        if(!audioSource) {
-          const source = audioContext.createMediaElementSource(audioRef.current);
-          source.connect(analyser);
-          setAudioSource(source);
-        }
+      if (mediaStream) {
+        console.log("success get mediastream");
+        audioCtx = new AudioContext();
+
+        const analyser = audioCtx.createAnalyser();
+        setAnalyser(analyser);
+
+        analyser.fftSize = 2048;
+        bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        analyser.getByteTimeDomainData(dataArray);
+
+        const source = audioCtx.createMediaStreamSource(mediaStream);
+        source.connect(analyser);
       }
-
-      /* use the stream */
     } catch (err) {
-      console.error(`에러 발생: ${String(err)}`);
+      console.log(`에러발생 ${err as string}`);
     }
-  }, [audioSource]);
+  }, []);
 
   useEffect(() => {
     void getMediaStream();
@@ -42,15 +49,14 @@ export default function MainPage() {
 
   return (
     <div>
-      <br />
-      <audio ref={audioRef}></audio>
-      <button
+      {/* <button
         onClick={() => {
           navigate("/archive");
         }}
       >
-        Go ArchivePage
-      </button>
+        Go Archive
+      </button> */}
+      {analyser && <LinearDataCanvas getDomainData={getDomainData} />}
     </div>
   );
 }
