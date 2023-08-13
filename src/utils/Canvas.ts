@@ -1,3 +1,5 @@
+type animationType = () => boolean | void
+
 export default class Canvas {
   public element: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D | null;
@@ -37,7 +39,7 @@ export default class Canvas {
     this.ctx?.scale(this.dpr, this.dpr);
   }
 
-  public animate(anim: () => boolean): void {
+  public animate(anim: animationType): void {
     this.requestId = window.requestAnimationFrame(() => {
       this.animate(anim);
     });
@@ -48,11 +50,11 @@ export default class Canvas {
 
     this.clearCanvas();
     const result = anim();
-    console.log('inin', result)
+    // console.log('animate', result)
 
     this.then = this.now - (this.delta % this.interval);
 
-    if (!result) cancelAnimationFrame(this.requestId);
+    if (result !== undefined && !result) cancelAnimationFrame(this.requestId);
   }
 
   public clearCanvas(): void {
