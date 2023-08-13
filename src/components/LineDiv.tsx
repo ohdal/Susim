@@ -2,32 +2,25 @@ import { useEffect, useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div<{ $sizeL: number; $sizeR: number }>`
-  position: relative;
+  padding: 0 10px;
   margin: 0 auto;
 
   p {
-    position: absolute;
-    padding: 0 10px;
-    margin: 0;
-    line-height: 48px;
     z-index: 2;
 
     &.left {
       font-size: ${(props) => props.$sizeL}rem;
-      left: 0;
     }
 
     &.right {
       font-family: "Libre Baskerville", serif !important;
       font-size: ${(props) => props.$sizeR}rem;
-      right: 0;
     }
   }
 `;
 
 const WhiteLine = styled.hr<{ $left: number; $right: number }>`
-  width: calc(100% - ${(props) => props.$left + props.$right}px);
-  transform: translateX(${(props) => props.$left}px);
+  width: calc(100% - ${(props) => props.$left + props.$right + 30}px);
 `;
 
 type Props = {
@@ -58,7 +51,11 @@ export default function LineDiv(props: Props) {
   }, [handleResize]);
 
   return (
-    <Container className="w-4/5 h-12 flex items-center" $sizeL={left.size || 2.125} $sizeR={right.size || 2.125}>
+    <Container
+      className="w-4/5 h-12 flex items-center justify-between flex-row"
+      $sizeL={left.size || 2.125}
+      $sizeR={right.size || 2.125}
+    >
       <p className="left" ref={leftRef}>
         {left.text || "Left"}
       </p>
