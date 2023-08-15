@@ -7,72 +7,72 @@ import MusicLayout from "./layouts/MusicLayout";
 import MusicBasic from "./pages/music/MusicBasic";
 import MusicQuestion from "./pages/music/MusicQuestion";
 import MusicResult from "./pages/music/MusicResult";
-// import IntroPage from "./pages/IntroPage";
-// import MainPage from "./pages/MainPage";
-// import ArchivePage from "./pages/ArchivePage";
+import IntroPage from "./pages/IntroPage";
+import MainPage from "./pages/MainPage";
+import ArchivePage from "./pages/ArchivePage";
 
-const routerTemp = createBrowserRouter(
-  [
-    {
-      path: "/",
-      element: <MusicLayout />,
-      children: [
-        {
-          path: "",
-          element: <MusicBasic />,
-        },
-        {
-          path: "question",
-          element: <MusicQuestion />,
-        },
-        {
-          path: "result",
-          element: <MusicResult />,
-        },
-      ],
-    },
-  ],
+// const routerTemp = createBrowserRouter(
+//   [
+//     {
+//       path: "/",
+//       element: <MusicLayout />,
+//       children: [
+//         {
+//           path: "",
+//           element: <MusicBasic />,
+//         },
+//         {
+//           path: "question",
+//           element: <MusicQuestion />,
+//         },
+//         {
+//           path: "result",
+//           element: <MusicResult />,
+//         },
+//       ],
+//     },
+//   ],
+//   {
+//     basename: "/Susim",
+//   }
+// );
+
+const router = createBrowserRouter([
   {
-    basename: "/Susim",
-  }
-);
-
-// const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <IntroPage />,
-//   },
-//   {
-//     path: "/main",
-//     element: <MainPage />,
-//   },
-//   {
-//     path: "/archive",
-//     element: <ArchivePage />,
-//   },
-//   {
-//     path: "/music",
-//     element: <MusicLayout />,
-//     children: [
-//       {
-//         path: "",
-//         element: <MusicBasic />,
-//       },
-//       {
-//         path: "question",
-//         element: <MusicQuestion />,
-//       },
-//       {
-//         path: "result",
-//         element: <MusicResult />,
-//       },
-//     ],
-//   },
-// ]);
+    path: "/",
+    element: <IntroPage />,
+  },
+  {
+    path: "/main",
+    element: <MainPage />,
+  },
+  {
+    path: "/archive",
+    element: <ArchivePage />,
+  },
+  {
+    path: "/music",
+    element: <MusicLayout />,
+    children: [
+      {
+        path: "",
+        element: <MusicBasic />,
+      },
+      {
+        path: "question",
+        element: <MusicQuestion />,
+      },
+      {
+        path: "result",
+        element: <MusicResult />,
+      },
+    ],
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={routerTemp} />
-    {/* <RouterProvider router={router} /> */}
+    {/* <RouterProvider router={routerTemp} /> */}
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

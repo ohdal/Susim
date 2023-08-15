@@ -163,14 +163,15 @@ export default function ScatterCanvas(props: Props) {
     let met;
     let maxWidth = 0;
     let lineHeight = 0;
+    ctx.font = `${fontSize}px KoPubWorld Medium`;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
     for (let i = 0; i < text.length; i++) {
-      ctx.font = `${fontSize}px KoPubWorld Medium`;
-      ctx.fillStyle = "#FFFFFF";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
       ctx.fillText(text[i], x, y + fontSize * i + lineHeight);
       lineHeight += LINE_VALUE;
-      
+
       met = ctx.measureText(text[i]);
       if (!maxWidth) maxWidth = met.width;
       else if (maxWidth < met.width) maxWidth = met.width;

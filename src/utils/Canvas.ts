@@ -18,7 +18,9 @@ export default class Canvas {
     this.ctx = this.element.getContext("2d");
     this.CANVAS_WIDTH = innerWidth;
     this.CANVAS_HEIGHT = innerHeight;
-    this.dpr = window.devicePixelRatio;
+
+    const ratio = window.devicePixelRatio;
+    this.dpr = ratio > 2 ? 2: ratio;
 
     this.interval = 1000 / 10;
     this.now = Date.now();
