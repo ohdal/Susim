@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getRandomInt } from "../utils";
 import Canvas from "../utils/Canvas";
 import styled from "styled-components";
+import font_ttf from "../assets/fonts/KoPubWorld_Batang_Pro_Medium.ttf";
 
 // import text_img from "../assets/text_test.png";
 
@@ -14,7 +15,6 @@ const PointerDiv = styled.div<{ $width: number; $height: number }>`
   width: ${(props) => props.$width}px;
   height: ${(props) => props.$height}px;
   cursor: pointer;
-  // background: rgba(201, 131, 131, 0.5);
   background: rgba(255, 255, 255, 0);
 `;
 
@@ -119,28 +119,15 @@ export default function ScatterCanvas(props: Props) {
     [canvas]
   );
 
-  const drawText = useCallback(() => {
-    if (!canvas) return;
-
-    const LINE_VALUE = 5; // 줄 간격 값 5px
-    const ctx = canvas.ctx as CanvasRenderingContext2D;
-    const totalHeight = text.length * fontSize + (LINE_VALUE * text.length - 1);
-    const spacing = canvas.dpr * text.length;
-    const x = canvas.CANVAS_WIDTH / 2;
-    const y = (canvas.CANVAS_HEIGHT - totalHeight) / 2 + spacing;
-
+  const drawImage = useCallback(() => {
     // const img: HTMLImageElement = new Image();
     // img.src = text_img;
-
     // const imgX = x - img.width / 2;
     // const imgY = y - img.height / 2;
     // let imgData = null;
-
     // img.onload = () => {
     //   ctx.drawImage(img, imgX, imgY);
-
     //   const imgData = ctx.getImageData(imgX * 2, imgY * 2, img.width * 2, img.height * 2);
-
     //   console.log(img.width)
     // const obj: { [key: string]: number } = {};
     // ctx.beginPath();
@@ -155,29 +142,49 @@ export default function ScatterCanvas(props: Props) {
     // obj[key]++;
     // }
     // ctx.closePath();
-
     // console.log(obj);
     // ctx.putImageData(imgData, 100, 100);
     // };
+  }, []);
+
+  const drawText = useCallback(() => {
+    if (!canvas) return;
+
+    const LINE_VALUE = 5; // 줄 간격 값 5px
+    const ctx = canvas.ctx as CanvasRenderingContext2D;
+    const totalHeight = text.length * fontSize + (LINE_VALUE * text.length - 1);
+    const spacing = canvas.dpr * text.length;
+    const x = canvas.CANVAS_WIDTH / 2;
+    const y = (canvas.CANVAS_HEIGHT - totalHeight) / 2 + spacing;
 
     let met;
     let maxWidth = 0;
     let lineHeight = 0;
-    ctx.font = `${fontSize}px KoPubWorld Medium`;
-    ctx.fillStyle = "#FFFFFF";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
 
-    for (let i = 0; i < text.length; i++) {
-      ctx.fillText(text[i], x, y + fontSize * i + lineHeight);
-      lineHeight += LINE_VALUE;
+    const fontFile = new FontFace("KoPubWorld Medium", `url(${font_ttf}) format("truetype")`);
+    document.fonts.add(fontFile);
+    fontFile
+      .load()
+      .then(() => {
+        ctx.font = `${fontSize}px KoPubWorld Medium`;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
 
-      met = ctx.measureText(text[i]);
-      if (!maxWidth) maxWidth = met.width;
-      else if (maxWidth < met.width) maxWidth = met.width;
-    }
+        for (let i = 0; i < text.length; i++) {
+          ctx.fillText(text[i], x, y + fontSize * i + lineHeight);
+          lineHeight += LINE_VALUE;
 
-    setPointerDiv({ width: maxWidth, height: totalHeight });
+          met = ctx.measureText(text[i]);
+          if (!maxWidth) maxWidth = met.width;
+          else if (maxWidth < met.width) maxWidth = met.width;
+        }
+
+        setPointerDiv({ width: maxWidth, height: totalHeight });
+      })
+      .catch((err: string) => {
+        console.log(`font 에러 발생: ${err}`);
+      });
   }, [canvas, text]);
 
   const animation = useCallback(
