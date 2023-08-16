@@ -53,3 +53,10 @@ export const musicFileList = [
   [music.Q4_1, music.Q4_2, music.Q4_3, music.Q4_4, music.Q4_5, music.Q4_6],
   [music.Q5_1, music.Q5_2, music.Q5_3, music.Q5_4, music.Q5_5, music.Q5_6],
 ];
+
+export const canvasFontSize = {
+  sm: 14,
+  md: 20,
+  lg: 26,
+  xl: 32,
+}

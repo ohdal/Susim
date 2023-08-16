@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getRandomInt } from "../utils";
 import Canvas from "../utils/Canvas";
 import styled from "styled-components";
+
+import { canvasFontSize } from "../constant/Data";
 import font_ttf from "../assets/fonts/KoPubWorld_Batang_Pro_Medium.ttf";
 
 // import text_img from "../assets/text_test.png";
@@ -75,7 +77,6 @@ class Particle {
 }
 
 const particles: { [key: string]: Particle } = {};
-const fontSize = 32;
 export default function ScatterCanvas(props: Props) {
   const { text } = props;
   const navigate = useNavigate();
@@ -83,6 +84,20 @@ export default function ScatterCanvas(props: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [pointerDiv, setPointerDiv] = useState<PointerDiv | null>(null);
+
+  const getFontSize = useCallback((width: number) => {
+    if (width > 1200) {
+      return canvasFontSize["xl"];
+    } else if (width > 992) {
+      return canvasFontSize["lg"];
+    } else if (width > 768) {
+      return canvasFontSize["md"];
+    } else if (width > 576) {
+      return canvasFontSize["sm"];
+    } else {
+      return 12;
+    }
+  }, []);
 
   const createParticle = useCallback(
     (textInfo: PointerDiv, xPos: number, yPos: number) => {
@@ -150,9 +165,10 @@ export default function ScatterCanvas(props: Props) {
   const drawText = useCallback(() => {
     if (!canvas) return;
 
+    const FONT_SIZE = getFontSize(canvas.CANVAS_WIDTH);
     const LINE_VALUE = 5; // 줄 간격 값 5px
     const ctx = canvas.ctx as CanvasRenderingContext2D;
-    const totalHeight = text.length * fontSize + (LINE_VALUE * text.length - 1);
+    const totalHeight = text.length * FONT_SIZE + (LINE_VALUE * text.length - 1);
     const spacing = canvas.dpr * text.length;
     const x = canvas.CANVAS_WIDTH / 2;
     const y = (canvas.CANVAS_HEIGHT - totalHeight) / 2 + spacing;
@@ -166,13 +182,13 @@ export default function ScatterCanvas(props: Props) {
     fontFile
       .load()
       .then(() => {
-        ctx.font = `${fontSize}px KoPubWorld Medium`;
+        ctx.font = `${FONT_SIZE}px KoPubWorld Medium`;
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
         for (let i = 0; i < text.length; i++) {
-          ctx.fillText(text[i], x, y + fontSize * i + lineHeight);
+          ctx.fillText(text[i], x, y + FONT_SIZE * i + lineHeight);
           lineHeight += LINE_VALUE;
 
           met = ctx.measureText(text[i]);
@@ -185,7 +201,7 @@ export default function ScatterCanvas(props: Props) {
       .catch((err: string) => {
         console.log(`font 에러 발생: ${err}`);
       });
-  }, [canvas, text]);
+  }, [canvas, text, getFontSize]);
 
   const animation = useCallback(
     (isFirst: boolean, x?: number, y?: number): boolean => {
