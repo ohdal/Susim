@@ -2,6 +2,8 @@ import { useRef, useEffect, useState, useCallback, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { getRandomInt } from "../utils";
 import Canvas from "../utils/Canvas";
+import Vector from "../utils/Vector";
+import Mouse from "../utils/Mouse";
 import styled from "styled-components";
 
 import { canvasFontSize } from "../constant/Data";
@@ -30,53 +32,74 @@ type PointerDiv = {
 };
 
 class Particle {
-  private x: number;
-  private y: number;
+  private pos: Vector;
   private firstPosX: number;
   private firstPosY: number;
   private friction: number;
   public speed: number;
   public opacity: number;
   private ctx: CanvasRenderingContext2D;
+  public isTouched: boolean;
 
   constructor(x: number, y: number, opacity: number, ctx: CanvasRenderingContext2D) {
-    const r = getRandomInt(0, 1);
+    const r = getRandomInt(0, 0.5);
     const angle = (Math.PI / 180) * getRandomInt(0, 360);
 
-    this.x = x;
-    this.y = y;
+    this.pos = new Vector(x, y);
     this.firstPosX = r * Math.cos(angle);
     this.firstPosY = r * Math.sin(angle);
-    this.speed = 1;
+    this.speed = 0.95;
     this.friction = 0.9;
 
     this.opacity = opacity;
     this.ctx = ctx;
+    this.isTouched = false;
   }
 
   firstUpdate(): void {
-    this.x += this.firstPosX * this.speed;
-    this.y += this.firstPosY * this.speed;
+    this.pos.x += this.firstPosX * this.speed;
+    this.pos.y += this.firstPosY * this.speed;
 
     this.speed *= this.friction;
-    this.opacity -= 0.025;
   }
 
-  update(): void {
-    this.opacity -= 0.02;
+  update(mouse: Mouse): void {
+    const dist = this.pos.dist(mouse.pos);
+
+    if (this.isTouched) this.opacity -= 0.005;
+
+    if (dist > 15) return;
+
+    const { x: dx_m, y: dy_m } = Vector.sub(mouse.pos, mouse.oldPos);
+    const { x: dx_c, y: dy_c } = Vector.sub(mouse.pos, this.pos);
+
+    const dist_m = Math.sqrt(dx_m * dx_m + dy_m * dy_m); // 이전 마우스 위치와의 거리 구하기
+    const dist_c = Math.sqrt(dx_c * dx_c + dy_c * dy_c); // 현재 파티클 위치와 마우스의 위치와의 거리 구하기
+
+    const direction_m = new Vector(dx_m / dist_m, dy_m / dist_m); // 방향 벡터 구하기 - 마우스 방향대로 밀리는
+    const direction_c = new Vector(dx_c / dist_c, dy_c / dist_c); // 방향 벡터 구하기 - 마우스 위치에서 떨어져서 미리는
+
+    // direction_c - 마우스 포인터 위치에서 떨어지게끔 밀려야하므로 마이너스 값을 곱해준다.
+    const add_Vector = Vector.add(direction_m.mult(10), direction_c.mult(-5));
+    this.pos.add(add_Vector.x, add_Vector.y);
+
+    if (!this.isTouched) this.isTouched = true;
+  }
+
+  test() {
+    this.opacity -= 0.03;
   }
 
   draw() {
     this.ctx.beginPath();
     this.ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-    // this.ctx.arc(this.x, this.y, 1, 0, (Math.PI / 180) * 360);
-    // this.ctx.fill();
-    this.ctx.fillRect(this.x, this.y, 1, 1);
+    this.ctx.fillRect(this.pos.x, this.pos.y, 1, 1);
     this.ctx.closePath();
   }
 }
 
 const particles: { [key: string]: Particle } = {};
+let firstLength = 0;
 export default function ScatterCanvas(props: Props) {
   const { text } = props;
   const navigate = useNavigate();
@@ -84,6 +107,7 @@ export default function ScatterCanvas(props: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [pointerDiv, setPointerDiv] = useState<PointerDiv | null>(null);
+  const [mouse, setMouse] = useState<Mouse | null>(null);
 
   const getFontSize = useCallback((width: number) => {
     if (width > 1200) {
@@ -103,8 +127,6 @@ export default function ScatterCanvas(props: Props) {
     (textInfo: PointerDiv, xPos: number, yPos: number) => {
       if (!canvas || !canvas.ctx) return;
 
-      // particles = {};
-
       const ctx = canvas.ctx;
       const dpr = canvas.dpr;
       const met = textInfo;
@@ -115,7 +137,7 @@ export default function ScatterCanvas(props: Props) {
       canvas.clearCanvas();
 
       let count = 0;
-      for (let i = 0; i < imgData.data.length; i += 8) {
+      for (let i = 0; i < imgData.data.length; i += 4 * dpr) {
         count++;
 
         if (imgData.data[i + 3] !== 0) {
@@ -129,38 +151,10 @@ export default function ScatterCanvas(props: Props) {
         }
       }
 
-      console.log(particles);
+      firstLength = Object.keys(particles).length;
     },
     [canvas]
   );
-
-  const drawImage = useCallback(() => {
-    // const img: HTMLImageElement = new Image();
-    // img.src = text_img;
-    // const imgX = x - img.width / 2;
-    // const imgY = y - img.height / 2;
-    // let imgData = null;
-    // img.onload = () => {
-    //   ctx.drawImage(img, imgX, imgY);
-    //   const imgData = ctx.getImageData(imgX * 2, imgY * 2, img.width * 2, img.height * 2);
-    //   console.log(img.width)
-    // const obj: { [key: string]: number } = {};
-    // ctx.beginPath();
-    // for (let i = 0; i < imgData.data.length; i += 4) {
-    // if (imgData.data[i + 0] !== 0) {
-    // ctx.fillStyle = `rgba(255, 255, 255, ${(imgData.data[i + 3] / 255) * 100})`;
-    // ctx.arc((i % img.width) * 2, Math.floor((i / img.width) * 2), 1, 0, (Math.PI / 180) * 360);
-    // ctx.fill();
-    // }
-    // const key: string = imgData.data[i].toString();
-    // if (!obj[key]) obj[key] = 0;
-    // obj[key]++;
-    // }
-    // ctx.closePath();
-    // console.log(obj);
-    // ctx.putImageData(imgData, 100, 100);
-    // };
-  }, []);
 
   const drawText = useCallback(() => {
     if (!canvas) return;
@@ -204,74 +198,52 @@ export default function ScatterCanvas(props: Props) {
   }, [canvas, text, getFontSize]);
 
   const animation = useCallback(
-    (isFirst: boolean, x?: number, y?: number): boolean => {
-      if (Object.keys(particles).length === 0) {
+    (isFirst: boolean): void => {
+      const length = Object.keys(particles).length;
+      if (firstLength / 2 > length) {
         navigate("/main");
-        return false;
       }
 
       for (const [key, value] of Object.entries(particles)) {
         if (isFirst) {
           value.draw();
           value.firstUpdate();
-
-          if (value.opacity <= 0) {
-            delete particles[key];
-          }
-          // if (value.speed <= 0.001) {
-          //   navigate("/main");
-          //   return false;
-          // }
         } else {
-          if (!x || !y) return false;
+          if (!mouse) return;
+
           value.draw();
+          value.update(mouse);
 
-          const coord = `${x}-${y}`;
-          const particle = particles[coord];
-
-          if (particle) {
-            console.log(particle);
-            for (let i = 0; i < 5; i++) {
-              const coord = `${x - i}-${y - i}`;
-              const coord2 = `${x + i}-${y + i}`;
-              const other = particles[coord];
-              const other2 = particles[coord2];
-
-              if (other) other.update();
-              if (other2) other2.update();
-            }
-          } else {
-            return false;
-          }
+          if (value.opacity <= 0) delete particles[key];
         }
       }
-
-      return true;
     },
-    [navigate]
+    [navigate, mouse]
   );
 
-  const handleCanvas = useCallback(
-    (e: MouseEvent<HTMLCanvasElement>) => {
-      if (!canvas) return;
-
-      console.log(e.clientX, e.clientY);
-
-      // canvas.animate(() => {
-      //   return animation(false, e.clientX, e.clientY);
-      // });
-    },
-    [canvas, animation]
-  );
-
-  const handlePointerDiv = useCallback(() => {
+  const onMouseDownPointerDiv = useCallback(() => {
     if (!canvas || !pointerDiv) return;
 
     const x = canvas.CANVAS_WIDTH / 2;
     const y = (canvas.CANVAS_HEIGHT - pointerDiv.height) / 2;
     createParticle(pointerDiv, x, y);
-    // setPointerDiv(null);
   }, [canvas, pointerDiv, createParticle]);
+
+  const onMouseUpPointerDiv = useCallback(() => {
+    if (!canvas) return;
+
+    canvas.animate(() => {
+      return animation(true);
+    });
+    setTimeout(() => {
+      canvas.cancelAnimation();
+      canvas.animate(() => {
+        animation(false);
+      });
+    }, 1500);
+
+    setPointerDiv(null);
+  }, [canvas, animation]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -279,6 +251,8 @@ export default function ScatterCanvas(props: Props) {
     drawText();
 
     window.addEventListener("resize", () => {
+      if (firstLength !== 0) return;
+      
       canvas.init();
       drawText();
     });
@@ -290,18 +264,19 @@ export default function ScatterCanvas(props: Props) {
     }
   }, []);
 
+  useEffect(() => {
+    if (!canvas) return;
+
+    setMouse(new Mouse(canvas));
+  }, [canvas]);
+
   return (
     <>
-      <canvas ref={canvasRef} onClick={handleCanvas}></canvas>
+      <canvas ref={canvasRef}></canvas>
       {pointerDiv && (
         <PointerDiv
-          onMouseDown={handlePointerDiv}
-          onMouseUp={() => {
-            canvas?.animate(() => {
-              return animation(true);
-            });
-            setPointerDiv(null);
-          }}
+          onMouseDown={onMouseDownPointerDiv}
+          onMouseUp={onMouseUpPointerDiv}
           $width={pointerDiv.width}
           $height={pointerDiv.height}
         />

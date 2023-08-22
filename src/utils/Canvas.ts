@@ -1,4 +1,4 @@
-type animationType = () => boolean | void
+type animationType = () => boolean | void;
 
 export default class Canvas {
   public element: HTMLCanvasElement;
@@ -20,7 +20,7 @@ export default class Canvas {
     this.CANVAS_HEIGHT = innerHeight;
 
     const ratio = window.devicePixelRatio;
-    this.dpr = ratio > 2 ? 2: ratio;
+    this.dpr = ratio > 2 ? 2 : ratio;
 
     this.interval = 1000 / 10;
     this.now = Date.now();
@@ -51,12 +51,13 @@ export default class Canvas {
     if (this.delta < this.interval) return;
 
     this.clearCanvas();
-    const result = anim();
-    // console.log('animate', result)
+    anim();
 
     this.then = this.now - (this.delta % this.interval);
+  }
 
-    if (result !== undefined && !result) cancelAnimationFrame(this.requestId);
+  public cancelAnimation(): void {
+    if (this.requestId) cancelAnimationFrame(this.requestId);
   }
 
   public clearCanvas(): void {
