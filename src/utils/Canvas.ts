@@ -7,6 +7,7 @@ export default class Canvas {
   public CANVAS_HEIGHT: number;
   public readonly dpr: number;
 
+  private frame: number;
   private interval: number;
   private now: number;
   private delta: number;
@@ -22,7 +23,8 @@ export default class Canvas {
     const ratio = window.devicePixelRatio;
     this.dpr = ratio > 2 ? 2 : ratio;
 
-    this.interval = 1000 / 10;
+    this.frame = 10;
+    this.interval = 1000 / this.frame;
     this.now = Date.now();
     this.delta = 0;
     this.then = 0;
@@ -62,5 +64,10 @@ export default class Canvas {
 
   public clearCanvas(): void {
     this.ctx?.clearRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+  }
+
+  public setFrame(v: number): void {
+    this.frame = v;
+    this.interval = 1000 / v;
   }
 }
