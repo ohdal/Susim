@@ -36,6 +36,7 @@ class Particle {
   private firstPosX: number;
   private firstPosY: number;
   private friction: number;
+  private radius: number;
   public speed: number;
   public opacity: number;
   private ctx: CanvasRenderingContext2D;
@@ -48,6 +49,7 @@ class Particle {
     this.pos = new Vector(x, y);
     this.firstPosX = r * Math.cos(angle);
     this.firstPosY = r * Math.sin(angle);
+    this.radius = 20;
     this.speed = 0.95;
     this.friction = 0.9;
 
@@ -68,7 +70,7 @@ class Particle {
 
     if (this.isTouched) this.opacity -= 0.005;
 
-    if (dist > 15) return;
+    if (dist > this.radius) return;
 
     const { x: dx_m, y: dy_m } = Vector.sub(mouse.pos, mouse.oldPos);
     const { x: dx_c, y: dy_c } = Vector.sub(mouse.pos, this.pos);
@@ -98,7 +100,7 @@ class Particle {
   }
 }
 
-const particles: { [key: string]: Particle } = {};
+const particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
 let firstLength = 0;
 export default function ScatterCanvas(props: Props) {
   const { text } = props;
@@ -214,6 +216,7 @@ export default function ScatterCanvas(props: Props) {
           value.draw();
           value.update(mouse);
 
+          // if (value.opacity <= 0.2) delete particles[key];
           if (value.opacity <= 0) delete particles[key];
         }
       }
@@ -248,11 +251,12 @@ export default function ScatterCanvas(props: Props) {
   useEffect(() => {
     if (!canvas) return;
     canvas.init();
+    canvas.setFrame(15);
     drawText();
 
     window.addEventListener("resize", () => {
       if (firstLength !== 0) return;
-      
+
       canvas.init();
       drawText();
     });
@@ -268,6 +272,10 @@ export default function ScatterCanvas(props: Props) {
     if (!canvas) return;
 
     setMouse(new Mouse(canvas));
+
+    return () => {
+      canvas.cancelAnimation();
+    };
   }, [canvas]);
 
   return (
