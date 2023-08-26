@@ -1,10 +1,14 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
 import { getRandomNum } from "../utils";
 import Canvas from "../utils/Canvas";
 
 type Props = {
   getDomainData: () => { bufferLength: number; dataArray: Uint8Array };
 };
+
+export interface LinearDataCanvasHandle {
+  stopAnimation: () => void;
+}
 
 type dotDataType = { x: number; y: number };
 type dotGroupType = dotDataType[];
@@ -66,22 +70,35 @@ class Queue {
 let queue: Queue | null = null;
 let lineArr: lineType = [];
 const lineInfoArr: lineInfoType[] = [
+  { yPos: -122 },
   { yPos: -92 },
-  { yPos: -82 },
   { yPos: 0 },
   { yPos: 10, per: 66, particle: 5, large: true },
-  { yPos: 30, per: 60, particle: 4, large: true },
-  { yPos: 40, per: 55, particle: 3, large: true },
-  { yPos: 70, per: 50, large: true },
+  { yPos: 30, per: 60, particle: 5, large: true },
+  { yPos: 40, per: 55, particle: 5, large: true },
+  { yPos: 70, per: 50, particle: 4, large: true },
   { yPos: 100, per: 40 },
   { yPos: 130, per: 40 },
   { yPos: 200, per: 20 },
-  { yPos: 220, per: 10 },
+  { yPos: 240, per: 10, large: true },
 ];
-export default function LinearDataCanvas(props: Props) {
+
+const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) => {
   const { getDomainData } = props;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    stopAnimation,
+  }));
+
+  const stopAnimation = useCallback((): void => {
+    if (!canvas) return;
+
+    canvas.cancelAnimation();
+    lineArr = [];
+    queue = null;
+  }, [canvas]);
 
   const saveDot = useCallback((arr: dotGroupType, data: dotDataType, info: lineInfoType) => {
     const { yPos, per, particle, large } = info;
@@ -195,12 +212,8 @@ export default function LinearDataCanvas(props: Props) {
       canvas.init();
     });
 
-    return () => {
-      canvas.cancelAnimation();
-      lineArr = [];
-      queue = null;
-    };
-  }, [canvas, draw]);
+    return stopAnimation;
+  }, [canvas, draw, stopAnimation]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -208,5 +221,7 @@ export default function LinearDataCanvas(props: Props) {
     }
   }, []);
 
-  return <canvas ref={canvasRef} />;
-}
+  return <canvas style={{ zIndex: 0 }} ref={canvasRef} />;
+});
+
+export default LinearDataCanvas;
