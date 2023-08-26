@@ -11,7 +11,7 @@ const AnimationDiv = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  transition: all 3s ease-out;
+  transition: all 1.5s ease-out;
 `;
 
 const MyTextarea = styled.textarea`
@@ -131,6 +131,20 @@ export default function MainPage() {
         setIsLast(true);
         break;
     }
+  }, [level]);
+
+  useEffect(() => {
+    const myResize = () => {
+      if (level === 2) {
+        canvasRef?.current?.currentDraw();
+      }
+    };
+
+    window.addEventListener("resize", myResize);
+
+    return () => {
+      window.removeEventListener("resize", myResize);
+    };
   }, [level]);
 
   return (

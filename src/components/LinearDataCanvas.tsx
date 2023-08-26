@@ -8,6 +8,7 @@ type Props = {
 
 export interface LinearDataCanvasHandle {
   stopAnimation: () => void;
+  currentDraw: () => void;
 }
 
 type dotDataType = { x: number; y: number };
@@ -90,14 +91,13 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
   useImperativeHandle(ref, () => ({
     stopAnimation,
+    currentDraw,
   }));
 
   const stopAnimation = useCallback((): void => {
     if (!canvas) return;
 
     canvas.cancelAnimation();
-    lineArr = [];
-    queue = null;
   }, [canvas]);
 
   const saveDot = useCallback((arr: dotGroupType, data: dotDataType, info: lineInfoType) => {
@@ -146,6 +146,12 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     [canvas]
   );
 
+  const currentDraw = useCallback((): void => {
+    for (let i = 0; i < lineArr.length; i++) {
+      drawDot(lineArr[i], lineInfoArr[i]);
+    }
+  }, [drawDot]);
+
   const draw = useCallback(() => {
     if (!canvas) return;
 
@@ -158,6 +164,8 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       queue.setData(dataArray);
     }
 
+    lineArr = [];
+
     ctx.fillStyle = "rgb(0, 0, 0)";
     ctx.fillRect(0, 0, canvas.CANVAS_WIDTH, canvas.CANVAS_HEIGHT);
 
@@ -169,7 +177,6 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     const sliceWidth = (canvas.CANVAS_WIDTH * 1.0) / bufferLength;
     let x = 0;
 
-    lineArr = [];
     for (let i = 0; i < queue.getLength(); i++) {
       const data = queue.getData(i);
       const v = data / 128.0;
@@ -195,29 +202,36 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     ctx.stroke();
     ctx.closePath();
 
-    queue.shiftData();
+    currentDraw();
 
-    for (let i = 0; i < lineArr.length; i++) {
-      drawDot(lineArr[i], lineInfoArr[i]);
-    }
-  }, [canvas, getDomainData, drawDot, saveDot]);
+    queue.shiftData();
+  }, [canvas, getDomainData, saveDot, currentDraw]);
 
   useEffect(() => {
     if (!canvas) return;
-    canvas.init();
+
+    const myResize = () => {
+      canvas.init();
+    };
+
+    myResize();
     canvas.setFrame(5);
     canvas.animate(draw);
 
-    window.addEventListener("resize", () => {
-      canvas.init();
-    });
+    window.addEventListener("resize", myResize);
 
-    return stopAnimation;
+    return () => {
+      stopAnimation();
+      window.removeEventListener("resize", myResize);
+    };
   }, [canvas, draw, stopAnimation]);
 
   useEffect(() => {
     if (canvasRef.current) {
       setCanvas(new Canvas(canvasRef.current));
+
+      queue = null;
+      lineArr = [];
     }
   }, []);
 

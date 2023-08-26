@@ -213,7 +213,7 @@ export default function ScatterCanvas(props: Props) {
           if (!mouse) return;
 
           value.draw();
-          if (firstLength / 3 * 2 > length) {
+          if ((firstLength / 3) * 2 > length) {
             value.update_opacity();
           } else {
             value.update(mouse);
@@ -257,12 +257,18 @@ export default function ScatterCanvas(props: Props) {
     canvas.setFrame(15);
     drawText();
 
-    window.addEventListener("resize", () => {
+    const myResize = () => {
       if (firstLength !== 0) return;
 
       canvas.init();
       drawText();
-    });
+    };
+
+    window.addEventListener("resize", myResize);
+
+    return () => {
+      window.removeEventListener("resize", myResize);
+    };
   }, [canvas, drawText, animation]);
 
   useEffect(() => {
