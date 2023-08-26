@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { getRandomInt } from "../utils";
+import { getRandomNum } from "../utils";
 import Canvas from "../utils/Canvas";
 import Vector from "../utils/Vector";
 import Mouse from "../utils/Mouse";
@@ -43,8 +43,8 @@ class Particle {
   public isTouched: boolean;
 
   constructor(x: number, y: number, opacity: number, ctx: CanvasRenderingContext2D) {
-    const r = getRandomInt(0, 0.5);
-    const angle = (Math.PI / 180) * getRandomInt(0, 360);
+    const r = getRandomNum(0, 0.5);
+    const angle = (Math.PI / 180) * getRandomNum(0, 360);
 
     this.pos = new Vector(x, y);
     this.firstPosX = r * Math.cos(angle);
