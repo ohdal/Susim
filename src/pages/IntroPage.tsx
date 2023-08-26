@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import ScatterCanvas from "../components/ScatterCanvas";
 
 const text = [
@@ -13,9 +14,16 @@ const text = [
 ];
 
 export default function IntroPage() {
+  const navigate = useNavigate();
+
   return (
     <>
-      <ScatterCanvas text={text} />
+      <ScatterCanvas
+        text={text}
+        afterAnimationFunc={() => {
+          navigate("/main");
+        }}
+      />
     </>
   );
 }

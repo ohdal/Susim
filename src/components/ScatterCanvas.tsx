@@ -1,5 +1,4 @@
-import { useRef, useEffect, useState, useCallback, MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { getRandomNum } from "../utils";
 import Canvas from "../utils/Canvas";
 import Vector from "../utils/Vector";
@@ -24,6 +23,7 @@ const PointerDiv = styled.div<{ $width: number; $height: number }>`
 
 type Props = {
   text: string[];
+  afterAnimationFunc: () => void;
 };
 
 type PointerDiv = {
@@ -88,8 +88,8 @@ class Particle {
     if (!this.isTouched) this.isTouched = true;
   }
 
-  test() {
-    this.opacity -= 0.03;
+  update_opacity() {
+    this.opacity -= 0.02;
   }
 
   draw() {
@@ -103,8 +103,7 @@ class Particle {
 let particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
 let firstLength = 0;
 export default function ScatterCanvas(props: Props) {
-  const { text } = props;
-  const navigate = useNavigate();
+  const { text, afterAnimationFunc } = props;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
@@ -202,8 +201,8 @@ export default function ScatterCanvas(props: Props) {
   const animation = useCallback(
     (isFirst: boolean): void => {
       const length = Object.keys(particles).length;
-      if (firstLength / 2 > length) {
-        navigate("/main");
+      if (length === 0) {
+        afterAnimationFunc();
       }
 
       for (const [key, value] of Object.entries(particles)) {
@@ -214,14 +213,18 @@ export default function ScatterCanvas(props: Props) {
           if (!mouse) return;
 
           value.draw();
-          value.update(mouse);
+          if (firstLength / 3 * 2 > length) {
+            value.update_opacity();
+          } else {
+            value.update(mouse);
+          }
 
           // if (value.opacity <= 0.2) delete particles[key];
           if (value.opacity <= 0) delete particles[key];
         }
       }
     },
-    [navigate, mouse]
+    [mouse, afterAnimationFunc]
   );
 
   const onMouseDownPointerDiv = useCallback(() => {
