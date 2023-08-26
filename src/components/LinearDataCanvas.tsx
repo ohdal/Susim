@@ -152,14 +152,13 @@ export default function LinearDataCanvas(props: Props) {
     const sliceWidth = (canvas.CANVAS_WIDTH * 1.0) / bufferLength;
     let x = 0;
 
+    lineArr = [];
     for (let i = 0; i < queue.getLength(); i++) {
       const data = queue.getData(i);
       const v = data / 128.0;
       const y = (v * canvas.CANVAS_HEIGHT) / 2;
 
       if (i === 0) {
-        lineArr = [];
-
         for (let i = 0; i < lineInfoArr.length; i++) {
           lineArr.push([]);
         }
@@ -198,6 +197,8 @@ export default function LinearDataCanvas(props: Props) {
 
     return () => {
       canvas.cancelAnimation();
+      lineArr = [];
+      queue = null;
     };
   }, [canvas, draw]);
 
