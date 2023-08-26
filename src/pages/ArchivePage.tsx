@@ -7,7 +7,9 @@ export default function ArchivePage() {
     <div>
       archivePage
       <br />
-      <button onClick={() => navigate("/main")}>Go MainPage</button>
+      <button className="fixed right-4 top-4" onClick={() => navigate("/main")}>
+        나가기
+      </button>
     </div>
   );
 }
