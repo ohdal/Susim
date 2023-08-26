@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
-import { getRandomNum } from "../utils";
+import { getRandomNum, hexToRgb } from "../utils";
 import Canvas from "../utils/Canvas";
 
 type Props = {
@@ -124,10 +124,11 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   }, []);
 
   const drawDot = useCallback(
-    (arr: dotGroupType, info: lineInfoType) => {
+    (arr: dotGroupType, info: lineInfoType, color = "#FFFFFF") => {
       if (!canvas) return;
 
       const { yPos } = info;
+      const { r, g, b } = hexToRgb(color) || { r: 255, g: 255, b: 255 };
       const isOrigin = yPos === 0;
       const ctx = canvas.ctx as CanvasRenderingContext2D;
 
@@ -136,7 +137,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
           const opacity = isOrigin ? getRandomNum(0.7, 1) : getRandomNum(0.2, 1);
 
           ctx.beginPath();
-          ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
           ctx.arc(x + (yPos < 0 ? 10 : 0), y - yPos, 2, 0, (Math.PI / 180) * 360);
           ctx.fill();
           ctx.closePath();
