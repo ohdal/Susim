@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { getRandomInt } from "../utils";
+import { getRandomNum } from "../utils";
 import Canvas from "../utils/Canvas";
 
 type Props = {
@@ -7,34 +7,44 @@ type Props = {
 };
 
 type dotDataType = { x: number; y: number };
-type dotArrType = dotDataType[] | null;
+type dotGroupType = dotDataType[];
+type lineType = dotGroupType[];
+type lineInfoType = { yPos: number; per?: number; particle?: number; large?: boolean };
 
 class Queue {
-  private arr_origin: number[];
   private arr: number[];
   private buffer: number;
 
   constructor(bufferLength: number, data: Uint8Array) {
-    this.arr_origin = this.filterData(data);
     this.arr = this.filterData(data);
     this.buffer = bufferLength;
   }
 
-  setData_horizontal(data: Uint8Array) {
-    if (this.arr_origin.length >= this.buffer * 2) return;
+  setData(data: Uint8Array) {
+    if (this.arr.length >= this.buffer * 2) return;
 
-    const temp = this.filterData(data);
+    const filter = this.filterData(data);
+    if (filter.length === 0) return;
 
-    this.arr_origin.push(...temp);
-    this.arr.push(...temp);
-  }
+    const last = this.arr[this.arr.length - 1];
+    const first = filter[0];
+    const diff = Math.abs(last - first);
+    const arrCor = [];
 
-  setData_vertical() {
-    console.log("vertical");
+    if (diff > 10) {
+      const value = Math.floor(diff / 5);
+
+      for (let i = 1; i <= 4; i++) {
+        if (last > first) arrCor.push(last - value * i);
+        else arrCor.push(last + value * i);
+      }
+    }
+
+    this.arr.push(...arrCor, ...filter);
   }
 
   getLength(): number {
-    return this.arr_origin.length;
+    return this.arr.length;
   }
 
   getData(idx: number): number {
@@ -44,29 +54,6 @@ class Queue {
   }
 
   shiftData() {
-    // const SIZE_VALUE = 20;
-
-    // for (let i = 0; i < this.arr.length; i++) {
-    //   const v_origin = this.arr_origin[i];
-    //   const v = this.arr[i];
-    //   const
-
-    //   let isUp: boolean;
-    //   if(v_origin > 128.0) {
-
-    //   } else {
-    //     isUp = true;
-    //   }
-
-    //   if(isUp) {
-    //     this.arr[i]++;
-    //   } else {
-    //     this.arr[i]--;
-    //   }
-    // }
-
-    this.arr_origin.shift();
-    this.arr_origin.shift();
     this.arr.shift();
     this.arr.shift();
   }
@@ -77,33 +64,63 @@ class Queue {
 }
 
 let queue: Queue | null = null;
-let dotArr_1: dotArrType = null;
-let dotArr_2: dotArrType = null;
-let dotArr_3: dotArrType = null;
+let lineArr: lineType = [];
+const lineInfoArr: lineInfoType[] = [
+  { yPos: -92 },
+  { yPos: -82 },
+  { yPos: 0 },
+  { yPos: 10, per: 66, particle: 5, large: true },
+  { yPos: 30, per: 60, particle: 4, large: true },
+  { yPos: 40, per: 55, particle: 3, large: true },
+  { yPos: 70, per: 50, large: true },
+  { yPos: 100, per: 40 },
+  { yPos: 130, per: 40 },
+  { yPos: 200, per: 20 },
+  { yPos: 220, per: 10 },
+];
 export default function LinearDataCanvas(props: Props) {
   const { getDomainData } = props;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
 
-  const saveDot = useCallback((arr: dotArrType, data: dotDataType) => {
-    const num = getRandomInt(0, 1000);
+  const saveDot = useCallback((arr: dotGroupType, data: dotDataType, info: lineInfoType) => {
+    const { yPos, per, particle, large } = info;
 
-    if (num <= 300 && arr) {
+    const num = getRandomNum(0, 1000, true);
+    const isOrigin = yPos === 0;
+    const standard = isOrigin ? 1000 : per ? 10 * per : 300;
+
+    if (num <= standard && arr) {
       arr.push(data);
+
+      if (isOrigin) {
+        arr.push({ x: data.x + getRandomNum(1, 5), y: data.y });
+        arr.push({ x: data.x, y: data.y + getRandomNum(1, 5) });
+      } else {
+        const size = particle ? particle : 2;
+
+        for (let i = 0; i < size; i++) {
+          arr.push({ x: data.x + getRandomNum(10, 20), y: data.y + getRandomNum(5, large ? 20 : 10) });
+        }
+      }
     }
   }, []);
 
   const drawDot = useCallback(
-    (arr: dotArrType, style: { color: string; yPos: number }) => {
+    (arr: dotGroupType, info: lineInfoType) => {
       if (!canvas) return;
 
+      const { yPos } = info;
+      const isOrigin = yPos === 0;
       const ctx = canvas.ctx as CanvasRenderingContext2D;
 
       if (arr) {
         arr.forEach(({ x, y }) => {
+          const opacity = isOrigin ? getRandomNum(0.7, 1) : getRandomNum(0.2, 1);
+
           ctx.beginPath();
-          ctx.fillStyle = style.color;
-          ctx.arc(x, y - style.yPos, 1, 0, (Math.PI / 180) * 360);
+          ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+          ctx.arc(x + (yPos < 0 ? 10 : 0), y - yPos, 2, 0, (Math.PI / 180) * 360);
           ctx.fill();
           ctx.closePath();
         });
@@ -120,15 +137,8 @@ export default function LinearDataCanvas(props: Props) {
 
     if (!queue) {
       queue = new Queue(bufferLength, dataArray);
-
-      // setInterval(() => {
-      //   const { dataArray } = getDomainData();
-      //   queue?.setData_horizontal(dataArray);
-
-      //   console.log(queue?.getLength());
-      // }, 1000);
     } else {
-      queue.setData_horizontal(dataArray);
+      queue.setData(dataArray);
     }
 
     ctx.fillStyle = "rgb(0, 0, 0)";
@@ -148,30 +158,32 @@ export default function LinearDataCanvas(props: Props) {
       const y = (v * canvas.CANVAS_HEIGHT) / 2;
 
       if (i === 0) {
-        dotArr_1 = [];
-        dotArr_2 = [];
-        dotArr_3 = [];
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
+        lineArr = [];
 
-        saveDot(dotArr_1, { x, y });
-        saveDot(dotArr_2, { x, y });
-        saveDot(dotArr_3, { x, y });
+        for (let i = 0; i < lineInfoArr.length; i++) {
+          lineArr.push([]);
+        }
+        // ctx.moveTo(x, y);
+      } else {
+        // ctx.lineTo(x, y);
+
+        for (let i = 0; i < lineArr.length; i++) {
+          saveDot(lineArr[i], { x, y }, lineInfoArr[i]);
+        }
       }
 
       x += sliceWidth;
     }
 
-    ctx.lineTo(x, canvas.CANVAS_HEIGHT / 2);
+    // ctx.lineTo(x, canvas.CANVAS_HEIGHT / 2);
     ctx.stroke();
     ctx.closePath();
 
     queue.shiftData();
 
-    drawDot(dotArr_1, { color: "red", yPos: 80 });
-    drawDot(dotArr_2, { color: "yellow", yPos: 30 });
-    drawDot(dotArr_3, { color: "green", yPos: 10 });
+    for (let i = 0; i < lineArr.length; i++) {
+      drawDot(lineArr[i], lineInfoArr[i]);
+    }
   }, [canvas, getDomainData, drawDot, saveDot]);
 
   useEffect(() => {
