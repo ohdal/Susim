@@ -100,7 +100,7 @@ class Particle {
   }
 }
 
-const particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
+let particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
 let firstLength = 0;
 export default function ScatterCanvas(props: Props) {
   const { text } = props;
@@ -275,6 +275,8 @@ export default function ScatterCanvas(props: Props) {
 
     return () => {
       canvas.cancelAnimation();
+      particles = {};
+      firstLength = 0;
     };
   }, [canvas]);
 

@@ -198,6 +198,8 @@ export default function LinearDataCanvas(props: Props) {
 
     return () => {
       canvas.cancelAnimation();
+      lineArr = [];
+      queue = null;
     };
   }, [canvas, draw]);
 
