@@ -14,12 +14,22 @@ const AnimationDiv = styled.div`
   transition: all 3s ease-out;
 `;
 
-const MyInput = styled.textarea`
+const MyTextarea = styled.textarea`
   width: 100%;
-  height: 200px;
+  min-height: 120px;
+  max-height: 200px;
   border: 1px solid #ffffff;
   background: rgba(0, 0, 0, 0.7);
   padding: 10px;
+  margin: 12px 0;
+  outline: none;
+`;
+
+const MyInput = styled.input`
+  width: 100%;
+  border: 1px solid #ffffff;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
   margin: 12px 0;
   outline: none;
 `;
@@ -139,7 +149,7 @@ export default function MainPage() {
           <div className="w-full h-full relative">
             <AnimationDiv style={{ opacity: level === 0 ? 1 : 0, visibility: level === 0 ? "visible" : "hidden" }}>
               <p className="text-center">당신의 수심을 적어주세요</p>
-              <MyInput />
+              <MyTextarea />
               <MyButton
                 onClick={() => {
                   setLevel(1);
@@ -161,7 +171,8 @@ export default function MainPage() {
               <MyButton>전송하기</MyButton>
             </AnimationDiv>
             {level === 0 && (
-              <button className="fixed right-4 bottom-4"
+              <button
+                className="fixed right-4 bottom-4"
                 onClick={() => {
                   navigate("/archive");
                 }}
