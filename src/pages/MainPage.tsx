@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import ScatterCanvas from "../components/ScatterCanvas";
 
@@ -12,34 +13,28 @@ const AnimationDiv = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   transition: all 1.5s ease-out;
+
+  &.overlay {
+    background: rgba(0, 0, 0, 0.4);
+  }
 `;
 
-const MyTextarea = styled.textarea`
-  width: 100%;
-  min-height: 120px;
-  max-height: 200px;
-  border: 1px solid #ffffff;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  margin: 12px 0;
-  outline: none;
+const MainP = styled.p`
+  text-align: center;
+  font-size: 1.625rem;
 `;
 
-const MyInput = styled.input`
-  width: 100%;
-  border: 1px solid #ffffff;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px 20px;
-  margin: 12px 0;
-  outline: none;
-`;
-
-const MyButton = styled.button`
+const MainButton = styled.button`
+  float: right;
   padding: 10px 12px;
+  margin-right: 10px;
   text-align: center;
   border: 1px solid #ffffff;
   background: rgba(0, 0, 0, 0.7);
-  float: right;
+
+  &:first-child {
+    margin-right: 0;
+  }
 `;
 
 const text = [
@@ -63,6 +58,8 @@ let dataArray: Uint8Array;
 
 export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
+  const susimInputRef = useRef<MainInputHandle>(null);
+  const emailInputRef = useRef<MainInputHandle>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [level, setLevel] = useState(0);
   const [isLast, setIsLast] = useState(false);
@@ -106,6 +103,68 @@ export default function MainPage() {
     }
   }, []);
 
+  const validate = useCallback((cur: MainInputHandle | null): { result: boolean; value: string; text: string } => {
+    const returnObj = { result: false, value: "", text: "" };
+    if (!cur) return returnObj;
+
+    const text = cur.getText();
+    const name = cur.name;
+
+    if (!text.trim()) {
+      returnObj.text = `${name}을 입력해주세요.`;
+      return returnObj;
+    } else {
+      returnObj.value = text;
+    }
+
+    let v;
+    const email_reg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    switch (name) {
+      case "수심":
+        v = text.length <= 200;
+        returnObj.result = v;
+        returnObj.text = v ? "" : "200자 이하로 작성해주세요.";
+        break;
+      case "이메일":
+        v = email_reg.test(text);
+        returnObj.result = v;
+        returnObj.text = v ? "" : "이메일 형식에 맞게 입력해주세요.";
+        break;
+      default:
+        break;
+    }
+
+    return returnObj;
+  }, []);
+
+  const handleSusim = useCallback(() => {
+    const { result, value, text } = validate(susimInputRef.current);
+
+    if (result) {
+      // 수심 데이터 저장
+      // linear 데이터 저장
+      console.log("데이터 저장 완료", value);
+
+      setLevel(1);
+    } else {
+      alert(text);
+    }
+  }, [validate]);
+
+  const handleEmail = useCallback(() => {
+    const { result, value, text } = validate(emailInputRef.current);
+
+    if (result) {
+      // 이메일 전송 하기
+
+      console.log("이메일 전송 완료", value);
+
+      setLevel(3);
+    } else {
+      alert(text);
+    }
+  }, [validate]);
+
   useEffect(() => {
     void getMediaStream();
   }, [getMediaStream]);
@@ -116,7 +175,6 @@ export default function MainPage() {
         break;
       case 1:
         setTimeout(() => {
-          canvasRef.current?.stopAnimation();
           setLevel((v) => v + 1);
         }, 5000);
         break;
@@ -133,20 +191,6 @@ export default function MainPage() {
     }
   }, [level]);
 
-  useEffect(() => {
-    const myResize = () => {
-      if (level === 2) {
-        canvasRef?.current?.currentDraw();
-      }
-    };
-
-    window.addEventListener("resize", myResize);
-
-    return () => {
-      window.removeEventListener("resize", myResize);
-    };
-  }, [level]);
-
   return (
     <>
       {isLast ? (
@@ -161,28 +205,29 @@ export default function MainPage() {
         <>
           {analyser && <LinearDataCanvas ref={canvasRef} getDomainData={getDomainData} />}
           <div className="w-full h-full relative">
+            {level === 2 && (
+              <div className="w-full h-full absolute top-0 left-0" style={{ background: "rgba(0,0,0,0.5)" }} />
+            )}
             <AnimationDiv style={{ opacity: level === 0 ? 1 : 0, visibility: level === 0 ? "visible" : "hidden" }}>
-              <p className="text-center">당신의 수심을 적어주세요</p>
-              <MyTextarea />
-              <MyButton
-                onClick={() => {
-                  setLevel(1);
-                }}
-              >
-                전송하기
-              </MyButton>
+              <MainP>당신의 수심을 적어주세요</MainP>
+              <MainInput name="수심" ref={susimInputRef} />
+              <div>
+                <MainButton onClick={handleSusim}>전송하기</MainButton>
+              </div>
             </AnimationDiv>
             <AnimationDiv style={{ opacity: level === 2 ? 1 : 0, visibility: level === 2 ? "visible" : "hidden" }}>
-              <p className="text-center">당신의 숨의 기록을 전송하시겠습니까 ?</p>
-              <MyInput placeholder="이메일을 입력해주세요." />
-              <MyButton
-                onClick={() => {
-                  setLevel(3);
-                }}
-              >
-                아니요
-              </MyButton>
-              <MyButton>전송하기</MyButton>
+              <MainP>당신의 숨의 기록을 전송하시겠습니까 ?</MainP>
+              <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." />
+              <div>
+                <MainButton
+                  onClick={() => {
+                    setLevel(3);
+                  }}
+                >
+                  아니요
+                </MainButton>
+                <MainButton onClick={handleEmail}>전송하기</MainButton>
+              </div>
             </AnimationDiv>
             {level === 0 && (
               <button
