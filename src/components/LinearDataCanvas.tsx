@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
-import { getRandomNum, hexToRgb } from "../utils";
+import { getRandomNum, hexToRgb, debounce } from "../utils";
 import Canvas from "../utils/Canvas";
 
 type Props = {
@@ -26,26 +26,29 @@ class Queue {
   }
 
   setData(data: Uint8Array) {
-    if (this.arr.length >= this.buffer * 2) return;
+    this.arr = this.filterData(data);
+    return;
 
-    const filter = this.filterData(data);
-    if (filter.length === 0) return;
+    // if (this.arr.length >= this.buffer * 2) return;
 
-    const last = this.arr[this.arr.length - 1];
-    const first = filter[0];
-    const diff = Math.abs(last - first);
-    const arrCor = [];
+    // const filter = this.filterData(data);
+    // if (filter.length === 0) return;
 
-    if (diff > 10) {
-      const value = Math.floor(diff / 5);
+    // const last = this.arr[this.arr.length - 1];
+    // const first = filter[0];
+    // const diff = Math.abs(last - first);
+    // const arrCor = [];
 
-      for (let i = 1; i <= 4; i++) {
-        if (last > first) arrCor.push(last - value * i);
-        else arrCor.push(last + value * i);
-      }
-    }
+    // if (diff > 10) {
+    //   const value = Math.floor(diff / 5);
 
-    this.arr.push(...arrCor, ...filter);
+    //   for (let i = 1; i <= 4; i++) {
+    //     if (last > first) arrCor.push(last - value * i);
+    //     else arrCor.push(last + value * i);
+    //   }
+    // }
+
+    // this.arr.push(...arrCor, ...filter);
   }
 
   getLength(): number {
@@ -64,7 +67,8 @@ class Queue {
   }
 
   filterData(data: Uint8Array): number[] {
-    return Array.from(data).filter((v) => !(v < 129 && v > 126));
+    // return Array.from(data).filter((v) => !(v < 129 && v > 126));
+    return Array.from(data);
   }
 }
 
@@ -181,7 +185,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     for (let i = 0; i < queue.getLength(); i++) {
       const data = queue.getData(i);
       const v = data / 128.0;
-      const y = (v * canvas.CANVAS_HEIGHT) / 2;
+      const y = (v * canvas.CANVAS_HEIGHT) / 1.6;
 
       if (i === 0) {
         for (let i = 0; i < lineInfoArr.length; i++) {
@@ -205,19 +209,19 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
     currentDraw();
 
-    queue.shiftData();
+    // queue.shiftData();
   }, [canvas, getDomainData, saveDot, currentDraw]);
 
   useEffect(() => {
     if (!canvas) return;
 
-    const myResize = () => {
+    const myResize = debounce(() => {
       canvas.init();
-    };
+      canvas.setFrame(3);
+      canvas.animate(draw);
+    }, 300)
 
     myResize();
-    canvas.setFrame(5);
-    canvas.animate(draw);
 
     window.addEventListener("resize", myResize);
 
