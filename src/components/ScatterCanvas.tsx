@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from "react";
-import { getRandomNum } from "../utils";
+import { getRandomNum, debounce } from "../utils";
 import Canvas from "../utils/Canvas";
 import Vector from "../utils/Vector";
 import Mouse from "../utils/Mouse";
@@ -257,12 +257,12 @@ export default function ScatterCanvas(props: Props) {
     canvas.setFrame(15);
     drawText();
 
-    const myResize = () => {
+    const myResize = debounce(() => {
       if (firstLength !== 0) return;
 
       canvas.init();
       drawText();
-    };
+    }, 300);
 
     window.addEventListener("resize", myResize);
 
