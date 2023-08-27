@@ -160,11 +160,13 @@ export default function ScatterCanvas(props: Props) {
   const drawText = useCallback(() => {
     if (!canvas) return;
 
+    console.log(text)
+
     const FONT_SIZE = getFontSize(canvas.CANVAS_WIDTH);
     const LINE_VALUE = 5; // 줄 간격 값 5px
     const ctx = canvas.ctx as CanvasRenderingContext2D;
     const totalHeight = text.length * FONT_SIZE + (LINE_VALUE * text.length - 1);
-    const spacing = canvas.dpr * text.length;
+    const spacing = canvas.dpr * (text.length - 1);
     const x = canvas.CANVAS_WIDTH / 2;
     const y = (canvas.CANVAS_HEIGHT - totalHeight) / 2 + spacing;
 
@@ -180,7 +182,6 @@ export default function ScatterCanvas(props: Props) {
         ctx.font = `${FONT_SIZE}px KoPubWorld Medium`;
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
 
         for (let i = 0; i < text.length; i++) {
           ctx.fillText(text[i], x, y + FONT_SIZE * i + lineHeight);
