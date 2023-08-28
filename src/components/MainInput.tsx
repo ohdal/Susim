@@ -13,6 +13,7 @@ const InputComp = styled.input`
 type Props = {
   name: string;
   placeholder?: string;
+  changeEventHandle?: (v: string) => void;
 };
 
 export interface MainInputHandle {
@@ -21,7 +22,7 @@ export interface MainInputHandle {
 }
 
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
-  const { name, placeholder } = props;
+  const { name, placeholder, changeEventHandle } = props;
   const [text, setText] = useState("");
 
   useImperativeHandle(ref, () => ({
@@ -37,6 +38,7 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
       placeholder={placeholder}
       onChange={(e) => {
         setText(e.target.value);
+        if (changeEventHandle) changeEventHandle(e.target.value);
       }}
     />
   );

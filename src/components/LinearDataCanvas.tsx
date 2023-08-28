@@ -9,6 +9,7 @@ type Props = {
 export interface LinearDataCanvasHandle {
   stopAnimation: () => void;
   currentDraw: () => void;
+  fillUp: (v: string) => void;
 }
 
 type dotDataType = { x: number; y: number };
@@ -87,6 +88,7 @@ const lineInfoArr: lineInfoType[] = [
   { yPos: 200, per: 20 },
   { yPos: 240, per: 10, large: true },
 ];
+let yPosCount = 0;
 
 const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) => {
   const { getDomainData } = props;
@@ -96,6 +98,10 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   useImperativeHandle(ref, () => ({
     stopAnimation,
     currentDraw,
+    fillUp: (v) => {
+      const value = -2 * v.length;
+      yPosCount = Math.max(value, -200);
+    },
   }));
 
   const stopAnimation = useCallback((): void => {
@@ -185,7 +191,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     for (let i = 0; i < queue.getLength(); i++) {
       const data = queue.getData(i);
       const v = data / 128.0;
-      const y = (v * canvas.CANVAS_HEIGHT) / 1.6;
+      const y = (v * canvas.CANVAS_HEIGHT) / 1.6 + yPosCount;
 
       if (i === 0) {
         for (let i = 0; i < lineInfoArr.length; i++) {
@@ -219,7 +225,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       canvas.init();
       canvas.setFrame(3);
       canvas.animate(draw);
-    }, 300)
+    }, 300);
 
     myResize();
 
@@ -237,6 +243,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
       queue = null;
       lineArr = [];
+      yPosCount = 0;
     }
   }, []);
 

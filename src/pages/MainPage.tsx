@@ -210,7 +210,7 @@ export default function MainPage() {
             )}
             <AnimationDiv style={{ opacity: level === 0 ? 1 : 0, visibility: level === 0 ? "visible" : "hidden" }}>
               <MainP>당신의 수심을 적어주세요</MainP>
-              <MainInput name="수심" ref={susimInputRef} />
+              <MainInput name="수심" ref={susimInputRef} changeEventHandle={canvasRef.current?.fillUp}/>
               <div>
                 <MainButton onClick={handleSusim}>전송하기</MainButton>
               </div>
