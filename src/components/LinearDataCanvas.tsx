@@ -9,7 +9,7 @@ type Props = {
 export interface LinearDataCanvasHandle {
   stopAnimation: () => void;
   currentDraw: () => void;
-  fillUp: (v: string) => void;
+  fillUp: (v: string, max: number) => void;
 }
 
 type dotDataType = { x: number; y: number };
@@ -98,9 +98,9 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   useImperativeHandle(ref, () => ({
     stopAnimation,
     currentDraw,
-    fillUp: (v) => {
+    fillUp: (v, max) => {
       const value = -2 * v.length;
-      yPosCount = Math.max(value, -200);
+      yPosCount = Math.max(value, -2 * max);
     },
   }));
 
@@ -223,9 +223,10 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
     const myResize = debounce(() => {
       canvas.init();
-      canvas.setFrame(3);
-      canvas.animate(draw);
     }, 300);
+
+    canvas.setFrame(3);
+    canvas.animate(draw);
 
     myResize();
 

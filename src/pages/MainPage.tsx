@@ -55,6 +55,7 @@ const AudioContext = window.AudioContext;
 let audioCtx: AudioContext;
 let bufferLength: number;
 let dataArray: Uint8Array;
+const MAX_TEXT_COUNT = 150;
 
 export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
@@ -121,7 +122,7 @@ export default function MainPage() {
     const email_reg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
     switch (name) {
       case "수심":
-        v = text.length <= 200;
+        v = text.length <= MAX_TEXT_COUNT;
         returnObj.result = v;
         returnObj.text = v ? "" : "200자 이하로 작성해주세요.";
         break;
@@ -179,6 +180,7 @@ export default function MainPage() {
         }, 5000);
         break;
       case 2:
+        // canvasRef.current?.stopAnimation();
         break;
       case 3:
         setTimeout(() => {
@@ -210,7 +212,14 @@ export default function MainPage() {
             )}
             <AnimationDiv style={{ opacity: level === 0 ? 1 : 0, visibility: level === 0 ? "visible" : "hidden" }}>
               <MainP>당신의 수심을 적어주세요</MainP>
-              <MainInput name="수심" ref={susimInputRef} changeEventHandle={canvasRef.current?.fillUp}/>
+              <MainInput
+                name="수심"
+                ref={susimInputRef}
+                changeEventHandle={(...args) => {
+                  const [v, max] = args;
+                  canvasRef.current?.fillUp(v as string, max as number);
+                }}
+              />
               <div>
                 <MainButton onClick={handleSusim}>전송하기</MainButton>
               </div>

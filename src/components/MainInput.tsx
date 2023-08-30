@@ -13,7 +13,9 @@ const InputComp = styled.input`
 type Props = {
   name: string;
   placeholder?: string;
-  changeEventHandle?: (v: string) => void;
+  max?: number;
+  min?: number;
+  changeEventHandle?: <Params extends any[]>(...args: Params) => void;
 };
 
 export interface MainInputHandle {
@@ -21,8 +23,10 @@ export interface MainInputHandle {
   getText: () => string;
 }
 
+const MAX_SIZE = 150;
+const MIN_SIZE = 10;
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
-  const { name, placeholder, changeEventHandle } = props;
+  const { name, placeholder, changeEventHandle, min, max } = props;
   const [text, setText] = useState("");
 
   useImperativeHandle(ref, () => ({
@@ -36,9 +40,11 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
     <InputComp
       name={name}
       placeholder={placeholder}
+      min={min || MIN_SIZE}
+      max={max || MAX_SIZE}
       onChange={(e) => {
         setText(e.target.value);
-        if (changeEventHandle) changeEventHandle(e.target.value);
+        if (changeEventHandle) changeEventHandle(e.target.value, max ? max : MAX_SIZE);
       }}
     />
   );
