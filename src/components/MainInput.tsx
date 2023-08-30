@@ -23,10 +23,9 @@ export interface MainInputHandle {
   getText: () => string;
 }
 
-const MAX_SIZE = 150;
-const MIN_SIZE = 10;
+const MAX_DEFAULT = 150;
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
-  const { name, placeholder, changeEventHandle, min, max } = props;
+  const { name, placeholder, changeEventHandle, max } = props;
   const [text, setText] = useState("");
 
   useImperativeHandle(ref, () => ({
@@ -40,11 +39,13 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
     <InputComp
       name={name}
       placeholder={placeholder}
-      min={min || MIN_SIZE}
-      max={max || MAX_SIZE}
+      value={text}
       onChange={(e) => {
-        setText(e.target.value);
-        if (changeEventHandle) changeEventHandle(e.target.value, max ? max : MAX_SIZE);
+        const text = e.target.value;
+        const size = max ? max : MAX_DEFAULT;
+        if (text.length > MAX_DEFAULT) setText(text.slice(0, size));
+        else setText(e.target.value);
+        if (changeEventHandle) changeEventHandle(e.target.value, size);
       }}
     />
   );

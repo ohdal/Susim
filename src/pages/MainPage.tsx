@@ -55,7 +55,8 @@ const AudioContext = window.AudioContext;
 let audioCtx: AudioContext;
 let bufferLength: number;
 let dataArray: Uint8Array;
-const MAX_TEXT_COUNT = 150;
+const MAX_TEXT_SIZE = 150;
+const MIN_TEXT_SIZE = 10;
 
 export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
@@ -122,9 +123,9 @@ export default function MainPage() {
     const email_reg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
     switch (name) {
       case "수심":
-        v = text.length <= MAX_TEXT_COUNT;
+        v = text.length >= MIN_TEXT_SIZE;
         returnObj.result = v;
-        returnObj.text = v ? "" : "200자 이하로 작성해주세요.";
+        returnObj.text = v ? "" : `${MIN_TEXT_SIZE}자 이상 작성해주세요.`;
         break;
       case "이메일":
         v = email_reg.test(text);
@@ -215,6 +216,7 @@ export default function MainPage() {
               <MainInput
                 name="수심"
                 ref={susimInputRef}
+                max={MAX_TEXT_SIZE}
                 changeEventHandle={(...args) => {
                   const [v, max] = args;
                   canvasRef.current?.fillUp(v as string, max as number);
