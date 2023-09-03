@@ -9,12 +9,13 @@ type Props = {
 export interface LinearDataCanvasHandle {
   stopAnimation: () => void;
   currentDraw: () => void;
+  getLinearData: () => lineType;
   fillUp: (v: string, max: number) => void;
 }
 
 type dotDataType = { x: number; y: number };
 type dotGroupType = dotDataType[];
-type lineType = dotGroupType[];
+export type lineType = dotGroupType[];
 type lineInfoType = { yPos: number; per?: number; particle?: number; large?: boolean };
 
 class Queue {
@@ -98,6 +99,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   useImperativeHandle(ref, () => ({
     stopAnimation,
     currentDraw,
+    getLinearData,
     fillUp: (v, max) => {
       const value = -2 * v.length;
       yPosCount = Math.max(value, -2 * max);
@@ -109,6 +111,10 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
     canvas.cancelAnimation();
   }, [canvas]);
+
+  const getLinearData = useCallback((): lineType => {
+    return lineArr;
+  }, []);
 
   const saveDot = useCallback((arr: dotGroupType, data: dotDataType, info: lineInfoType) => {
     const { yPos, per, particle, large } = info;
@@ -157,11 +163,16 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     [canvas]
   );
 
-  const currentDraw = useCallback((): void => {
-    for (let i = 0; i < lineArr.length; i++) {
-      drawDot(lineArr[i], lineInfoArr[i]);
-    }
-  }, [drawDot]);
+  const currentDraw = useCallback(
+    (arr?: lineType): void => {
+      if (!arr) arr = lineArr;
+
+      for (let i = 0; i < arr.length; i++) {
+        drawDot(arr[i], lineInfoArr[i]);
+      }
+    },
+    [drawDot]
+  );
 
   const draw = useCallback(() => {
     if (!canvas) return;
@@ -213,7 +224,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     ctx.stroke();
     ctx.closePath();
 
-    currentDraw();
+    currentDraw(lineArr);
 
     // queue.shiftData();
   }, [canvas, getDomainData, saveDot, currentDraw]);

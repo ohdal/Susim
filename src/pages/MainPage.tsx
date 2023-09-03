@@ -1,6 +1,10 @@
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+
+import database from "../utils/firebase";
+import { push } from "firebase/database";
+
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import ScatterCanvas from "../components/ScatterCanvas";
@@ -139,13 +143,25 @@ export default function MainPage() {
     return returnObj;
   }, []);
 
-  const handleSusim = useCallback(() => {
+  // const handleSusim = useCallback(() => {
+  const handleSusim = useCallback(async () => {
     const { result, value, text } = validate(susimInputRef.current);
 
     if (result) {
-      // 수심 데이터 저장
-      // linear 데이터 저장
-      console.log("데이터 저장 완료", value);
+      const linearData = canvasRef.current?.getLinearData();
+      if (linearData) {
+        const db = database("susims");
+
+        const data = {
+          date: new Date().getTime(),
+          data: JSON.stringify(linearData),
+          text: value,
+        };
+        const result = await push(db, data);
+        console.log("데이터 저장 완료", result);
+      } else {
+        alert("error, 데이터 가져오기 오류");
+      }
 
       setLevel(1);
     } else {
@@ -223,7 +239,13 @@ export default function MainPage() {
                 }}
               />
               <div>
-                <MainButton onClick={handleSusim}>전송하기</MainButton>
+                <MainButton
+                  onClick={() => {
+                    void handleSusim();
+                  }}
+                >
+                  전송하기
+                </MainButton>
               </div>
             </AnimationDiv>
             <AnimationDiv style={{ opacity: level === 2 ? 1 : 0, visibility: level === 2 ? "visible" : "hidden" }}>
