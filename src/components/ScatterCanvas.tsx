@@ -213,7 +213,7 @@ export default function ScatterCanvas(props: Props) {
           if (!mouse) return;
 
           value.draw();
-          if ((firstLength / 3) * 2 > length) {
+          if (firstLength * 0.8 > length) {
             value.update_opacity();
           } else {
             value.update(mouse);
