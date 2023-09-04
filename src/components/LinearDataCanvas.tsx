@@ -101,8 +101,8 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     currentDraw,
     getLinearData,
     fillUp: (v, max) => {
-      const value = -2 * v.length;
-      yPosCount = Math.max(value, -2 * max);
+      const value = -6 * v.length;
+      yPosCount = Math.max(value, -6 * max);
     },
   }));
 
