@@ -23,7 +23,7 @@ export interface MainInputHandle {
   getText: () => string;
 }
 
-const MAX_DEFAULT = 150;
+const MAX_DEFAULT = 100;
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
   const { name, placeholder, changeEventHandle, max } = props;
   const [text, setText] = useState("");
@@ -43,7 +43,7 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
       onChange={(e) => {
         const text = e.target.value;
         const size = max ? max : MAX_DEFAULT;
-        if (text.length > MAX_DEFAULT) setText(text.slice(0, size));
+        if (text.length > size) setText(text.slice(0, size));
         else setText(e.target.value);
         if (changeEventHandle) changeEventHandle(e.target.value, size);
       }}
