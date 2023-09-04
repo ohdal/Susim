@@ -59,7 +59,7 @@ const AudioContext = window.AudioContext;
 let audioCtx: AudioContext;
 let bufferLength: number;
 let dataArray: Uint8Array;
-const MAX_TEXT_SIZE = 150;
+const MAX_TEXT_SIZE = 50;
 const MIN_TEXT_SIZE = 10;
 
 export default function MainPage() {
