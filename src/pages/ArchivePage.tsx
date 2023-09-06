@@ -1,20 +1,27 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import LinearDataCanvas, { lineType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
+import { debounce } from "../utils";
 import database from "../utils/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild } from "firebase/database";
 
-import { lineType } from "../components/LinearDataCanvas";
+type CardProps = {
+  data: lineType;
+  canvasInfo: { width: number; height: number };
+  text: string;
+};
 
 type listType = {
-  data: lineType[];
-  date: number;
+  data: string;
+  canvasInfo: string;
   text: string;
+  date: number;
 };
 
 const CardLayout = styled.div`
   position: relative;
-  height: 18.750rem;
+  height: 18.75rem;
 
   .front,
   .back {
@@ -27,6 +34,7 @@ const CardLayout = styled.div`
   }
 
   .front {
+    content: contain;
     background: #000000;
   }
 
@@ -45,7 +53,7 @@ const CardLayout = styled.div`
       transform: rotateY(-180deg);
       z-index: -2;
     }
-    
+
     .back {
       transform: rotateY(0deg);
       z-index: 0;
@@ -53,7 +61,41 @@ const CardLayout = styled.div`
   }
 `;
 
-const size = 5;
+function CardComponent(props: CardProps) {
+  const { data, text, canvasInfo } = props;
+  const layoutRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<LinearDataCanvasHandle | null>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current || !layoutRef.current) return;
+
+    const myResize = debounce(() => {
+      const width = (layoutRef.current?.clientWidth as number) - 10;
+      const height = (layoutRef.current?.clientHeight as number) - 10;
+      canvasRef.current?.canvasResize(width, height);
+      canvasRef.current?.currentDraw(data, canvasInfo);
+    }, 300);
+
+    myResize();
+
+    window.addEventListener("resize", myResize);
+
+    return () => {
+      window.removeEventListener("resize", myResize);
+    };
+  }, [data, canvasInfo]);
+
+  return (
+    <CardLayout ref={layoutRef}>
+      <div className="front">
+        <LinearDataCanvas ref={canvasRef} />
+      </div>
+      <div className="back">{text}</div>
+    </CardLayout>
+  );
+}
+
+const size = 10;
 export default function ArchivePage() {
   const navigate = useNavigate();
   const [list, setList] = useState<listType[] | null>(null);
@@ -72,7 +114,8 @@ export default function ArchivePage() {
         const db = database("susims");
 
         // 24시간 이전 데이터부터 가져오기
-        const startDate = isFirst ? new Date().getTime() - 1000 * 60 * 60 * 24 : getLastData();
+        // const startDate = isFirst ? new Date().getTime() - 1000 * 60 * 60 * 24 : getLastData();
+        const startDate = isFirst ? new Date().getTime() - 1000 * 60 * 60 * 24 * 7 : getLastData();
         const queryList = [orderByChild("date"), limitToFirst(size)];
 
         queryList.push(startAfter(startDate, "date"));
@@ -110,24 +153,18 @@ export default function ArchivePage() {
   }, [getSusimList, list]);
 
   return (
-    <div>
-      <br />
+    <div className="p-10 w-full h-full">
       <button className="fixed right-4 top-4" onClick={() => navigate("/main")}>
         나가기
       </button>
-      <div className="grid gap-4 grid-cols-5 grid-rows-2 w-11/12">
-        {list?.map((v, idx) => {
-          return (
-            <CardLayout>
-              <div className="front" key={`fron-${idx}`}>
-                {new Date(v.date).toString()}
-              </div>
-              <div className="back" key={`back-${idx}`}>
-                {v.text}
-              </div>
-            </CardLayout>
-          );
-        })}
+      <div className="w-full h-full grid overflow-auto">
+        <div className="grid gap-4 grid-rows-2 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 items-center">
+          {list?.map((v, idx) => {
+            return (
+              <CardComponent data={JSON.parse(v.data)} text={v.text} canvasInfo={JSON.parse(v.canvasInfo)} key={idx} />
+            );
+          })}
+        </div>
       </div>
       {/* <button
         onClick={() => {

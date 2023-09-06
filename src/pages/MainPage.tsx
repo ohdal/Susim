@@ -151,10 +151,12 @@ export default function MainPage() {
       const linearData = canvasRef.current?.getLinearData();
       if (linearData) {
         const db = database("susims");
+        const canvasInfo = { width: linearData.width, height: linearData.height };
 
         const data = {
           date: new Date().getTime(),
-          data: JSON.stringify(linearData),
+          data: JSON.stringify(linearData.data),
+          canvasInfo: JSON.stringify(canvasInfo),
           text: value,
         };
         const result = await push(db, data);

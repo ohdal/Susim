@@ -31,9 +31,9 @@ export default class Canvas {
     this.requestId = null;
   }
 
-  public init(): void {
-    this.CANVAS_WIDTH = innerWidth;
-    this.CANVAS_HEIGHT = innerHeight;
+  public init(width?: number, height?: number): void {
+    this.CANVAS_WIDTH = width || innerWidth;
+    this.CANVAS_HEIGHT = height || innerHeight;
 
     this.element.style.width = `${this.CANVAS_WIDTH}px`;
     this.element.style.height = `${this.CANVAS_HEIGHT}px`;
