@@ -34,7 +34,7 @@ const CardLayout = styled.div`
   }
 
   .front {
-    content: contain;
+    contain: content;
     background: #000000;
   }
 
