@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import database from "../utils/firebase";
-import { push } from "firebase/database";
+import { push, get } from "firebase/database";
 
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
@@ -143,7 +143,6 @@ export default function MainPage() {
     return returnObj;
   }, []);
 
-  // const handleSusim = useCallback(() => {
   const handleSusim = useCallback(async () => {
     const { result, value, text } = validate(susimInputRef.current);
 
@@ -155,6 +154,7 @@ export default function MainPage() {
 
         const data = {
           date: new Date().getTime(),
+          // date: 1694246986284,
           data: JSON.stringify(linearData.data),
           canvasInfo: JSON.stringify(canvasInfo),
           text: value,

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import database from "../utils/firebase";
-import { get, query, limitToFirst, startAfter, orderByChild } from "firebase/database";
+import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
 
 import CardComponent from "../components/CardComponent";
 
@@ -21,10 +21,30 @@ export default function ArchivePage() {
   const [isLast, setIsLast] = useState(false);
 
   const getStartDate = useCallback((): number => {
+    // 2주전 데이터부터 가져오기
     if (!list) return new Date().getTime() - 1000 * 60 * 60 * 24 * 14;
     else {
       const idx = list.length - 1;
       return list[idx].date;
+    }
+  }, [list]);
+
+  const setEqualData = useCallback(() => {
+    if (list) {
+      const db = database("susims");
+      const idx = list.length - 1;
+
+      get(query(db, orderByChild("date"), equalTo(list[idx].date)))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = Object.values(snapshot.val() as object);
+            data.shift();
+            setList(list.concat(data));
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }, [list]);
 
@@ -33,12 +53,12 @@ export default function ArchivePage() {
       if (!isLast) {
         const db = database("susims");
 
-        // 24시간 이전 데이터부터 가져오기
-        // const startDate = isFirst ? new Date().getTime() - 1000 * 60 * 60 * 24 : getLastData();
         const startDate = getStartDate();
         const queryList = [orderByChild("date"), limitToFirst(size)];
 
         queryList.push(startAfter(startDate, "date"));
+
+        setEqualData();
 
         get(query(db, ...queryList))
           .then((snapshot) => {
@@ -64,7 +84,7 @@ export default function ArchivePage() {
           });
       }
     },
-    [getStartDate, isLast, list]
+    [getStartDate, setEqualData, isLast, list]
   );
 
   const handleScroll = useCallback(
@@ -79,10 +99,12 @@ export default function ArchivePage() {
   );
 
   useEffect(() => {
-    if (!list) getSusimList(true);
-    else {
-      if (outterRef.current && innerRef.current && outterRef.current.clientHeight >= innerRef.current.clientHeight)
+    if (!list) {
+      getSusimList(true);
+    } else {
+      if (outterRef.current && innerRef.current && outterRef.current.clientHeight >= innerRef.current.clientHeight) {
         getSusimList();
+      }
     }
   }, [getSusimList, list]);
 
