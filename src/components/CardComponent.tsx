@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import styled from "styled-components";
 import LinearDataCanvas, { lineType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
@@ -14,6 +14,7 @@ type CardProps = {
 const CardLayout = styled.div`
   position: relative;
   height: 18.75rem;
+  cursor: pointer;
 
   .front,
   .back {
@@ -40,7 +41,7 @@ const CardLayout = styled.div`
     color: #000000;
   }
 
-  &:hover {
+  &.clicked {
     .front {
       transform: rotateY(-180deg);
       z-index: -2;
@@ -57,6 +58,7 @@ const CardComponent = (props: CardProps) => {
   const { data, text, canvasInfo } = props;
   const layoutRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<LinearDataCanvasHandle | null>(null);
+  const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
     if (!canvasRef.current || !layoutRef.current) return;
@@ -81,7 +83,13 @@ const CardComponent = (props: CardProps) => {
   }, [data, canvasInfo]);
 
   return (
-    <CardLayout ref={layoutRef}>
+    <CardLayout
+      ref={layoutRef}
+      className={clicked ? "clicked" : ""}
+      onClick={() => {
+        setClicked((v) => !v);
+      }}
+    >
       <div className="front">
         <LinearDataCanvas ref={canvasRef} />
       </div>
