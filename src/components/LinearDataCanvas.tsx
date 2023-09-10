@@ -126,6 +126,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   const getLinearData = useCallback((): { data: lineType; width: number; height: number } => {
     const width = canvas?.CANVAS_WIDTH as number;
     const height = canvas?.CANVAS_HEIGHT as number;
+
     return { data: lineArr, width, height };
   }, [canvas]);
 
@@ -153,16 +154,16 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   }, []);
 
   const drawDot = useCallback(
-    (arr: dotGroupType, info: lineInfoType, ratio: { x: number; y: number }, color = "#FFFFFF") => {
+    (arr: dotGroupType, info: lineInfoType, ratio: { x: number; y: number }, color = "#ffffff") => {
       if (!canvas) return;
 
       const { yPos } = info;
       const { r, g, b } = hexToRgb(color) || { r: 255, g: 255, b: 255 };
       const isOrigin = yPos === 0;
       const ctx = canvas.ctx as CanvasRenderingContext2D;
-      
+
       if (arr) {
-        const v = Math.floor(1 / ratio.x)
+        const v = Math.floor(1 / ratio.x);
         for (let i = 0; i < arr.length; i += v > 1 ? v : 1) {
           const { x, y } = arr[i];
           const opacity = isOrigin ? getRandomNum(0.7, 1) : getRandomNum(0.2, 1);
@@ -182,6 +183,8 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     (arr?: lineType, canvasInfo?: { width: number; height: number }): void => {
       if (!arr) arr = lineArr;
       if (!canvas) return;
+
+      canvas.clearCanvas();
 
       const ratio = { x: 1, y: 1 };
       if (canvasInfo) {
@@ -208,6 +211,11 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
     if (!queue) {
       queue = new Queue(bufferLength, dataArray);
+
+      // setInterval(() => {
+      //   const { dataArray } = getDomainData();
+      //   queue?.setData(dataArray);
+      // }, 1000);
     } else {
       queue.setData(dataArray);
     }
