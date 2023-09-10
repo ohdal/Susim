@@ -12,7 +12,7 @@ type listType = {
   date: number;
 };
 
-const size = 5;
+const PAGE_SIZE = 5;
 export default function ArchivePage() {
   const navigate = useNavigate();
   const outterRef = useRef<HTMLDivElement>(null);
@@ -29,62 +29,83 @@ export default function ArchivePage() {
     }
   }, [list]);
 
-  const setEqualData = useCallback(() => {
-    if (list) {
-      const db = database("susims");
-      const idx = list.length - 1;
-
-      get(query(db, orderByChild("date"), equalTo(list[idx].date)))
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const data = Object.values(snapshot.val() as object);
-            data.shift();
-            setList(list.concat(data));
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  }, [list]);
-
-  const getSusimList = useCallback(
-    (isFirst = false) => {
-      if (!isLast) {
+  const getEqualData = useCallback(
+    async (lastData: listType): Promise<listType[] | null> => {
+      let result: listType[] | null = null;
+      if (list) {
         const db = database("susims");
 
-        const startDate = getStartDate();
-        const queryList = [orderByChild("date"), limitToFirst(size)];
+        const snapshot = await get(query(db, orderByChild("date"), equalTo(lastData.date)));
 
-        queryList.push(startAfter(startDate, "date"));
+        if (snapshot.exists()) {
+          const data = Object.values(snapshot.val() as object);
 
-        setEqualData();
+          if (data.length > 1) {
+            let curIdx = 0;
 
-        get(query(db, ...queryList))
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              const data = snapshot.val();
-              const newArr = Object.values(data as object);
+            data.forEach((v, idx) => {
+              if (v.text === lastData.text) curIdx = idx;
+            });
 
-              if (newArr.length < size) setIsLast(true);
+            if (curIdx !== data.length - 1) result = data.slice(curIdx + 1);
+          }
+        }
+      }
 
-              if (isFirst) {
-                setList(newArr);
+      return result && result.length > 5 ? result.slice(0, 5) : result;
+    },
+    [list]
+  );
+
+  const getSusimList = useCallback(
+    async (isFirst = false) => {
+      if (!isLast) {
+        // 중복 데이터 처리
+        let equalDataArr: listType[] | null = null;
+        let size = PAGE_SIZE;
+        if (list) {
+          const idx = list.length - 1;
+          equalDataArr = await getEqualData(list[idx]);
+          size = equalDataArr ? PAGE_SIZE - equalDataArr.length : size;
+        }
+
+        if (size > 0) {
+          const db = database("susims");
+
+          const startDate = getStartDate();
+          const queryList = [orderByChild("date"), limitToFirst(size)];
+
+          queryList.push(startAfter(startDate, "date"));
+
+          get(query(db, ...queryList))
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const data = snapshot.val();
+                let newArr = Object.values(data as object);
+
+                if (equalDataArr) newArr = equalDataArr.concat(newArr);
+                if (newArr.length < PAGE_SIZE) setIsLast(true);
+
+                if (isFirst) {
+                  setList(newArr);
+                } else {
+                  setList((list as listType[]).concat(newArr));
+                }
               } else {
-                setList((list as listType[]).concat(newArr));
-              }
-            } else {
-              if (!list) setList([]);
+                if (!list) setList([]);
 
-              setIsLast(true);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+                setIsLast(true);
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        } else {
+          if (list && equalDataArr) setList(list.concat(equalDataArr));
+        }
       }
     },
-    [getStartDate, setEqualData, isLast, list]
+    [getStartDate, getEqualData, isLast, list]
   );
 
   const handleScroll = useCallback(
@@ -93,17 +114,17 @@ export default function ArchivePage() {
       const scrollHeight = (e.target as HTMLDivElement).scrollHeight;
       const scrollTop = (e.target as HTMLDivElement).scrollTop;
 
-      if (scrollHeight - clientHeight === scrollTop) getSusimList();
+      if (scrollHeight - clientHeight === scrollTop) void getSusimList();
     },
     [getSusimList]
   );
 
   useEffect(() => {
     if (!list) {
-      getSusimList(true);
+      void getSusimList(true);
     } else {
       if (outterRef.current && innerRef.current && outterRef.current.clientHeight >= innerRef.current.clientHeight) {
-        getSusimList();
+        void getSusimList();
       }
     }
   }, [getSusimList, list]);
@@ -114,7 +135,7 @@ export default function ArchivePage() {
         나가기
       </button>
       <div
-        className="w-full h-full grid overflow-auto"
+        className="w-full h-full grid overflow-auto px-4"
         ref={outterRef}
         onScroll={(e) => {
           handleScroll(e);
