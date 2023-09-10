@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import LinearDataCanvas, { lineType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
@@ -22,13 +22,13 @@ const CardLayout = styled.div`
     height: 100%;
     border: 1px solid #ffffff;
     border-radius: 10px;
-    padding: 5px;
     transition: all 0.8s ease-out;
   }
 
   .front {
     contain: content;
     background: #000000;
+    padding: 4px;
   }
 
   .back {
@@ -93,7 +93,7 @@ const CardComponent = (props: CardProps) => {
       <div className="front">
         <LinearDataCanvas ref={canvasRef} />
       </div>
-      <div className="back">{text}</div>
+      <div className="back p-5">{text}</div>
     </CardLayout>
   );
 };
