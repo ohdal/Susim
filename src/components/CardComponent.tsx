@@ -41,7 +41,7 @@ const CardLayout = styled.div`
     color: #000000;
   }
 
-  &.clicked {
+  &.clicked, &:hover {
     .front {
       transform: rotateY(-180deg);
       z-index: -2;
