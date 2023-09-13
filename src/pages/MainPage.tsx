@@ -106,9 +106,9 @@ export default function MainPage() {
       console.log(`에러발생 ${err as string}`);
 
       alert("원활한 온라인도우 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요.");
-      location.href = "/";
+      navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const validate = useCallback((cur: MainInputHandle | null): { result: boolean; value: string; text: string } => {
     const returnObj = { result: false, value: "", text: "" };
