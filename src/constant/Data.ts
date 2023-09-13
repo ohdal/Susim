@@ -57,6 +57,6 @@ export const musicFileList = [
 export const canvasFontSize = {
   sm: 14,
   md: 16,
-  lg: 22,
-  xl: 26,
+  lg: 18,
+  xl: 22,
 }
