@@ -11,31 +11,7 @@ import IntroPage from "./pages/IntroPage";
 import MainPage from "./pages/MainPage";
 import ArchivePage from "./pages/ArchivePage";
 
-// const routerTemp = createBrowserRouter(
-//   [
-//     {
-//       path: "/",
-//       element: <MusicLayout />,
-//       children: [
-//         {
-//           path: "",
-//           element: <MusicBasic />,
-//         },
-//         {
-//           path: "question",
-//           element: <MusicQuestion />,
-//         },
-//         {
-//           path: "result",
-//           element: <MusicResult />,
-//         },
-//       ],
-//     },
-//   ],
-//   {
-//     basename: "/Susim",
-//   }
-// );
+const mode = import.meta.env.MODE;
 
 const router = createBrowserRouter([
   {
@@ -70,9 +46,47 @@ const router = createBrowserRouter([
   },
 ]);
 
+const routerGit = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <IntroPage />,
+    },
+    {
+      path: "/main",
+      element: <MainPage />,
+    },
+    {
+      path: "/archive",
+      element: <ArchivePage />,
+    },
+    {
+      path: "/music",
+      element: <MusicLayout />,
+      children: [
+        {
+          path: "",
+          element: <MusicBasic />,
+        },
+        {
+          path: "question",
+          element: <MusicQuestion />,
+        },
+        {
+          path: "result",
+          element: <MusicResult />,
+        },
+      ],
+    },
+  ],
+  {
+    basename: "/Susim",
+  }
+);
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <RouterProvider router={routerTemp} /> */}
-    <RouterProvider router={router} />
+    <RouterProvider router={mode === "github" ? routerGit : router} />
   </React.StrictMode>
 );

@@ -33,7 +33,7 @@ class Queue {
     this.arr = this.filterData(data);
     return;
 
-    // if (this.arr.length >= this.buffer * 2) return;
+    if (this.arr.length >= this.buffer * 2) return;
 
     // const filter = this.filterData(data);
     // if (filter.length === 0) return;
