@@ -86,6 +86,9 @@ const CardComponent = (props: CardProps) => {
   return (
     <CardLayout
       ref={layoutRef}
+      data-aos="fade-up"
+      data-aos-delay="50"
+      data-aos-anchor="bottom"
       className={clicked ? "clicked" : ""}
       onClick={() => {
         setClicked((v) => !v);

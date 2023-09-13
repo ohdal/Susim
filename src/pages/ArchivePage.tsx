@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import database from "../utils/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
 
+import AOS from "aos";
+import "aos/dist/aos.css"; // You can also use <link> for styles
+
 import CardComponent from "../components/CardComponent";
 
 type listType = {
@@ -129,6 +132,10 @@ export default function ArchivePage() {
     }
   }, [getSusimList, list]);
 
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
   return (
     <div className="p-16 w-full h-full">
       <button className="fixed right-4 top-4" onClick={() => navigate("/main")}>
@@ -148,7 +155,9 @@ export default function ArchivePage() {
               ref={innerRef}
             >
               {list.map((v, idx) => {
-                return <CardComponent data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />;
+                return (
+                  <CardComponent data-aos="fade-up" data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />
+                );
               })}
             </div>
           ) : (
