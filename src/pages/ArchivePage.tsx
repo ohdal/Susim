@@ -114,7 +114,7 @@ export default function ArchivePage() {
       const scrollHeight = (e.target as HTMLDivElement).scrollHeight;
       const scrollTop = (e.target as HTMLDivElement).scrollTop;
 
-      if (scrollHeight - clientHeight === scrollTop) void getSusimList();
+      if (scrollHeight - clientHeight === Math.round(scrollTop)) void getSusimList();
     },
     [getSusimList]
   );
