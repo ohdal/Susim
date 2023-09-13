@@ -214,7 +214,7 @@ export default function ScatterCanvas(props: Props) {
           value.firstUpdate();
           setTimeout(() => {
             lastAnim = true;
-          }, 10000);
+          }, 7000);
         } else {
           if (!mouse) return;
 
