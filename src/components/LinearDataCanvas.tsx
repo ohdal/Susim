@@ -11,7 +11,8 @@ export interface LinearDataCanvasHandle {
   currentDraw: (arr?: lineType, canvasInfo?: { width: number; height: number }) => void;
   canvasResize: (width: number, height: number) => void;
   getLinearData: () => { data: lineType; width: number; height: number };
-  fillUp: (v: string, max: number) => void;
+  getImageData: () => string | null;
+  fillUp: (v: string) => void;
 }
 
 type dotDataType = { x: number; y: number };
@@ -102,9 +103,10 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     currentDraw,
     canvasResize,
     getLinearData,
-    fillUp: (v, max) => {
-      const value = -6 * v.length;
-      yPosCount = Math.max(value, -6 * max);
+    getImageData,
+    fillUp: (v) => {
+      const value = -4 * v.length;
+      yPosCount = Math.max(value, -300);
     },
   }));
 
@@ -128,6 +130,12 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     const height = canvas?.CANVAS_HEIGHT as number;
 
     return { data: lineArr, width, height };
+  }, [canvas]);
+
+  const getImageData = useCallback((): string |  null => {
+    if (!canvas) return null;
+
+    return canvas.element.toDataURL();
   }, [canvas]);
 
   const saveDot = useCallback((arr: dotGroupType, data: dotDataType, info: lineInfoType) => {
@@ -236,7 +244,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     for (let i = 0; i < queue.getLength(); i++) {
       const data = queue.getData(i);
       const v = data / 128.0;
-      const y = (v * canvas.CANVAS_HEIGHT) / 1.6 + yPosCount;
+      const y = (v * canvas.CANVAS_HEIGHT) / 1.4 + yPosCount;
 
       if (i === 0) {
         for (let i = 0; i < lineInfoArr.length; i++) {
