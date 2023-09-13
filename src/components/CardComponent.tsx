@@ -41,7 +41,8 @@ const CardLayout = styled.div`
     color: #000000;
   }
 
-  &.clicked, &:hover {
+  &.clicked,
+  &:hover {
     .front {
       transform: rotateY(-180deg);
       z-index: -2;
@@ -93,7 +94,9 @@ const CardComponent = (props: CardProps) => {
       <div className="front">
         <LinearDataCanvas ref={canvasRef} />
       </div>
-      <div className="back p-5">{text}</div>
+      <div className="back p-5">
+        <p className="w-full h-full overflow-auto">{text}</p>
+      </div>
     </CardLayout>
   );
 };
