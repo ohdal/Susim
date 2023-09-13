@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import database from "../utils/firebase";
-import { push, get } from "firebase/database";
+import { push } from "firebase/database";
 
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
@@ -59,7 +59,7 @@ const AudioContext = window.AudioContext;
 let audioCtx: AudioContext;
 let bufferLength: number;
 let dataArray: Uint8Array;
-const MAX_TEXT_SIZE = 50;
+const MAX_TEXT_SIZE = 200;
 const MIN_TEXT_SIZE = 10;
 
 export default function MainPage() {
@@ -69,6 +69,7 @@ export default function MainPage() {
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [level, setLevel] = useState(0);
   const [isLast, setIsLast] = useState(false);
+  const [imageData, setImageData] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const getDomainData = useCallback(() => {
@@ -104,7 +105,7 @@ export default function MainPage() {
     } catch (err) {
       console.log(`에러발생 ${err as string}`);
 
-      alert("원활한 온라인전시 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요.");
+      alert("원활한 온라인도우 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요.");
       location.href = "/";
     }
   }, []);
@@ -148,6 +149,8 @@ export default function MainPage() {
 
     if (result) {
       const linearData = canvasRef.current?.getLinearData();
+      setImageData(canvasRef.current?.getImageData() || null);
+
       if (linearData) {
         const db = database("susims");
         const canvasInfo = { width: linearData.width, height: linearData.height };
@@ -177,13 +180,14 @@ export default function MainPage() {
     if (result) {
       // 이메일 전송 하기
 
+      console.log(imageData);
       console.log("이메일 전송 완료", value);
 
       setLevel(3);
     } else {
       alert(text);
     }
-  }, [validate]);
+  }, [validate, imageData]);
 
   useEffect(() => {
     void getMediaStream();
@@ -235,9 +239,10 @@ export default function MainPage() {
                 name="수심"
                 ref={susimInputRef}
                 max={MAX_TEXT_SIZE}
+                visibleCount={true}
                 changeEventHandle={(...args) => {
-                  const [v, max] = args;
-                  canvasRef.current?.fillUp(v as string, max as number);
+                  const [v] = args;
+                  canvasRef.current?.fillUp(v as string);
                 }}
               />
               <div>
@@ -252,7 +257,7 @@ export default function MainPage() {
             </AnimationDiv>
             <AnimationDiv style={{ opacity: level === 2 ? 1 : 0, visibility: level === 2 ? "visible" : "hidden" }}>
               <MainP>당신의 숨의 기록을 전송하시겠습니까 ?</MainP>
-              <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." />
+              <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." visibleCount={false} />
               <div>
                 <MainButton
                   onClick={() => {
