@@ -103,7 +103,8 @@ class Particle {
 }
 
 let particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
-let lastAnim = false;
+let lastAnim = false,
+  firstLength = 0;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
 
@@ -155,6 +156,8 @@ export default function ScatterCanvas(props: Props) {
           particles[`${coordX}-${coordY}`].draw();
         }
       }
+
+      firstLength = Object.keys(particles).length;
     },
     [canvas]
   );
@@ -258,7 +261,7 @@ export default function ScatterCanvas(props: Props) {
     drawText();
 
     const myResize = debounce(() => {
-      if (lastAnim) return;
+      if (firstLength !== 0) return;
 
       canvas.init();
       drawText();
@@ -285,6 +288,7 @@ export default function ScatterCanvas(props: Props) {
     return () => {
       canvas.cancelAnimation();
       particles = {};
+      firstLength = 0;
       lastAnim = false;
     };
   }, [canvas]);
