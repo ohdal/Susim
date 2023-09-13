@@ -82,7 +82,9 @@ class Particle {
     const direction_c = new Vector(dx_c / dist_c, dy_c / dist_c); // 방향 벡터 구하기 - 마우스 위치에서 떨어져서 미리는
 
     // direction_c - 마우스 포인터 위치에서 떨어지게끔 밀려야하므로 마이너스 값을 곱해준다.
-    const add_Vector = Vector.add(direction_m.mult(10), direction_c.mult(-5));
+    const randomNum_m = getRandomNum(20, 40);
+    const randomNum_c = getRandomNum(-20, -5);
+    const add_Vector = Vector.add(direction_m.mult(randomNum_m), direction_c.mult(randomNum_c));
     this.pos.add(add_Vector.x, add_Vector.y);
 
     if (!this.isTouched) this.isTouched = true;
@@ -101,7 +103,7 @@ class Particle {
 }
 
 let particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
-let firstLength = 0;
+let lastAnim = false;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
 
@@ -153,8 +155,6 @@ export default function ScatterCanvas(props: Props) {
           particles[`${coordX}-${coordY}`].draw();
         }
       }
-
-      firstLength = Object.keys(particles).length;
     },
     [canvas]
   );
@@ -209,15 +209,15 @@ export default function ScatterCanvas(props: Props) {
         if (isFirst) {
           value.draw();
           value.firstUpdate();
+          setTimeout(() => {
+            lastAnim = true;
+          }, 10000);
         } else {
           if (!mouse) return;
 
           value.draw();
-          if (firstLength * 0.8 > length) {
-            value.update_opacity();
-          } else {
-            value.update(mouse);
-          }
+          if (!lastAnim) value.update(mouse);
+          else value.update_opacity();
 
           // if (value.opacity <= 0.2) delete particles[key];
           if (value.opacity <= 0) delete particles[key];
@@ -258,7 +258,7 @@ export default function ScatterCanvas(props: Props) {
     drawText();
 
     const myResize = debounce(() => {
-      if (firstLength !== 0) return;
+      if (lastAnim) return;
 
       canvas.init();
       drawText();
@@ -285,7 +285,7 @@ export default function ScatterCanvas(props: Props) {
     return () => {
       canvas.cancelAnimation();
       particles = {};
-      firstLength = 0;
+      lastAnim = false;
     };
   }, [canvas]);
 
