@@ -138,7 +138,7 @@ export default function ScatterCanvas(props: Props) {
       const met = textInfo;
       const width = Math.floor(met.width * dpr);
 
-      const imgData = ctx.getImageData(xPos * dpr - met.width, yPos * dpr, met.width * dpr, met.height * dpr);
+      const imgData = ctx.getImageData(xPos * dpr - met.width / 2 * dpr, yPos * dpr, met.width * dpr, met.height * dpr);
 
       canvas.clearCanvas();
 
@@ -147,7 +147,7 @@ export default function ScatterCanvas(props: Props) {
         count++;
 
         if (imgData.data[i + 3] !== 0) {
-          const x = (count % (width / 2)) + (xPos - met.width / 2);
+          const x = (count % (width / dpr)) + (xPos - met.width / 2);
           const y = Math.floor(count / width) + yPos;
           const coordX = Math.floor(x);
           const coordY = Math.floor(y);
@@ -211,6 +211,7 @@ export default function ScatterCanvas(props: Props) {
       for (const [key, value] of Object.entries(particles)) {
         if (isFirst) {
           value.draw();
+          lastAnim = false;
           value.firstUpdate();
           setTimeout(() => {
             lastAnim = true;
@@ -289,7 +290,6 @@ export default function ScatterCanvas(props: Props) {
       canvas.cancelAnimation();
       particles = {};
       firstLength = 0;
-      lastAnim = false;
     };
   }, [canvas]);
 
