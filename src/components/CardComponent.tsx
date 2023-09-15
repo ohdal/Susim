@@ -41,14 +41,26 @@ const CardLayout = styled.div`
     color: #000000;
   }
 
+  &.clicked, &.not-clicked {
+    &[data-aos^="fade"][data-aos^="fade"] {
+      opacity: 1; !important
+    }
+  
+    &[data-aos=fade-up] {
+      transform: translate3d(0, 0, 0); !important;
+    }
+  }
+
   &.clicked,
   &:hover {
     .front {
+      opacity: 1;
       transform: rotateY(-180deg);
       z-index: -2;
     }
 
     .back {
+      opacity: 1;
       transform: rotateY(0deg);
       z-index: 0;
     }
@@ -59,7 +71,7 @@ const CardComponent = (props: CardProps) => {
   const { data, text, canvasInfo } = props;
   const layoutRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<LinearDataCanvasHandle | null>(null);
-  const [clicked, setClicked] = useState(false);
+  const [clicked, setClicked] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current || !layoutRef.current) return;
@@ -89,9 +101,12 @@ const CardComponent = (props: CardProps) => {
       data-aos="fade-up"
       data-aos-delay="50"
       data-aos-anchor="bottom"
-      className={clicked ? "clicked" : ""}
+      data-aos-once="true"
+      className={clicked === null ? "" : clicked ? "clicked" : "not-clicked"}
       onClick={() => {
-        setClicked((v) => !v);
+        setClicked((v) => {
+          return v === null ? true : !v;
+        });
       }}
     >
       <div className="front">

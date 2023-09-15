@@ -117,7 +117,10 @@ export default function ArchivePage() {
       const scrollHeight = (e.target as HTMLDivElement).scrollHeight;
       const scrollTop = (e.target as HTMLDivElement).scrollTop;
 
-      if (scrollHeight - clientHeight === Math.round(scrollTop)) void getSusimList();
+      if (scrollHeight - clientHeight === Math.round(scrollTop)) {
+        void getSusimList();
+        (e.target as HTMLDivElement).scrollTop += 30;
+      }
     },
     [getSusimList]
   );
@@ -155,9 +158,7 @@ export default function ArchivePage() {
               ref={innerRef}
             >
               {list.map((v, idx) => {
-                return (
-                  <CardComponent data-aos="fade-up" data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />
-                );
+                return <CardComponent data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />;
               })}
             </div>
           ) : (
