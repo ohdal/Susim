@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import database from "../utils/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
 
+import { Scrollbars, positionValues } from "react-custom-scrollbars";
 import AOS from "aos";
 import "aos/dist/aos.css"; // You can also use <link> for styles
 
@@ -18,7 +19,6 @@ type listType = {
 const PAGE_SIZE = 5;
 export default function ArchivePage() {
   const navigate = useNavigate();
-  const outterRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<listType[] | null>(null);
   const [isLast, setIsLast] = useState(false);
@@ -119,21 +119,24 @@ export default function ArchivePage() {
 
       if (scrollHeight - clientHeight === Math.round(scrollTop)) {
         void getSusimList();
-        (e.target as HTMLDivElement).scrollTop += 30;
+        (e.target as HTMLDivElement).scrollTop += 40;
       }
     },
     [getSusimList]
   );
 
-  useEffect(() => {
-    if (!list) {
-      void getSusimList(true);
-    } else {
-      if (outterRef.current && innerRef.current && outterRef.current.clientHeight >= innerRef.current.clientHeight) {
-        void getSusimList();
+  const getOutterHeight = useCallback(
+    (v: positionValues) => {
+      if (!list) {
+        void getSusimList(true);
+      } else {
+        if (innerRef.current && v.clientHeight >= innerRef.current.clientHeight) {
+          void getSusimList();
+        }
       }
-    }
-  }, [getSusimList, list]);
+    },
+    [getSusimList, list]
+  );
 
   useEffect(() => {
     AOS.init();
@@ -144,13 +147,7 @@ export default function ArchivePage() {
       <button className="fixed right-4 top-4" onClick={() => navigate("/main")}>
         나가기
       </button>
-      <div
-        className="w-full h-full grid overflow-auto px-4"
-        ref={outterRef}
-        onScroll={(e) => {
-          handleScroll(e);
-        }}
-      >
+      <Scrollbars onScroll={handleScroll} onUpdate={getOutterHeight} style={{ width: "100%", height: "100%" }}>
         {list ? (
           list.length > 0 ? (
             <div
@@ -162,32 +159,36 @@ export default function ArchivePage() {
               })}
             </div>
           ) : (
-            <p className="place-self-center">수심이 존재하지 않습니다.</p>
+            <div className="w-full h-full grid">
+              <p className="place-self-center">수심이 존재하지 않습니다.</p>
+            </div>
           )
         ) : (
-          <div className="place-self-center">
-            <svg
-              className="animate-spin h-5 w-5 mr-3 inline-block"
-              fill="#ffffff"
-              height="200px"
-              width="200px"
-              version="1.1"
-              id="Capa_1"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 220 220"
-              stroke="#ffffff"
-            >
-              <g id="SVGRepo_bgCarrier"></g>
-              <g id="SVGRepo_tracerCarrier"></g>
-              <g id="SVGRepo_iconCarrier">
-                {" "}
-                <path d="M158.505,10.987l12.99,7.5L154.29,48.289l-12.99-7.5L158.505,10.987z M209.013,61.495l-7.5-12.99L171.711,65.71l7.5,12.99 L209.013,61.495z M185.59,117.5H220v-15h-34.41V117.5z M171.711,154.29l29.802,17.205l7.5-12.99L179.211,141.3L171.711,154.29z M141.3,179.211l17.205,29.802l12.99-7.5l-17.205-29.802L141.3,179.211z M102.5,220h15v-34.41h-15V220z M48.505,201.513l12.99,7.5 L78.7,179.211l-12.99-7.5L48.505,201.513z M10.987,158.505l7.5,12.99l29.802-17.205l-7.5-12.99L10.987,158.505z M0,117.5h34.41v-15 H0V117.5z M48.288,65.71L18.487,48.505l-7.5,12.99L40.788,78.7L48.288,65.71z M48.505,18.487L65.71,48.288l12.99-7.5L61.495,10.987 L48.505,18.487z M102.5,34.409h15V0h-15V34.409z"></path>{" "}
-              </g>
-            </svg>
-            수심을 불러오는 중입니다...
+          <div className="w-full h-full grid">
+            <div className="place-self-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-3 inline-block"
+                fill="#ffffff"
+                height="200px"
+                width="200px"
+                version="1.1"
+                id="Capa_1"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 220 220"
+                stroke="#ffffff"
+              >
+                <g id="SVGRepo_bgCarrier"></g>
+                <g id="SVGRepo_tracerCarrier"></g>
+                <g id="SVGRepo_iconCarrier">
+                  {" "}
+                  <path d="M158.505,10.987l12.99,7.5L154.29,48.289l-12.99-7.5L158.505,10.987z M209.013,61.495l-7.5-12.99L171.711,65.71l7.5,12.99 L209.013,61.495z M185.59,117.5H220v-15h-34.41V117.5z M171.711,154.29l29.802,17.205l7.5-12.99L179.211,141.3L171.711,154.29z M141.3,179.211l17.205,29.802l12.99-7.5l-17.205-29.802L141.3,179.211z M102.5,220h15v-34.41h-15V220z M48.505,201.513l12.99,7.5 L78.7,179.211l-12.99-7.5L48.505,201.513z M10.987,158.505l7.5,12.99l29.802-17.205l-7.5-12.99L10.987,158.505z M0,117.5h34.41v-15 H0V117.5z M48.288,65.71L18.487,48.505l-7.5,12.99L40.788,78.7L48.288,65.71z M48.505,18.487L65.71,48.288l12.99-7.5L61.495,10.987 L48.505,18.487z M102.5,34.409h15V0h-15V34.409z"></path>{" "}
+                </g>
+              </svg>
+              수심을 불러오는 중입니다...
+            </div>
           </div>
         )}
-      </div>
+      </Scrollbars>
     </div>
   );
 }
