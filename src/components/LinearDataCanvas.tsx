@@ -178,7 +178,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
           ctx.beginPath();
           ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-          ctx.arc((x + (yPos < 0 ? 10 : 0)) * ratio.x, (y - yPos) * ratio.y, 2, 0, (Math.PI / 180) * 360);
+          ctx.arc((x + (yPos < 0 ? 10 : 0)) * ratio.x, (y - yPos) * ratio.y, 1, 0, (Math.PI / 180) * 360);
           ctx.fill();
           ctx.closePath();
         }

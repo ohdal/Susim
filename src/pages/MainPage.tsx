@@ -91,7 +91,7 @@ export default function MainPage() {
 
         setAnalyser(analyser);
 
-        analyser.fftSize = 256;
+        analyser.fftSize = 512;
         analyser.smoothingTimeConstant = 0.85;
         bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
