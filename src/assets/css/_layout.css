@@ -1,0 +1,33 @@
+.music-page {
+  width: 100%;
+  height: 100%;
+}
+
+.music-page .content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 30px 20px;
+}
+
+.music-page .footer {
+  width: 100%;
+  height: 84px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  padding: 30px;
+}
+
+.music-page .footer button,
+a {
+  float: right;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #ffffff;
+}

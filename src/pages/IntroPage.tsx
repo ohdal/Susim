@@ -21,7 +21,7 @@ export default function IntroPage() {
       <ScatterCanvas
         text={text}
         afterAnimationFunc={() => {
-          navigate("/main");
+          navigate("/question");
         }}
       />
     </>

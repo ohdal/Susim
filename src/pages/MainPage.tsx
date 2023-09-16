@@ -273,7 +273,7 @@ export default function MainPage() {
               <button
                 className="fixed right-4 bottom-4"
                 onClick={() => {
-                  navigate("/archive");
+                  navigate("archive");
                 }}
               >
                 Go Archive

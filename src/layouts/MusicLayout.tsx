@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { musicFileList } from "../constant/Data";
@@ -7,35 +7,6 @@ import { musicFileList } from "../constant/Data";
 const Container = styled.div`
   width: 100%;
   height: 100%;
-
-  .content {
-    position: relative;
-    width; 100%;
-    height: 100%;
-    padding: 30px 20px;
-  }
-
-  .footer {
-    width: 100%;
-    height: 84px;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    padding: 30px;
-
-    button,
-    a {
-      float: right;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      padding: 0;
-      text-decoration: none;
-      font-size: 1.5rem;
-      line-height: 1;
-      color: #ffffff;
-    }
-  }
 `;
 
 type MusicListType = number[] | null;
@@ -46,6 +17,7 @@ let loadedCount = 0;
 export default function MusicLayout() {
   const [musicList, setMusicList] = useState<MusicListType>(null);
   const navigate = useNavigate();
+  const { list } = useParams();
 
   const handleMusicList = useCallback((arr: MusicListType): void => {
     setMusicList(arr);
@@ -98,11 +70,12 @@ export default function MusicLayout() {
             long = audioList[long].duration < audio.duration ? i : long;
           }
 
-          audioList[long].onended = () => {
-            navigate("/result");
-          };
+          // audioList[long].onended = () => {
+          //   navigate("/result");
+          // };
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error(err);
           alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요.");
           navigate("/");
         });
@@ -112,10 +85,13 @@ export default function MusicLayout() {
   }, [musicList, loadedEvent, handleAllMusic, navigate]);
 
   useEffect(() => {
+    if (list) handleMusicList(list.split("").map((v) => Number(v)));
+
     return () => {
       handleAllMusic();
+      setMusicList(null);
     };
-  }, [handleAllMusic]);
+  }, [handleAllMusic, handleMusicList, list]);
 
   return (
     <Container>

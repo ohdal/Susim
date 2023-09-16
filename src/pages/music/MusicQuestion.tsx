@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { useOutletContext } from "react-router-dom";
-import { ContextType } from "../../layouts/MusicLayout";
+import { useOutletContext, useNavigate } from "react-router-dom";
+// import { ContextType } from "../../layouts/MusicLayout";
 import styled from "styled-components";
 
 import background_img_2 from "../../assets/images/background_2.png";
@@ -90,10 +90,11 @@ const QuestionCard = styled.div<{ $count: number }>`
 
 let userChoiceList: number[] = [];
 export default function MusicQuestion() {
-  const [level, setLevel] = useState(-1);
+  const [level, setLevel] = useState(0);
   const [question, setQuestion] = useState<questionType | null>(null);
   const [userChoice, setUserChoice] = useState<number | null>(null);
-  const { handleMusicList } = useOutletContext<ContextType>();
+  const navigate = useNavigate();
+  // const { handleMusicList } = useOutletContext<ContextType>();
 
   const handleCard = useCallback((v: number) => {
     setUserChoice(v);
@@ -118,13 +119,22 @@ export default function MusicQuestion() {
     setQuestion(questionList[level]);
 
     if (level > questionList.length - 1) {
-      handleMusicList(userChoiceList);
+      navigate(`/main/${userChoiceList.join("")}`);
+      // handleMusicList(userChoiceList);
     }
-  }, [level, handleMusicList]);
+  }, [level, navigate]);
 
-  useEffect(() => {
-    handleMusicList(null);
-  }, [handleMusicList])
+  // useEffect(() => {
+  //   setQuestion(questionList[level]);
+
+  //   if (level > questionList.length - 1) {
+  //     handleMusicList(userChoiceList);
+  //   }
+  // }, [level, handleMusicList]);
+
+  // useEffect(() => {
+  //   handleMusicList(null);
+  // }, [handleMusicList])
 
   return (
     <div className="content">
