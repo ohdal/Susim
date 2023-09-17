@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+// import { useOutletContext, useNavigate } from "react-router-dom";
 // import { ContextType } from "../../layouts/MusicLayout";
 import styled from "styled-components";
 
@@ -152,7 +153,7 @@ export default function MusicQuestion() {
           <>
             <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} />
             <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} />
-            <CardLayout className="columns-3xl">
+            <CardLayout>
               {question.answerList.map((answer, idx) => {
                 if (question.answerType === "text") {
                   return (
