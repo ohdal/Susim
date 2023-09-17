@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
+import { Scrollbars } from "react-custom-scrollbars";
+
 import LinearDataCanvas, { lineType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
 
@@ -113,7 +115,9 @@ const CardComponent = (props: CardProps) => {
         <LinearDataCanvas ref={canvasRef} />
       </div>
       <div className="back p-5">
-        <p className="w-full h-full overflow-auto">{text}</p>
+        <Scrollbars style={{ width: "100%", height: "100%" }}>
+          <p className="w-full h-full">{text}</p>
+        </Scrollbars>
       </div>
     </CardLayout>
   );
