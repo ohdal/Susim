@@ -53,8 +53,8 @@ export default function LineDiv(props: Props) {
   return (
     <Container
       className="w-4/5 h-12 flex items-center justify-between flex-row"
-      $sizeL={left.size || 1.750}
-      $sizeR={right.size || 1.750}
+      $sizeL={left.size || 1.625}
+      $sizeR={right.size || 1.625}
     >
       <p className="left" ref={leftRef}>
         {left.text || "Left"}
