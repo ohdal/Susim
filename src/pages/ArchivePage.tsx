@@ -119,7 +119,10 @@ export default function ArchivePage() {
 
       if (scrollHeight - clientHeight === Math.round(scrollTop)) {
         void getSusimList();
-        (e.target as HTMLDivElement).scrollTop += 40;
+        setTimeout(() => {
+          const target = e.target as HTMLDivElement;
+          target.scrollTop += 50;
+        }, 300);
       }
     },
     [getSusimList]
