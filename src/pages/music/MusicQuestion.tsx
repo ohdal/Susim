@@ -4,26 +4,27 @@ import { useNavigate } from "react-router-dom";
 // import { ContextType } from "../../layouts/MusicLayout";
 import styled from "styled-components";
 
-import background_img_2 from "../../assets/images/background_2.png";
+import background_card from "../../assets/images/background_card.png";
+// import background_img_2 from "../../assets/images/background_2.png";
 
 import LineDiv from "../../components/LineDiv";
 
 import { questionList, questionType } from "../../constant/Data";
 
-const BackgroundDiv = styled.div<{ $background: string }>`
-  width: 90%;
-  min-height: 90%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-image: url(${(props) => props.$background});
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  filter: blur(8px);
-  z-index: 0;
-`;
+// const BackgroundDiv = styled.div<{ $background: string }>`
+//   width: 90%;
+//   min-height: 90%;
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%);
+//   background-image: url(${(props) => props.$background});
+//   background-position: center;
+//   background-size: contain;
+//   background-repeat: no-repeat;
+//   filter: blur(8px);
+//   z-index: 0;
+// `;
 
 const ContentInner = styled.div`
   width: inherit;
@@ -38,7 +39,6 @@ const CardLayout = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  padding: 120px 0;
   margin: 0 auto;
 `;
 
@@ -48,24 +48,27 @@ const QuestionImgCard = styled.img<{ $count: number }>`
   border-radius: 10px;
   display: inline-block;
   transition: all 0.3s ease-out;
-  box-shadow: 3px 3px 0px 3px #7c7c7c;
-
+  // box-shadow: 3px 3px 0px 3px #7c7c7c;
+  
   &:not(:last-child) {
     margin-right: 2%;
   }
-
+  
   &:hover,
   &.selected {
     transform: translateY(-30px);
   }
-`;
-
-const QuestionCard = styled.div<{ $count: number }>`
+  `;
+  
+  const QuestionCard = styled.div<{ $src: string; $count: number }>`
   cursor: pointer;
-  width: calc((100% - 100px) / ${(props) => props.$count});
-  height: 300px;
+  width: ${(props) => (100 - (props.$count - 1) * 2) / props.$count}%;
+  height: 24.720rem; // 395.52px
   display: inline-block;
-  background: #ffffff;
+  background-image: url(${(props) => props.$src});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   border-radius: 10px;
   transition: all 0.3s ease-out;
 
@@ -75,18 +78,22 @@ const QuestionCard = styled.div<{ $count: number }>`
 
   p {
     margin: 0;
-    color: #000000;
-    font-family: "nomal" !important;
-    font-size: 2.625rem; // 42px
+    font-size: 1.375rem; // 22px
     font-weight: bold;
     text-align: center;
-    line-height: 300px;
+    line-height: 16.25rem;
   }
 
   &:hover,
   &.selected {
     transform: translateY(-30px);
   }
+`;
+
+const QuestionP = styled.p`
+  padding-top: 6.25rem; // 100px
+  text-align: center;
+  font-size: 1.625rem;
 `;
 
 let userChoiceList: number[] = [];
@@ -138,8 +145,8 @@ export default function MusicQuestion() {
   // }, [handleMusicList])
 
   return (
-    <div className="content">
-      <BackgroundDiv $background={background_img_2} />
+    <div className="content background-img">
+      {/* <BackgroundDiv $background={background_img_2} /> */}
       <ContentInner>
         {level < 0 && (
           <div className="w-full h-full flex justify-center items-center">
@@ -151,14 +158,16 @@ export default function MusicQuestion() {
         )}
         {question && (
           <>
-            <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} />
-            <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} />
+            {/* <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} /> */}
+            {/* <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} /> */}
+            <QuestionP>{question.question}</QuestionP>
             <CardLayout>
               {question.answerList.map((answer, idx) => {
                 if (question.answerType === "text") {
                   return (
                     <QuestionCard
                       key={idx}
+                      $src={background_card}
                       $count={question.answerList.length}
                       className={idx + 1 === userChoice ? "selected" : ""}
                       onClick={() => {
@@ -195,7 +204,9 @@ export default function MusicQuestion() {
         )}
         {level < questionList.length && (
           <div className="footer">
-            <button onClick={handleButton}>넘어가기</button>
+            <button className="gradient-btn" onClick={handleButton}>
+              넘어가기
+            </button>
           </div>
         )}
       </ContentInner>

@@ -1,0 +1,5 @@
+button.gradient-btn {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3)) !important;
+  border-radius: 10px !important;
+  padding: 0.625rem 2.5rem !important;
+}

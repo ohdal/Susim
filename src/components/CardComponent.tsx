@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { Scrollbars } from "react-custom-scrollbars";
 
+import background_archive from "../assets/images/background_archive.png";
+
 import LinearDataCanvas, { lineType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
 
@@ -13,24 +15,30 @@ type CardProps = {
   text: string;
 };
 
-const CardLayout = styled.div`
-  position: relative;
-  height: 18.75rem;
+const CardLayout = styled.div<{ $src: string }>`
   cursor: pointer;
+  display: inline-block;
+  position: relative;
+  width: 192.25px;
+  height: 354.5px;
 
   .front,
   .back {
     width: 100%;
     height: 100%;
-    border: 1px solid #ffffff;
+    border: 1px solid #000000;
     border-radius: 10px;
     transition: all 0.8s ease-out;
   }
-
+  
   .front {
     contain: content;
+    padding: 7px;
     background: #000000;
-    padding: 4px;
+    background-image: url(${(props) => props.$src});
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
   }
 
   .back {
@@ -79,8 +87,8 @@ const CardComponent = (props: CardProps) => {
     if (!canvasRef.current || !layoutRef.current) return;
 
     const myResize = debounce(() => {
-      const width = (layoutRef.current?.clientWidth as number) - 10;
-      const height = (layoutRef.current?.clientHeight as number) - 10;
+      const width = (layoutRef.current?.clientWidth as number) - 14;
+      const height = (layoutRef.current?.clientHeight as number) - 14;
       canvasRef.current?.canvasResize(width, height);
       canvasRef.current?.currentDraw(
         JSON.parse(data) as lineType,
@@ -100,6 +108,7 @@ const CardComponent = (props: CardProps) => {
   return (
     <CardLayout
       ref={layoutRef}
+      $src={background_archive}
       data-aos="fade-up"
       data-aos-delay="50"
       data-aos-anchor="bottom"

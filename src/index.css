@@ -1,5 +1,6 @@
 @import "./assets/css/_breakpoints.css";
 @import "./assets/css/_layout.css";
+@import "./assets/css/_button.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

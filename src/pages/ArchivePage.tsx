@@ -16,7 +16,7 @@ type listType = {
   date: number;
 };
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 6;
 export default function ArchivePage() {
   const navigate = useNavigate();
   const innerRef = useRef<HTMLDivElement>(null);
@@ -147,15 +147,16 @@ export default function ArchivePage() {
 
   return (
     <div className="p-16 w-full h-full">
-      <button className="fixed right-4 top-4" onClick={() => navigate("..", { relative: "path" })}>
+      <button className="gradient-btn fixed right-4 top-4" onClick={() => navigate("..", { relative: "path" })}>
         나가기
       </button>
       <Scrollbars onScroll={handleScroll} onUpdate={getOutterHeight} style={{ width: "100%", height: "100%" }}>
         {list ? (
           list.length > 0 ? (
             <div
-              className="grid gap-4 grid-rows-2 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 items-center px-2"
-              style={{width: "calc(100% - 17px)"}}
+              className="grid xs_card:grid-cols-2 sm_card:grid-cols-3 md_card:grid-cols-4 lg_card:grid-cols-5 xl_card:grid-cols-6 justify-items-center"
+              // className="flex flex-row flex-wrap justify-between justify-self-center"
+              style={{ width: "clac(100% - 17px)" }}
               ref={innerRef}
             >
               {list.map((v, idx) => {

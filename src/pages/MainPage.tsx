@@ -30,11 +30,10 @@ const MainP = styled.p`
 
 const MainButton = styled.button`
   float: right;
-  padding: 10px 12px;
+  padding: 10px 15px;
   margin-right: 10px;
   text-align: center;
-  border: 1px solid #ffffff;
-  background: rgba(0, 0, 0, 0.7);
+  border: none;
 
   &:first-child {
     margin-right: 0;
@@ -203,9 +202,9 @@ export default function MainPage() {
         }, 5000);
         break;
       case 2:
-        // canvasRef.current?.stopAnimation();
         break;
       case 3:
+        canvasRef.current?.stopAnimation();
         setTimeout(() => {
           setLevel((v) => v + 1);
         }, 5000);
@@ -247,6 +246,7 @@ export default function MainPage() {
               />
               <div>
                 <MainButton
+                  className="gradient-btn px-5 py-2.5"
                   onClick={() => {
                     void handleSusim();
                   }}
@@ -260,6 +260,7 @@ export default function MainPage() {
               <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." visibleCount={false} />
               <div>
                 <MainButton
+                  className="gradient-btn"
                   onClick={() => {
                     setLevel(3);
                   }}
@@ -271,7 +272,7 @@ export default function MainPage() {
             </AnimationDiv>
             {level === 0 && (
               <button
-                className="fixed right-4 bottom-4"
+                className="fixed right-4 bottom-4 gradient-btn"
                 onClick={() => {
                   navigate("archive");
                 }}

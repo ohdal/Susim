@@ -17,13 +17,13 @@ export default function IntroPage() {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div className="w-full h-full background-img">
       <ScatterCanvas
         text={text}
         afterAnimationFunc={() => {
           navigate("/question");
         }}
       />
-    </>
+    </div>
   );
 }
