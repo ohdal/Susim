@@ -49,26 +49,22 @@ const QuestionImgCard = styled.img<{ $count: number }>`
   display: inline-block;
   transition: all 0.3s ease-out;
   // box-shadow: 3px 3px 0px 3px #7c7c7c;
-  
+
   &:not(:last-child) {
     margin-right: 2%;
   }
-  
+
   &:hover,
   &.selected {
     transform: translateY(-30px);
   }
-  `;
-  
-  const QuestionCard = styled.div<{ $src: string; $count: number }>`
+`;
+
+const QuestionCard = styled.div<{ $count: number }>`
   cursor: pointer;
+  position: relative;
   width: ${(props) => (100 - (props.$count - 1) * 2) / props.$count}%;
-  height: 24.720rem; // 395.52px
   display: inline-block;
-  background-image: url(${(props) => props.$src});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
   border-radius: 10px;
   transition: all 0.3s ease-out;
 
@@ -77,11 +73,15 @@ const QuestionImgCard = styled.img<{ $count: number }>`
   }
 
   p {
+    position: absolute;
+    top: 43%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     margin: 0;
     font-size: 1.375rem; // 22px
     font-weight: bold;
     text-align: center;
-    line-height: 16.25rem;
+    // line-height: 16.25rem;
   }
 
   &:hover,
@@ -165,15 +165,15 @@ export default function MusicQuestion() {
               {question.answerList.map((answer, idx) => {
                 if (question.answerType === "text") {
                   return (
-                    <QuestionCard
-                      key={idx}
-                      $src={background_card}
-                      $count={question.answerList.length}
-                      className={idx + 1 === userChoice ? "selected" : ""}
-                      onClick={() => {
-                        handleCard(idx + 1);
-                      }}
-                    >
+                    <QuestionCard key={idx} $count={question.answerList.length}>
+                      <img
+                        width="100%"
+                        src={background_card}
+                        className={idx + 1 === userChoice ? "selected" : ""}
+                        onClick={() => {
+                          handleCard(idx + 1);
+                        }}
+                      />
                       <p>{answer}</p>
                     </QuestionCard>
                   );
