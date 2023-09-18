@@ -6,7 +6,7 @@ import Mouse from "../utils/Mouse";
 import styled from "styled-components";
 
 import { canvasFontSize } from "../constant/Data";
-import font_ttf from "../assets/fonts/KoPubWorld_Batang_Pro_Medium.ttf";
+import font_ttf from "../assets/fonts/GowunBatang-Regular.ttf";
 
 // import text_img from "../assets/text_test.png";
 

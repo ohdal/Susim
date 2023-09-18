@@ -13,7 +13,6 @@ const Container = styled.div<{ $sizeL: number; $sizeR: number }>`
     }
 
     &.right {
-      font-family: "Libre Baskerville", serif !important;
       font-size: ${(props) => props.$sizeR}rem;
     }
   }

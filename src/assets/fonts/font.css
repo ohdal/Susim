@@ -1,23 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap');
-
 @font-face {
-  font-family: "KoPubWorld Bold";
+  font-family: "GowunBatang-Bold";
   font-style: normal;
   font-weight: normal;
-  src: url('./KoPubWorld_Batang_Bold.eot'); /* IE9 Compat Modes */
-  src: url("./KoPubWorld_Batang_Bold.woff") format("woff"),
-  url('./KoPubWorld Batang_Pro Bold.otf') format('opentype'),
-  url('./KoPubWorld Batang Bold.ttf') format('truetype'), /* Safari, Android, iOS */
-  url('./KoPubWorld_Batang_Bold.svg') format('svg'); /* Legacy iOS */
+  src: url("./GowunBatang-Bold.eot"); /* IE9 Compat Modes */
+  src: url("./GowunBatang-Bold.woff") format("woff"), url("./GowunBatang-Bold.otf") format("opentype"),
+    url("./GowunBatang-Bold.ttf") format("truetype"),
+    /* Safari, Android, iOS */ url("./GowunBatang-Bold.svg") format("svg"); /* Legacy iOS */
 }
 
 @font-face {
-  font-family: "KoPubWorld Medium";
+  font-family: "GowunBatang-Regular";
   font-style: normal;
   font-weight: normal;
-  src: url('./KoPubWorld_Batang_Pro_Medium.eot'); /* IE9 Compat Modes */
-  src: url("./KoPubWorld_Batang_Pro_Medium.woff") format("woff"),
-  url('./KoPubWorld Batang_Pro Medium.otf') format('opentype'),
-  url('./KoPubWorld_Batang_Pro_Medium.ttf') format('truetype'), /* Safari, Android, iOS */
-  url('./KoPubWorld_Batang_Pro_Medium.svg') format('svg'); /* Legacy iOS */
+  src: url("./GowunBatang-Regular.eot"); /* IE9 Compat Modes */
+  src: url("./GowunBatang-Regular.woff") format("woff"), url("./GowunBatang-Regular.otf") format("opentype"),
+    url("./GowunBatang-Regular.ttf") format("truetype"),
+    /* Safari, Android, iOS */ url("./GowunBatang-Regular.svg") format("svg"); /* Legacy iOS */
 }
