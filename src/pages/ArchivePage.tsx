@@ -155,6 +155,7 @@ export default function ArchivePage() {
           list.length > 0 ? (
             <div
               className="grid gap-4 grid-rows-2 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 items-center px-2"
+              style={{width: "calc(100% - 17px)"}}
               ref={innerRef}
             >
               {list.map((v, idx) => {
