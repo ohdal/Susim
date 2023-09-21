@@ -147,7 +147,10 @@ export default function ArchivePage() {
 
   return (
     <div className="p-16 w-full h-full">
-      <button className="gradient-btn fixed right-4 top-4" onClick={() => navigate("..", { relative: "path" })}>
+      <button
+        className="gradient-btn fixed right-4 top-4"
+        onClick={() => navigate("..", { relative: "path", state: "archive" })}
+      >
         나가기
       </button>
       <Scrollbars onScroll={handleScroll} onUpdate={getOutterHeight} style={{ width: "100%", height: "100%" }}>

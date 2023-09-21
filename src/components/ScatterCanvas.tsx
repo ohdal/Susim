@@ -234,7 +234,7 @@ export default function ScatterCanvas(props: Props) {
         }
       }
     },
-    [mouse, afterAnimationFunc]
+    [mouse, afterAnimationFunc, canvas]
   );
 
   const onMouseDownPointerDiv = useCallback(() => {

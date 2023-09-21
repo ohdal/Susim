@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, useRef } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 // import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
 
@@ -75,6 +75,7 @@ export default function MainPage() {
   const [textLevel, setTextLevel] = useState(0);
   const [imageData, setImageData] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // const { handleMusicList } = useOutletContext<ContextType>();
 
@@ -175,7 +176,7 @@ export default function MainPage() {
         alert("error, 데이터 가져오기 오류");
       }
 
-      setLevel(1);
+      setLevel(2);
     } else {
       alert(text);
     }
@@ -190,7 +191,7 @@ export default function MainPage() {
       console.log(imageData);
       console.log("이메일 전송 완료", value);
 
-      setLevel(3);
+      setLevel(4);
     } else {
       alert(text);
     }
@@ -218,7 +219,8 @@ export default function MainPage() {
   useEffect(() => {
     switch (level) {
       case 0:
-        setTextLevel(1);
+        if (location.state === "archive") setLevel(1);
+        else setTextLevel(1);
         break;
       case 1:
         break;
@@ -241,12 +243,14 @@ export default function MainPage() {
         setTextLevel(3);
         break;
     }
-  }, [level]);
+  }, [level, navigate, location]);
 
   return (
     <>
       {textLevel ? (
-        <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
+        <div className="w-full h-full background-img">
+          <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
+        </div>
       ) : (
         <>
           {analyser && <LinearDataCanvas ref={canvasRef} getDomainData={getDomainData} />}
@@ -284,12 +288,14 @@ export default function MainPage() {
                 <MainButton
                   className="gradient-btn"
                   onClick={() => {
-                    setLevel(3);
+                    setLevel(4);
                   }}
                 >
                   아니요
                 </MainButton>
-                <MainButton onClick={handleEmail}>전송하기</MainButton>
+                <MainButton className="gradient-btn" onClick={handleEmail}>
+                  전송하기
+                </MainButton>
               </div>
             </AnimationDiv>
             {level === 1 && (
