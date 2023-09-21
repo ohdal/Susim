@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
@@ -10,20 +10,15 @@ const Container = styled.div`
 `;
 
 type MusicListType = number[] | null;
-export type ContextType = { handleMusicList: (arr: MusicListType) => void };
+export type ContextType = { musicPause: () => void };
 
 let audioList: HTMLAudioElement[] = [];
 let loadedCount = 0;
 export default function MusicLayout() {
-  const [musicList, setMusicList] = useState<MusicListType>(null);
   const navigate = useNavigate();
   const { list } = useParams();
 
-  const handleMusicList = useCallback((arr: MusicListType): void => {
-    setMusicList(arr);
-  }, []);
-
-  const handleAllMusic = useCallback((type = false) => {
+  const handleAllMusic = useCallback((type: boolean) => {
     if (audioList.length > 0) {
       audioList.forEach((audio) => {
         if (type) {
@@ -34,7 +29,8 @@ export default function MusicLayout() {
       });
 
       if (!type) audioList = [];
-      else loadedCount = 0;
+
+      loadedCount = 0;
     }
   }, []);
 
@@ -46,56 +42,74 @@ export default function MusicLayout() {
     }
   }, [handleAllMusic]);
 
+  const musicPlay = useCallback(
+    (musicList: MusicListType) => {
+      if (musicList) {
+        let long = 0;
+        const firstMusic = musicList[0] - 1;
+        const testAudio = new Audio(musicFileList[0][firstMusic]);
+
+        testAudio.loop = false;
+        testAudio
+          .play()
+          .then(() => {
+            testAudio.pause();
+
+            for (let i = 0; i < musicList.length; i++) {
+              const num = musicList[i] - 1;
+              const audio = new Audio(musicFileList[i][num]);
+
+              audioList.push(audio);
+              audio.loop = false;
+              audio.onloadeddata = loadedEvent;
+
+              long = audioList[long].duration < audio.duration ? i : long;
+            }
+
+            // audioList[long].onended = () => {
+            //   navigate("/result");
+            // };
+          })
+          .catch((err) => {
+            const errorText = err.toString();
+            if (errorText.includes("document first")) {
+              alert("카드를 다시 선택해주세요.");
+            } else {
+              alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요.");
+            }
+            navigate("/question");
+          });
+      }
+    },
+    [loadedEvent, navigate]
+  );
+
   useEffect(() => {
-    if (musicList) {
-      console.log("musicList", musicList);
-      let long = 0;
-      const firstMusic = musicList[0] - 1;
-      const testAudio = new Audio(musicFileList[0][firstMusic]);
-
-      testAudio.loop = false;
-      testAudio
-        .play()
-        .then(() => {
-          testAudio.pause();
-
-          for (let i = 0; i < musicList.length; i++) {
-            const num = musicList[i] - 1;
-            const audio = new Audio(musicFileList[i][num]);
-
-            audioList.push(audio);
-            audio.loop = false;
-            audio.onloadeddata = loadedEvent;
-
-            long = audioList[long].duration < audio.duration ? i : long;
-          }
-
-          // audioList[long].onended = () => {
-          //   navigate("/result");
-          // };
-        })
-        .catch((err) => {
-          console.error(err);
-          alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요.");
-          navigate("/");
-        });
-    } else {
-      handleAllMusic();
+    if (list) {
+      const reg = new RegExp("^[0-9]{5}$");
+      const result = reg.test(list);
+      console.log(result);
+      if (result) musicPlay(list.split("").map((v) => Number(v)));
+      else {
+        alert("잘못된 접근입니다.");
+        navigate("/question");
+      }
     }
-  }, [musicList, loadedEvent, handleAllMusic, navigate]);
-
-  useEffect(() => {
-    if (list) handleMusicList(list.split("").map((v) => Number(v)));
 
     return () => {
-      handleAllMusic();
-      setMusicList(null);
+      handleAllMusic(false);
     };
-  }, [handleAllMusic, handleMusicList, list]);
+  }, [handleAllMusic, list, musicPlay, navigate]);
 
   return (
     <Container>
-      <Outlet context={{ handleMusicList }} />
+      <Outlet
+        context={{
+          musicPause: () => {
+            handleAllMusic(false);
+          },
+        }}
+      />
     </Container>
   );
 }
