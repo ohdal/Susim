@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
+// import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
 
 import database from "../utils/firebase";
@@ -41,16 +42,20 @@ const MainButton = styled.button`
 `;
 
 const text = [
-  "당신이 적은 수심은 사라졌습니다.",
-  "배수된 감정과 물은 모두 섞여 어딘가로 흘렀습니다.",
-  "",
-  "하지만, 당신이 수심을 적을때 남긴 숨의 기록은",
-  "당신에게 전송되었습니다.",
-  "",
-  "이 사이트에는 24간 동안은 당신의 수심이 기록되지만,",
-  "그 이후에는 영구적으로 삭제됩니다.",
-  "",
-  "다른이들의 수심을 보고 싶다면 아카이브 버튼을 클릭하세요.",
+  ["답변이 도착했습니다.", "", "당신의 선택으로 만들어진 곡입니다."],
+  [
+    "당신이 적은 수심은 사라졌습니다.",
+    "배수된 감정과 물은 모두 섞여 어딘가로 흘렀습니다.",
+    "",
+    "하지만, 당신이 수심을 적을때 남긴 숨의 기록은",
+    "당신에게 전송되었습니다.",
+  ],
+  [
+    "이 사이트에는 24간 동안은 당신의 수심이 기록되지만,",
+    "그 이후에는 영구적으로 삭제됩니다.",
+    "",
+    "다른이들의 수심을 보고 싶다면 아카이브 버튼을 클릭하세요.",
+  ],
 ];
 
 // const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -67,9 +72,11 @@ export default function MainPage() {
   const emailInputRef = useRef<MainInputHandle>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [level, setLevel] = useState(0);
-  const [isLast, setIsLast] = useState(false);
+  const [textLevel, setTextLevel] = useState(0);
   const [imageData, setImageData] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // const { handleMusicList } = useOutletContext<ContextType>();
 
   const getDomainData = useCallback(() => {
     if (analyser) analyser.getByteTimeDomainData(dataArray);
@@ -147,6 +154,7 @@ export default function MainPage() {
     const { result, value, text } = validate(susimInputRef.current);
 
     if (result) {
+      canvasRef.current?.stopAnimation();
       const linearData = canvasRef.current?.getLinearData();
       setImageData(canvasRef.current?.getImageData() || null);
 
@@ -188,6 +196,21 @@ export default function MainPage() {
     }
   }, [validate, imageData]);
 
+  const handleText = useCallback(() => {
+    switch (textLevel) {
+      case 1:
+        setLevel((v) => v + 1);
+        break;
+      case 2:
+        setLevel((v) => v + 1);
+        break;
+      case 3:
+        setLevel(1);
+        break;
+    }
+    setTextLevel(0);
+  }, [textLevel]);
+
   useEffect(() => {
     void getMediaStream();
   }, [getMediaStream]);
@@ -195,44 +218,43 @@ export default function MainPage() {
   useEffect(() => {
     switch (level) {
       case 0:
+        setTextLevel(1);
         break;
       case 1:
-        setTimeout(() => {
-          setLevel((v) => v + 1);
-        }, 5000);
         break;
       case 2:
+        setTimeout(() => {
+          setLevel((v) => v + 1);
+        }, 2000);
         break;
       case 3:
-        canvasRef.current?.stopAnimation();
+        break;
+      case 4:
         setTimeout(() => {
           setLevel((v) => v + 1);
         }, 5000);
         break;
-      case 4:
-        setIsLast(true);
+      case 5:
+        setTextLevel(2);
+        break;
+      case 6:
+        setTextLevel(3);
         break;
     }
   }, [level]);
 
   return (
     <>
-      {isLast ? (
-        <ScatterCanvas
-          text={text}
-          afterAnimationFunc={() => {
-            setLevel(0);
-            setIsLast(false);
-          }}
-        />
+      {textLevel ? (
+        <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
       ) : (
         <>
           {analyser && <LinearDataCanvas ref={canvasRef} getDomainData={getDomainData} />}
           <div className="w-full h-full relative">
-            {level === 2 && (
+            {level === 3 && (
               <div className="w-full h-full absolute top-0 left-0" style={{ background: "rgba(0,0,0,0.5)" }} />
             )}
-            <AnimationDiv style={{ opacity: level === 0 ? 1 : 0, visibility: level === 0 ? "visible" : "hidden" }}>
+            <AnimationDiv style={{ opacity: level === 1 ? 1 : 0, visibility: level === 1 ? "visible" : "hidden" }}>
               <MainP>당신의 수심을 적어주세요</MainP>
               <MainInput
                 name="수심"
@@ -255,7 +277,7 @@ export default function MainPage() {
                 </MainButton>
               </div>
             </AnimationDiv>
-            <AnimationDiv style={{ opacity: level === 2 ? 1 : 0, visibility: level === 2 ? "visible" : "hidden" }}>
+            <AnimationDiv style={{ opacity: level === 3 ? 1 : 0, visibility: level === 3 ? "visible" : "hidden" }}>
               <MainP>당신의 숨의 기록을 전송하시겠습니까 ?</MainP>
               <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." visibleCount={false} />
               <div>
@@ -270,7 +292,7 @@ export default function MainPage() {
                 <MainButton onClick={handleEmail}>전송하기</MainButton>
               </div>
             </AnimationDiv>
-            {level === 0 && (
+            {level === 1 && (
               <button
                 className="fixed right-4 bottom-4 gradient-btn"
                 onClick={() => {

@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-// import { useOutletContext, useNavigate } from "react-router-dom";
-// import { ContextType } from "../../layouts/MusicLayout";
 import styled from "styled-components";
 
 import background_card from "../../assets/images/background_card.png";
@@ -102,7 +100,6 @@ export default function MusicQuestion() {
   const [question, setQuestion] = useState<questionType | null>(null);
   const [userChoice, setUserChoice] = useState<number | null>(null);
   const navigate = useNavigate();
-  // const { handleMusicList } = useOutletContext<ContextType>();
 
   const handleCard = useCallback((v: number) => {
     setUserChoice(v);
@@ -165,15 +162,15 @@ export default function MusicQuestion() {
               {question.answerList.map((answer, idx) => {
                 if (question.answerType === "text") {
                   return (
-                    <QuestionCard key={idx} $count={question.answerList.length}>
-                      <img
-                        width="100%"
-                        src={background_card}
-                        className={idx + 1 === userChoice ? "selected" : ""}
-                        onClick={() => {
-                          handleCard(idx + 1);
-                        }}
-                      />
+                    <QuestionCard
+                      key={idx}
+                      $count={question.answerList.length}
+                      className={idx + 1 === userChoice ? "selected" : ""}
+                      onClick={() => {
+                        handleCard(idx + 1);
+                      }}
+                    >
+                      <img width="100%" src={background_card} />
                       <p>{answer}</p>
                     </QuestionCard>
                   );

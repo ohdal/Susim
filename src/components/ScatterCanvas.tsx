@@ -91,7 +91,7 @@ class Particle {
   }
 
   update_opacity() {
-    this.opacity -= 0.02;
+    this.opacity -= 0.03;
   }
 
   draw() {
@@ -138,7 +138,12 @@ export default function ScatterCanvas(props: Props) {
       const met = textInfo;
       const width = Math.floor(met.width * dpr);
 
-      const imgData = ctx.getImageData(xPos * dpr - met.width / 2 * dpr, yPos * dpr, met.width * dpr, met.height * dpr);
+      const imgData = ctx.getImageData(
+        xPos * dpr - (met.width / 2) * dpr,
+        yPos * dpr,
+        met.width * dpr,
+        met.height * dpr
+      );
 
       canvas.clearCanvas();
 
@@ -206,6 +211,7 @@ export default function ScatterCanvas(props: Props) {
       const length = Object.keys(particles).length;
       if (length === 0) {
         afterAnimationFunc();
+        canvas?.cancelAnimation();
       }
 
       for (const [key, value] of Object.entries(particles)) {
@@ -215,7 +221,7 @@ export default function ScatterCanvas(props: Props) {
           value.firstUpdate();
           setTimeout(() => {
             lastAnim = true;
-          }, 7000);
+          }, 3000);
         } else {
           if (!mouse) return;
 
@@ -245,6 +251,7 @@ export default function ScatterCanvas(props: Props) {
     canvas.animate(() => {
       return animation(true);
     });
+
     setTimeout(() => {
       canvas.cancelAnimation();
       canvas.animate(() => {
