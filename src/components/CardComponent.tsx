@@ -4,7 +4,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import background_archive from "../assets/images/background_archive.png";
 
-import LinearDataCanvas, { lineType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
+import LinearDataCanvas, { lineGroupType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
 
 type CardProps = {
@@ -91,7 +91,7 @@ const CardComponent = (props: CardProps) => {
       const height = (layoutRef.current?.clientHeight as number) - 14;
       canvasRef.current?.canvasResize(width, height);
       canvasRef.current?.currentDraw(
-        JSON.parse(data) as lineType,
+        JSON.parse(data) as lineGroupType,
         JSON.parse(canvasInfo) as { width: number; height: number }
       );
     }, 300);

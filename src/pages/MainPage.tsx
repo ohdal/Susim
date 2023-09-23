@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 import database from "../utils/firebase";
-import { push, get, query, orderByChild, endBefore, limitToLast } from "firebase/database";
+import { push, get, query, orderByChild, limitToLast } from "firebase/database";
 
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
