@@ -29,16 +29,16 @@ const CardLayout = styled.div<{ $src: string }>`
     border: 1px solid #000000;
     border-radius: 10px;
     transition: all 0.8s ease-out;
-  }
-  
-  .front {
-    contain: content;
-    padding: 7px;
     background: #000000;
     background-image: url(${(props) => props.$src});
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
+  }
+  
+  .front {
+    contain: content;
+    padding: 12px 8px;
   }
 
   .back {
@@ -47,8 +47,7 @@ const CardLayout = styled.div<{ $src: string }>`
     left: 0;
     z-index: -1;
     transform: rotateY(180deg);
-    background: #ffffff;
-    color: #000000;
+    color: #FFFFFF;
   }
 
   &.clicked, &.not-clicked {
@@ -87,8 +86,8 @@ const CardComponent = (props: CardProps) => {
     if (!canvasRef.current || !layoutRef.current) return;
 
     const myResize = debounce(() => {
-      const width = (layoutRef.current?.clientWidth as number) - 14;
-      const height = (layoutRef.current?.clientHeight as number) - 14;
+      const width = (layoutRef.current?.clientWidth as number) - 16;
+      const height = (layoutRef.current?.clientHeight as number) - 24;
       canvasRef.current?.canvasResize(width, height);
       canvasRef.current?.currentDraw(
         JSON.parse(data) as lineGroupType,
