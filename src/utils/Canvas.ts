@@ -13,6 +13,7 @@ export default class Canvas {
   private delta: number;
   private then: number;
   private requestId: number | null;
+  private animCount: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.element = canvas;
@@ -29,6 +30,7 @@ export default class Canvas {
     this.delta = 0;
     this.then = 0;
     this.requestId = null;
+    this.animCount = 0;
   }
 
   public init(width?: number, height?: number): void {
@@ -54,12 +56,20 @@ export default class Canvas {
 
     this.clearCanvas();
     anim();
+    this.animCount += 2;
 
     this.then = this.now - (this.delta % this.interval);
   }
 
   public cancelAnimation(): void {
-    if (this.requestId) cancelAnimationFrame(this.requestId);
+    if (this.requestId) {
+      this.animCount = 0;
+      cancelAnimationFrame(this.requestId);
+    }
+  }
+
+  public getAnimCount(): number {
+    return this.animCount;
   }
 
   public clearCanvas(): void {

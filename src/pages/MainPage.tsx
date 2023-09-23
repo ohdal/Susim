@@ -1,10 +1,11 @@
 import { useEffect, useCallback, useState, useRef } from "react";
-import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+// import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 // import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
 
 import database from "../utils/firebase";
-import { push } from "firebase/database";
+import { push, get, query, orderByChild, endBefore, limitToLast } from "firebase/database";
 
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
@@ -59,12 +60,15 @@ const text = [
 ];
 
 // const AudioContext = window.AudioContext || window.webkitAudioContext;
+type typeSusim = { date: number; data: string; canvasInfo: string; text: string };
 const AudioContext = window.AudioContext;
 let audioCtx: AudioContext;
 let bufferLength: number;
 let dataArray: Uint8Array;
 const MAX_TEXT_SIZE = 200;
 const MIN_TEXT_SIZE = 10;
+const db = database("susims");
+let userSusim: typeSusim | null = null;
 
 export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
@@ -151,6 +155,19 @@ export default function MainPage() {
     return returnObj;
   }, []);
 
+  const getLastSusim = useCallback(async (): Promise<typeSusim | null> => {
+    if (!userSusim) return null;
+
+    const snapshot = await get(query(db, orderByChild("date"), limitToLast(3)));
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const arr: typeSusim[] = Object.values(data as object);
+      return arr.filter((v) => v.text !== userSusim?.text)[0];
+    } else {
+      return null;
+    }
+  }, []);
+
   const handleSusim = useCallback(async () => {
     const { result, value, text } = validate(susimInputRef.current);
 
@@ -160,17 +177,18 @@ export default function MainPage() {
       setImageData(canvasRef.current?.getImageData() || null);
 
       if (linearData) {
-        const db = database("susims");
         const canvasInfo = { width: linearData.width, height: linearData.height };
 
         const data = {
           date: new Date().getTime(),
-          // date: 1694246986284,
           data: JSON.stringify(linearData.data),
           canvasInfo: JSON.stringify(canvasInfo),
           text: value,
         };
+
         const result = await push(db, data);
+        userSusim = data;
+
         console.log("데이터 저장 완료", result);
       } else {
         alert("error, 데이터 가져오기 오류");
@@ -232,9 +250,18 @@ export default function MainPage() {
       case 3:
         break;
       case 4:
-        setTimeout(() => {
-          setLevel((v) => v + 1);
-        }, 5000);
+        getLastSusim()
+          .then((result) => {
+            if (result) {
+              console.log(result.text);
+              canvasRef.current?.mergeAnimation(result.data, () => {
+                setLevel((v) => v + 1);
+              });
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+          });
         break;
       case 5:
         setTextLevel(2);
@@ -243,7 +270,7 @@ export default function MainPage() {
         setTextLevel(3);
         break;
     }
-  }, [level, navigate, location]);
+  }, [level, navigate, location, getLastSusim]);
 
   return (
     <>

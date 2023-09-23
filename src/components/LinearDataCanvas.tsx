@@ -8,34 +8,21 @@ type Props = {
 
 export interface LinearDataCanvasHandle {
   stopAnimation: () => void;
-  currentDraw: (arr?: lineType, canvasInfo?: { width: number; height: number }) => void;
+  mergeAnimation: (v: string, func: () => void) => void;
+  currentDraw: (arr?: lineGroupType, canvasInfo?: { width: number; height: number }) => void;
   canvasResize: (width: number, height: number) => void;
-  getLinearData: () => { data: lineType; width: number; height: number };
+  getLinearData: () => { data: lineGroupType; width: number; height: number };
   getImageData: () => string | null;
   fillUp: (v: string) => void;
 }
 
 type dotDataType = { x: number; y: number; opacity?: number };
-type dotGroupType = dotDataType[];
-export type lineType = dotGroupType[];
+type lineType = dotDataType[];
+export type lineGroupType = lineType[];
 type lineInfoType = { yPos: number; per?: number; particle?: number; large?: boolean };
 
-// class Particle {
-//   constructor() {
-
-//   }
-
-//   update() {
-
-//   }
-
-//   draw() {
-
-//   }
-// }
-
 let particles: number[] | null = null;
-let lineArr: lineType = [];
+let lineArr: lineGroupType = [];
 const lineInfoArr: lineInfoType[] = [
   { yPos: -122 },
   { yPos: -92 },
@@ -58,13 +45,20 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
   useImperativeHandle(ref, () => ({
     stopAnimation,
+    mergeAnimation: (v, func) => {
+      if (canvas) {
+        const data: lineGroupType = JSON.parse(v);
+        canvas.setFrame(10);
+        canvas.animate(() => animationMerge(lineArr, data, func));
+      }
+    },
     currentDraw,
     canvasResize,
     getLinearData,
     getImageData,
     fillUp: (v) => {
       const value = -4 * v.length;
-      yPosCount = Math.max(value, -300);
+      yPosCount = Math.max(value, -400);
     },
   }));
 
@@ -83,7 +77,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     [canvas]
   );
 
-  const getLinearData = useCallback((): { data: lineType; width: number; height: number } => {
+  const getLinearData = useCallback((): { data: lineGroupType; width: number; height: number } => {
     const width = canvas?.CANVAS_WIDTH as number;
     const height = canvas?.CANVAS_HEIGHT as number;
 
@@ -100,32 +94,51 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     return isOrigin ? getRandomNum(0.7, 1) : getRandomNum(0.2, 1);
   }, []);
 
-  const saveDot = useCallback((arr: dotGroupType, data: dotDataType, info: lineInfoType) => {
-    const { yPos, per, particle, large } = info;
+  const getCanvasRatio = useCallback(
+    (width: number, height: number): { x: number; y: number } => {
+      const ratio = { x: 1, y: 1 };
+      if (canvas) {
+        const isUpWidth = width < canvas.CANVAS_WIDTH;
+        const isUpHeight = height < canvas.CANVAS_HEIGHT;
 
-    const num = getRandomNum(0, 1000, true);
-    const isOrigin = yPos === 0;
-    const standard = isOrigin ? 1000 : per ? 10 * per : 300;
+        ratio.x = isUpWidth ? width / canvas.CANVAS_WIDTH : canvas.CANVAS_WIDTH / width;
+        ratio.y = isUpHeight ? height / canvas.CANVAS_HEIGHT : canvas.CANVAS_HEIGHT / height;
+      }
 
-    if (num <= standard && arr) {
-      arr.push(Object.assign(data, { opacity: getRandomOpacity(isOrigin) }));
+      return ratio;
+    },
+    [canvas]
+  );
 
-      if (isOrigin) {
-        arr.push({ x: data.x + getRandomNum(1, 5), y: data.y, opacity: getRandomOpacity(isOrigin) });
-        arr.push({ x: data.x, y: data.y + getRandomNum(1, 5), opacity: getRandomOpacity(isOrigin) });
-      } else {
-        const size = particle ? particle : 2;
+  const saveDot = useCallback(
+    (arr: lineType, data: dotDataType, info: lineInfoType) => {
+      const { yPos, per, particle, large } = info;
 
-        for (let i = 0; i < size; i++) {
-          const opacity = getRandomOpacity(isOrigin);
-          arr.push({ x: data.x + getRandomNum(10, 20), y: data.y + getRandomNum(5, large ? 20 : 10), opacity });
+      const num = getRandomNum(0, 1000, true);
+      const isOrigin = yPos === 0;
+      const standard = isOrigin ? 1000 : per ? 10 * per : 300;
+
+      if (num <= standard && arr) {
+        arr.push(Object.assign(data, { opacity: getRandomOpacity(isOrigin) }));
+
+        if (isOrigin) {
+          arr.push({ x: data.x + getRandomNum(1, 5), y: data.y, opacity: getRandomOpacity(isOrigin) });
+          arr.push({ x: data.x, y: data.y + getRandomNum(1, 5), opacity: getRandomOpacity(isOrigin) });
+        } else {
+          const size = particle ? particle : 2;
+
+          for (let i = 0; i < size; i++) {
+            const opacity = getRandomOpacity(isOrigin);
+            arr.push({ x: data.x + getRandomNum(10, 20), y: data.y + getRandomNum(5, large ? 20 : 10), opacity });
+          }
         }
       }
-    }
-  }, [getRandomOpacity]);
+    },
+    [getRandomOpacity]
+  );
 
   const drawDot = useCallback(
-    (arr: dotGroupType, info: lineInfoType, ratio: { x: number; y: number }, color = "#ffffff") => {
+    (arr: lineType, info: lineInfoType, ratio = { x: 1, y: 1 }, color = "#ffffff") => {
       if (!canvas) return;
 
       const { yPos } = info;
@@ -149,30 +162,23 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   );
 
   const currentDraw = useCallback(
-    (arr?: lineType, canvasInfo?: { width: number; height: number }): void => {
+    (arr?: lineGroupType, canvasInfo?: { width: number; height: number }): void => {
       if (!arr) arr = lineArr;
       if (!canvas) return;
 
       canvas.clearCanvas();
 
-      const ratio = { x: 1, y: 1 };
-      if (canvasInfo) {
-        const { width, height } = canvasInfo;
-        const isUpWidth = width < canvas.CANVAS_WIDTH;
-        const isUpHeight = height < canvas.CANVAS_HEIGHT;
-
-        ratio.x = isUpWidth ? width / canvas.CANVAS_WIDTH : canvas.CANVAS_WIDTH / width;
-        ratio.y = isUpHeight ? height / canvas.CANVAS_HEIGHT : canvas.CANVAS_HEIGHT / height;
-      }
+      let ratio;
+      if (canvasInfo) ratio = getCanvasRatio(canvasInfo.width, canvasInfo.height);
 
       for (let i = 0; i < arr.length; i++) {
         drawDot(arr[i], lineInfoArr[i], ratio);
       }
     },
-    [drawDot, canvas]
+    [drawDot, getCanvasRatio, canvas]
   );
 
-  const draw = useCallback(() => {
+  const animationDefault = useCallback(() => {
     if (!canvas || !getDomainData) return;
 
     const ctx = canvas.ctx as CanvasRenderingContext2D;
@@ -181,9 +187,6 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     particles = Array.from(dataArray);
 
     lineArr = [];
-
-    ctx.fillStyle = "rgb(0, 0, 0)";
-    ctx.fillRect(0, 0, canvas.CANVAS_WIDTH, canvas.CANVAS_HEIGHT);
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "rgb(255, 255, 255)";
@@ -196,7 +199,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     for (let i = 0; i < particles.length; i++) {
       const data = particles[i];
       const v = data / 128.0;
-      const y = (v * canvas.CANVAS_HEIGHT) / 1.4 + yPosCount;
+      const y = (v * canvas.CANVAS_HEIGHT) / 1.2 + yPosCount;
 
       if (i === 0) {
         for (let i = 0; i < lineInfoArr.length; i++) {
@@ -217,6 +220,30 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     currentDraw(lineArr);
   }, [canvas, getDomainData, saveDot, currentDraw]);
 
+  const animationMerge = useCallback(
+    (baseData: lineGroupType, mergeData: lineGroupType, afterFunc: () => void) => {
+      if (!canvas) return;
+
+      const count = canvas.getAnimCount();
+      const width = canvas.CANVAS_WIDTH;
+
+      for (let i = 0; i < mergeData.length; i++) {
+        if (width - count < 0) {
+          afterFunc();
+          break;
+        }
+
+        baseData[i] = baseData[i].filter((v) => Math.round(v.x) < width - count);
+        const temp = mergeData[i].filter((v) => Math.round(v.x) > width - count);
+
+        const result = baseData[i].concat(temp);
+
+        drawDot(result, lineInfoArr[i]);
+      }
+    },
+    [drawDot, canvas]
+  );
+
   useEffect(() => {
     if (!canvas || !getDomainData) return;
 
@@ -225,7 +252,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     }, 300);
 
     canvas.setFrame(3);
-    canvas.animate(draw);
+    canvas.animate(animationDefault);
 
     myResize();
 
@@ -235,7 +262,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       stopAnimation();
       window.removeEventListener("resize", myResize);
     };
-  }, [canvas, draw, stopAnimation, getDomainData]);
+  }, [canvas, animationDefault, stopAnimation, getDomainData]);
 
   useEffect(() => {
     if (canvasRef.current) {
