@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 // import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
 
+import { susim } from "../constant/Susim.ts";
 import database from "../utils/firebase";
 import { push, get, query, orderByChild, limitToLast } from "firebase/database";
 
@@ -255,6 +256,10 @@ export default function MainPage() {
             if (result) {
               console.log(result.text);
               canvasRef.current?.mergeAnimation(result.data, result.canvasInfo, () => {
+                setLevel((v) => v + 1);
+              });
+            } else {
+              canvasRef.current?.mergeAnimation(susim.data, susim.canvasInfo, () => {
                 setLevel((v) => v + 1);
               });
             }

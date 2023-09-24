@@ -17,6 +17,8 @@ export interface LinearDataCanvasHandle {
 }
 
 type canvasInfoType = { width: number; height: number };
+type linearDataType = { data: lineGroupType } & canvasInfoType;
+
 type dotDataType = { x: number; y: number; opacity?: number };
 type lineType = dotDataType[];
 export type lineGroupType = lineType[];
@@ -48,10 +50,11 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     stopAnimation,
     mergeAnimation: (v, canvasInfo, func) => {
       if (canvas) {
-        const data: lineGroupType = JSON.parse(v);
-        const info: canvasInfoType = JSON.parse(canvasInfo);
+        const base = getLinearData();
+        const merge: linearDataType = { data: JSON.parse(v), ...JSON.parse(canvasInfo) };
+
         canvas.setFrame(10);
-        canvas.animate(() => animationMerge(lineArr, data, info, func));
+        canvas.animate(() => animationMerge(base, merge, func));
       }
     },
     currentDraw,
@@ -79,7 +82,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     [canvas]
   );
 
-  const getLinearData = useCallback((): { data: lineGroupType; width: number; height: number } => {
+  const getLinearData = useCallback((): linearDataType => {
     const width = canvas?.CANVAS_WIDTH as number;
     const height = canvas?.CANVAS_HEIGHT as number;
 
@@ -100,11 +103,8 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     ({ width, height }: canvasInfoType): { x: number; y: number } => {
       const ratio = { x: 1, y: 1 };
       if (canvas) {
-        const isUpWidth = width < canvas.CANVAS_WIDTH;
-        const isUpHeight = height < canvas.CANVAS_HEIGHT;
-
-        ratio.x = isUpWidth ? width / canvas.CANVAS_WIDTH : canvas.CANVAS_WIDTH / width;
-        ratio.y = isUpHeight ? height / canvas.CANVAS_HEIGHT : canvas.CANVAS_HEIGHT / height;
+        ratio.x = canvas.CANVAS_WIDTH / width;
+        ratio.y = canvas.CANVAS_HEIGHT / height;
       }
 
       return ratio;
@@ -148,8 +148,9 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       const ctx = canvas.ctx as CanvasRenderingContext2D;
 
       if (arr) {
-        const v = Math.floor(1 / ratio.x);
-        for (let i = 0; i < arr.length; i += v > 1 ? v : 1) {
+        // const v = Math.floor(1 / ratio.x);
+        // for (let i = 0; i < arr.length; i += v > 1 ? v : 1) {
+        for (let i = 0; i < arr.length; i += 1) {
           const { x, y, opacity } = arr[i];
 
           ctx.beginPath();
@@ -223,24 +224,32 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   }, [canvas, getDomainData, saveDot, currentDraw]);
 
   const animationMerge = useCallback(
-    (baseData: lineGroupType, mergeData: lineGroupType, mergeCanvasInfo: canvasInfoType, afterFunc: () => void) => {
+    (baseInfo: linearDataType, mergeInfo: linearDataType, afterFunc: () => void) => {
       if (!canvas) return;
 
+      const { data: baseData } = baseInfo;
+      const { data: mergeData } = mergeInfo;
+
+      const base_ratio = getCanvasRatio({ width: baseInfo.width, height: baseInfo.height });
+      const merge_ratio = getCanvasRatio({ width: mergeInfo.width, height: mergeInfo.height });
       const count = canvas.getAnimCount();
       const width = canvas.CANVAS_WIDTH;
-      const ratio = getCanvasRatio(mergeCanvasInfo);
+      const value = canvas.CANVAS_WIDTH / (10 * 20); // 10프레임 * 10초
 
       for (let i = 0; i < mergeData.length; i++) {
-        if (width - count < 0) {
+        if (count === 10 * 20) {
           afterFunc();
           break;
         }
 
-        baseData[i] = baseData[i].filter((v) => Math.round(v.x) < width - count);
-        const mergeResult = mergeData[i].filter((v) => Math.round(v.x * ratio.x) > width - count);
-
-        drawDot(baseData[i], lineInfoArr[i]);
-        drawDot(mergeResult, lineInfoArr[i], ratio);
+        // x 값 기준으로 데이터 filter 처리 & 화면 비율 처리
+        const base_filtered = baseData[i].filter((v) => Math.round(v.x * base_ratio.x) < width - count * value);
+        const merge_filtered = mergeData[i].filter((v) => Math.round(v.x * merge_ratio.x) > width - count * value);
+        
+        // 화면에 그리기
+        console.log(base_ratio.x);
+        drawDot(base_filtered, lineInfoArr[i], base_ratio);
+        drawDot(merge_filtered, lineInfoArr[i], merge_ratio);
       }
     },
     [drawDot, canvas, getCanvasRatio]

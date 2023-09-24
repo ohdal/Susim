@@ -56,7 +56,7 @@ export default class Canvas {
 
     this.clearCanvas();
     anim();
-    this.animCount += 2;
+    this.animCount += 1;
 
     this.then = this.now - (this.delta % this.interval);
   }
