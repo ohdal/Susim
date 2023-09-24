@@ -8,14 +8,15 @@ type Props = {
 
 export interface LinearDataCanvasHandle {
   stopAnimation: () => void;
-  mergeAnimation: (v: string, func: () => void) => void;
-  currentDraw: (arr?: lineGroupType, canvasInfo?: { width: number; height: number }) => void;
+  mergeAnimation: (v: string, canvasInfo: string, func: () => void) => void;
+  currentDraw: (arr?: lineGroupType, canvasInfo?: canvasInfoType) => void;
   canvasResize: (width: number, height: number) => void;
   getLinearData: () => { data: lineGroupType; width: number; height: number };
   getImageData: () => string | null;
   fillUp: (v: string) => void;
 }
 
+type canvasInfoType = { width: number; height: number };
 type dotDataType = { x: number; y: number; opacity?: number };
 type lineType = dotDataType[];
 export type lineGroupType = lineType[];
@@ -45,11 +46,12 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
   useImperativeHandle(ref, () => ({
     stopAnimation,
-    mergeAnimation: (v, func) => {
+    mergeAnimation: (v, canvasInfo, func) => {
       if (canvas) {
         const data: lineGroupType = JSON.parse(v);
+        const info: canvasInfoType = JSON.parse(canvasInfo);
         canvas.setFrame(10);
-        canvas.animate(() => animationMerge(lineArr, data, func));
+        canvas.animate(() => animationMerge(lineArr, data, info, func));
       }
     },
     currentDraw,
@@ -95,7 +97,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   }, []);
 
   const getCanvasRatio = useCallback(
-    (width: number, height: number): { x: number; y: number } => {
+    ({ width, height }: canvasInfoType): { x: number; y: number } => {
       const ratio = { x: 1, y: 1 };
       if (canvas) {
         const isUpWidth = width < canvas.CANVAS_WIDTH;
@@ -162,14 +164,14 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   );
 
   const currentDraw = useCallback(
-    (arr?: lineGroupType, canvasInfo?: { width: number; height: number }): void => {
+    (arr?: lineGroupType, canvasInfo?: canvasInfoType): void => {
       if (!arr) arr = lineArr;
       if (!canvas) return;
 
       canvas.clearCanvas();
 
       let ratio;
-      if (canvasInfo) ratio = getCanvasRatio(canvasInfo.width, canvasInfo.height);
+      if (canvasInfo) ratio = getCanvasRatio(canvasInfo);
 
       for (let i = 0; i < arr.length; i++) {
         drawDot(arr[i], lineInfoArr[i], ratio);
@@ -221,11 +223,12 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   }, [canvas, getDomainData, saveDot, currentDraw]);
 
   const animationMerge = useCallback(
-    (baseData: lineGroupType, mergeData: lineGroupType, afterFunc: () => void) => {
+    (baseData: lineGroupType, mergeData: lineGroupType, mergeCanvasInfo: canvasInfoType, afterFunc: () => void) => {
       if (!canvas) return;
 
       const count = canvas.getAnimCount();
       const width = canvas.CANVAS_WIDTH;
+      const ratio = getCanvasRatio(mergeCanvasInfo);
 
       for (let i = 0; i < mergeData.length; i++) {
         if (width - count < 0) {
@@ -234,14 +237,13 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
         }
 
         baseData[i] = baseData[i].filter((v) => Math.round(v.x) < width - count);
-        const temp = mergeData[i].filter((v) => Math.round(v.x) > width - count);
+        const mergeResult = mergeData[i].filter((v) => Math.round(v.x * ratio.x) > width - count);
 
-        const result = baseData[i].concat(temp);
-
-        drawDot(result, lineInfoArr[i]);
+        drawDot(baseData[i], lineInfoArr[i]);
+        drawDot(mergeResult, lineInfoArr[i], ratio);
       }
     },
-    [drawDot, canvas]
+    [drawDot, canvas, getCanvasRatio]
   );
 
   useEffect(() => {

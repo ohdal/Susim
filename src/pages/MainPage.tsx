@@ -254,7 +254,7 @@ export default function MainPage() {
           .then((result) => {
             if (result) {
               console.log(result.text);
-              canvasRef.current?.mergeAnimation(result.data, () => {
+              canvasRef.current?.mergeAnimation(result.data, result.canvasInfo, () => {
                 setLevel((v) => v + 1);
               });
             }
