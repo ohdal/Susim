@@ -140,7 +140,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   );
 
   const drawDot = useCallback(
-    (arr: lineType, info: lineInfoType, ratio = { x: 1, y: 1 }, color = "#ffffff") => {
+    (arr: lineType, info: lineInfoType, ratio = { x: 1, y: 1 }, color = "#FFFFFF") => {
       if (!canvas) return;
 
       const { yPos } = info;
@@ -148,8 +148,6 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       const ctx = canvas.ctx as CanvasRenderingContext2D;
 
       if (arr) {
-        // const v = Math.floor(1 / ratio.x);
-        // for (let i = 0; i < arr.length; i += v > 1 ? v : 1) {
         for (let i = 0; i < arr.length; i += 1) {
           const { x, y, opacity } = arr[i];
 
@@ -227,32 +225,80 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     (baseInfo: linearDataType, mergeInfo: linearDataType, afterFunc: () => void) => {
       if (!canvas) return;
 
-      const { data: baseData } = baseInfo;
-      const { data: mergeData } = mergeInfo;
+      const baseData = baseInfo.data.concat([]);
+      const mergeData = mergeInfo.data.concat([]);
 
       const base_ratio = getCanvasRatio({ width: baseInfo.width, height: baseInfo.height });
       const merge_ratio = getCanvasRatio({ width: mergeInfo.width, height: mergeInfo.height });
       const count = canvas.getAnimCount();
       const width = canvas.CANVAS_WIDTH;
-      const value = canvas.CANVAS_WIDTH / (10 * 20); // 10프레임 * 10초
+      const value = canvas.CANVAS_WIDTH / (10 * 20); // 10프레임 * 20초
 
+      if (count >= 10 * 20) {
+        afterFunc();
+        stopAnimation();
+      }
+
+      const base_filtered: lineGroupType = [],
+        merge_filtered: lineGroupType = [];
+      // x 값 기준으로 데이터 filter 처리 & 화면 비율 처리
       for (let i = 0; i < mergeData.length; i++) {
-        if (count === 10 * 20) {
-          afterFunc();
-          break;
-        }
+        base_filtered.push(baseData[i].filter((v) => Math.round(v.x * base_ratio.x) < width - count * value));
+        merge_filtered.push(mergeData[i].filter((v) => Math.round(v.x * merge_ratio.x) > width - count * value));
+      }
 
-        // x 값 기준으로 데이터 filter 처리 & 화면 비율 처리
-        const base_filtered = baseData[i].filter((v) => Math.round(v.x * base_ratio.x) < width - count * value);
-        const merge_filtered = mergeData[i].filter((v) => Math.round(v.x * merge_ratio.x) > width - count * value);
-        
+      // yPos 값 조정하기 (blending)
+      const lastArr = base_filtered[2];
+      const firstArr = merge_filtered[2];
+      const lastValue = lastArr.length > 0 ? lastArr[lastArr.length - 1].y : firstArr[0].y;
+      const firstValue = firstArr.length > 0 ? firstArr[0].y : lastArr[lastArr.length - 1].y;
+      const sub = lastValue * base_ratio.y - firstValue * merge_ratio.y;
+      const diff = Number((Math.abs(sub) / 30).toFixed(2));
+
+      for (let i = 0; i < merge_filtered.length; i++) {
+        const base_result: lineType = [];
+        const merge_result: lineType = [];
+        let baseSum = 0;
+        let mergeSum = 0;
+
+        base_filtered[i].forEach((v, idx) => {
+          const data = { ...v, y: v.y * base_ratio.y };
+          // v.y *= base_ratio.y;
+
+          if (i === 2) {
+            if (base_filtered[i].length - 16 < idx) {
+              baseSum += diff;
+              if (sub < 0) data.y -= baseSum;
+              else data.y += baseSum;
+            }
+          }
+
+          base_result.push(data);
+        });
+
+        merge_filtered[i].forEach((v, idx) => {
+          const data = { ...v, y: v.y * merge_ratio.y };
+          // v.y *= merge_ratio.y;
+
+          if (i === 2) {
+            if (idx < 15) {
+              mergeSum += diff;
+              if (sub < 0) data.y += mergeSum;
+              else data.y -= mergeSum;
+            }
+          }
+
+          merge_result.push(data);
+        });
+
         // 화면에 그리기
-        console.log(base_ratio.x);
-        drawDot(base_filtered, lineInfoArr[i], base_ratio);
-        drawDot(merge_filtered, lineInfoArr[i], merge_ratio);
+        // drawDot(base_filtered[i], lineInfoArr[i], { x: base_ratio.x, y: 1 });
+        // drawDot(merge_filtered[i], lineInfoArr[i], { x: merge_ratio.x, y: 1 });
+        drawDot(base_result, lineInfoArr[i], { x: base_ratio.x, y: 1 });
+        drawDot(merge_result, lineInfoArr[i], { x: merge_ratio.x, y: 1 });
       }
     },
-    [drawDot, canvas, getCanvasRatio]
+    [drawDot, canvas, getCanvasRatio, stopAnimation]
   );
 
   useEffect(() => {
