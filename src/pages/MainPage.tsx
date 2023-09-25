@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-// import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
-// import { ContextType } from "../layouts/MusicLayout";
+import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
+import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
 
 import { susim } from "../constant/Susim.ts";
@@ -82,7 +81,7 @@ export default function MainPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // const { handleMusicList } = useOutletContext<ContextType>();
+  const { musicPause, musicPlay } = useOutletContext<ContextType>();
 
   const getDomainData = useCallback(() => {
     if (analyser) analyser.getByteTimeDomainData(dataArray);
@@ -226,10 +225,11 @@ export default function MainPage() {
         break;
       case 3:
         setLevel(1);
+        musicPlay();
         break;
     }
     setTextLevel(0);
-  }, [textLevel]);
+  }, [textLevel, musicPlay]);
 
   useEffect(() => {
     void getMediaStream();
@@ -307,6 +307,7 @@ export default function MainPage() {
                   className="gradient-btn px-5 py-2.5"
                   onClick={() => {
                     void handleSusim();
+                    musicPause();
                   }}
                 >
                   전송하기

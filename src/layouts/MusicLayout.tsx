@@ -10,7 +10,7 @@ const Container = styled.div`
 `;
 
 type MusicListType = number[] | null;
-export type ContextType = { musicPause: () => void };
+export type ContextType = { musicPause: () => void; musicPlay: () => void };
 
 let audioList: HTMLAudioElement[] = [];
 let loadedCount = 0;
@@ -25,10 +25,9 @@ export default function MusicLayout() {
           void audio.play();
         } else {
           audio.pause();
+          audio.currentTime = 0;
         }
       });
-
-      if (!type) audioList = [];
 
       loadedCount = 0;
     }
@@ -98,6 +97,7 @@ export default function MusicLayout() {
 
     return () => {
       handleAllMusic(false);
+      audioList = [];
     };
   }, [handleAllMusic, list, musicPlay, navigate]);
 
@@ -107,6 +107,9 @@ export default function MusicLayout() {
         context={{
           musicPause: () => {
             handleAllMusic(false);
+          },
+          musicPlay: () => {
+            handleAllMusic(true);
           },
         }}
       />
