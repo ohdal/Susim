@@ -122,7 +122,7 @@ const CardComponent = (props: CardProps) => {
       <div className="front">
         <LinearDataCanvas ref={canvasRef} />
       </div>
-      <div className="back p-5">
+      <div className="back p-6">
         <Scrollbars style={{ width: "100%", height: "100%" }}>
           <p className="w-full h-full">{text}</p>
         </Scrollbars>

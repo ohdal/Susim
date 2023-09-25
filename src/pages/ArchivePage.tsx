@@ -16,7 +16,7 @@ type listType = {
   date: number;
 };
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 5;
 export default function ArchivePage() {
   const navigate = useNavigate();
   const innerRef = useRef<HTMLDivElement>(null);
@@ -157,9 +157,8 @@ export default function ArchivePage() {
         {list ? (
           list.length > 0 ? (
             <div
-              className="grid xs_card:grid-cols-2 sm_card:grid-cols-3 md_card:grid-cols-4 lg_card:grid-cols-5 xl_card:grid-cols-6 justify-items-center"
-              // className="flex flex-row flex-wrap justify-between justify-self-center"
-              style={{ width: "clac(100% - 17px)" }}
+              className="grid xs_card:grid-cols-2 sm_card:grid-cols-3 md_card:grid-cols-4 lg_card:grid-cols-5 justify-items-center"
+              style={{ width: "clac(100% - 17px)", maxWidth: "1060px", margin: "0 auto" }}
               ref={innerRef}
             >
               {list.map((v, idx) => {
@@ -168,7 +167,7 @@ export default function ArchivePage() {
             </div>
           ) : (
             <div className="w-full h-full grid">
-              <p className="place-self-center">수심이 존재하지 않습니다.</p>
+              <p className="place-self-center">24시간내 작성된 수심이 존재하지 않습니다.</p>
             </div>
           )
         ) : (
