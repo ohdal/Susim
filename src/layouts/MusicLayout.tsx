@@ -60,7 +60,7 @@ export default function MusicLayout() {
               const audio = new Audio(musicFileList[i][num]);
 
               audioList.push(audio);
-              audio.loop = false;
+              audio.loop = true;
               audio.onloadeddata = loadedEvent;
 
               long = audioList[long].duration < audio.duration ? i : long;
