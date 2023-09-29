@@ -77,7 +77,6 @@ export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
   const susimInputRef = useRef<MainInputHandle>(null);
   const emailInputRef = useRef<MainInputHandle>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [level, setLevel] = useState(0);
   const [textLevel, setTextLevel] = useState(0);
@@ -142,12 +141,12 @@ export default function MainPage() {
     let v;
     const email_reg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
     switch (name) {
-      case "susim":
+      case "수심":
         v = text.length >= MIN_TEXT_SIZE;
         returnObj.result = v;
         returnObj.text = v ? "" : `${MIN_TEXT_SIZE}자 이상 작성해주세요.`;
         break;
-      case "user_email":
+      case "이메일":
         v = email_reg.test(text);
         returnObj.result = v;
         returnObj.text = v ? "" : "이메일 형식에 맞게 입력해주세요.";
@@ -207,9 +206,7 @@ export default function MainPage() {
   const handleEmail = useCallback(() => {
     const { result, value, text } = validate(emailInputRef.current);
 
-    if (result && formRef.current) {
-      // 이메일 전송 하기
-
+    if (result) {
       emailjs
         .send(
           VITE_EMAIL_SERVICE_ID as string,
@@ -310,7 +307,7 @@ export default function MainPage() {
             <AnimationDiv style={{ opacity: level === 1 ? 1 : 0, visibility: level === 1 ? "visible" : "hidden" }}>
               <MainP>당신의 수심을 적어주세요</MainP>
               <MainInput
-                name="susim"
+                name="수심"
                 ref={susimInputRef}
                 max={MAX_TEXT_SIZE}
                 visibleCount={true}
@@ -333,33 +330,20 @@ export default function MainPage() {
             </AnimationDiv>
             <AnimationDiv style={{ opacity: level === 3 ? 1 : 0, visibility: level === 3 ? "visible" : "hidden" }}>
               <MainP>당신의 숨의 기록을 전송하시겠습니까 ?</MainP>
-              <form
-                ref={formRef}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleEmail();
-                }}
-              >
-                <MainInput
-                  name="user_email"
-                  ref={emailInputRef}
-                  placeholder="이메일을 입력해주세요."
-                  visibleCount={false}
-                />
-                <div>
-                  <MainButton
-                    className="gradient-btn"
-                    onClick={() => {
-                      setLevel(4);
-                    }}
-                  >
-                    아니요
-                  </MainButton>
-                  <MainButton className="gradient-btn" type="submit">
-                    전송하기
-                  </MainButton>
-                </div>
-              </form>
+              <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." visibleCount={false} />
+              <div>
+                <MainButton
+                  className="gradient-btn"
+                  onClick={() => {
+                    setLevel(4);
+                  }}
+                >
+                  아니요
+                </MainButton>
+                <MainButton className="gradient-btn" onClick={handleEmail}>
+                  전송하기
+                </MainButton>
+              </div>
             </AnimationDiv>
             {level === 1 && (
               <button
