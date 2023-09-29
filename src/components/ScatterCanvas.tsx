@@ -154,6 +154,7 @@ export default function ScatterCanvas(props: Props) {
         count++;
 
         if (imgData.data[i + 3] !== 0) {
+          if (count % 2 === 0) continue;
           const x = (count % (width / dpr)) + (xPos - met.width / 2);
           const y = Math.floor(count / width) + yPos;
           const coordX = Math.floor(x);
@@ -192,7 +193,7 @@ export default function ScatterCanvas(props: Props) {
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
 
-        for (let i = 0; i < text.length; i += 2) {
+        for (let i = 0; i < text.length; i++) {
           ctx.fillText(text[i], x, y + FONT_SIZE * i + lineHeight);
           lineHeight += LINE_VALUE;
 
