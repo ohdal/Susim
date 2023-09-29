@@ -59,6 +59,8 @@ class Particle {
   }
 
   firstUpdate(): void {
+    if (Number(this.speed.toFixed(5)) === 0) return;
+
     this.pos.x += this.firstPosX * this.speed;
     this.pos.y += this.firstPosY * this.speed;
 
@@ -190,7 +192,7 @@ export default function ScatterCanvas(props: Props) {
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
 
-        for (let i = 0; i < text.length; i++) {
+        for (let i = 0; i < text.length; i += 2) {
           ctx.fillText(text[i], x, y + FONT_SIZE * i + lineHeight);
           lineHeight += LINE_VALUE;
 
