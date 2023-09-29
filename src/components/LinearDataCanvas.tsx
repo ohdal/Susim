@@ -89,12 +89,6 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     return { data: lineArr, width, height };
   }, [canvas]);
 
-  const getImageData = useCallback((): string | null => {
-    if (!canvas) return null;
-
-    return canvas.element.toDataURL();
-  }, [canvas]);
-
   const getRandomOpacity = useCallback((isOrigin = false): number => {
     return isOrigin ? getRandomNum(0.7, 1) : getRandomNum(0.2, 1);
   }, []);
@@ -163,7 +157,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
   );
 
   const currentDraw = useCallback(
-    (arr?: lineGroupType, canvasInfo?: canvasInfoType): void => {
+    (arr?: lineGroupType, canvasInfo?: canvasInfoType, background = false): void => {
       if (!arr) arr = lineArr;
       if (!canvas) return;
 
@@ -171,6 +165,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
       let ratio;
       if (canvasInfo) ratio = getCanvasRatio(canvasInfo);
+      if (background) canvas.setBackground("000000");
 
       for (let i = 0; i < arr.length; i++) {
         drawDot(arr[i], lineInfoArr[i], ratio);
@@ -178,6 +173,21 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
     },
     [drawDot, getCanvasRatio, canvas]
   );
+
+  const getImageData = useCallback((): string | null => {
+    if (!canvas) return null;
+
+    const width = canvas.CANVAS_WIDTH;
+    const height = canvas.CANVAS_HEIGHT;
+    canvasResize(500, 350);
+    currentDraw(lineArr, { width, height }, true);
+    const data = canvas.element.toDataURL();
+
+    canvas.init();
+    currentDraw(lineArr);
+
+    return data;
+  }, [canvas, currentDraw, canvasResize]);
 
   const animationDefault = useCallback(() => {
     if (!canvas || !getDomainData) return;
@@ -253,6 +263,8 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       const lastValue = lastArr.length > 0 ? lastArr[lastArr.length - 1].y : firstArr[0].y;
       const firstValue = firstArr.length > 0 ? firstArr[0].y : lastArr[lastArr.length - 1].y;
       const sub = lastValue * base_ratio.y - firstValue * merge_ratio.y;
+      // const div = Math.floor(Math.abs(sub)) || 1;
+      // const diff = Number((Math.abs(sub) / (div % 2 === 0 ? div : div -1)).toFixed(2));
       const diff = Number((Math.abs(sub) / 30).toFixed(2));
 
       for (let i = 0; i < merge_filtered.length; i++) {
@@ -263,12 +275,12 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
         base_filtered[i].forEach((v, idx) => {
           const data = { ...v, y: v.y * base_ratio.y };
-          // v.y *= base_ratio.y;
 
           if (i === 2) {
+            // if (base_filtered[i].length - Math.floor(div / 2) - 1 < idx) {
             if (base_filtered[i].length - 16 < idx) {
               baseSum += diff;
-              if (sub < 0) data.y -= baseSum;
+              if (sub > 0) data.y -= baseSum;
               else data.y += baseSum;
             }
           }
@@ -276,14 +288,16 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
           base_result.push(data);
         });
 
+        // mergeSum = Math.floor(div / 2) * diff;
+        mergeSum = 15 * diff;
         merge_filtered[i].forEach((v, idx) => {
           const data = { ...v, y: v.y * merge_ratio.y };
-          // v.y *= merge_ratio.y;
 
           if (i === 2) {
+            // if (idx < Math.floor(div / 2)) {
             if (idx < 15) {
-              mergeSum += diff;
-              if (sub < 0) data.y += mergeSum;
+              mergeSum -= diff;
+              if (sub > 0) data.y += mergeSum;
               else data.y -= mergeSum;
             }
           }

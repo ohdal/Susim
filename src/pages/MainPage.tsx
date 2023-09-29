@@ -3,6 +3,9 @@ import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
 
+import emailjs from "@emailjs/browser";
+const { VITE_EMAIL_SERVICE_ID, VITE_EMAIL_TEMPLATE_ID, VITE_EMAIL_PUBLIC_KEY } = import.meta.env;
+
 import { susim } from "../constant/Susim.ts";
 import database from "../utils/firebase";
 import { push, get, query, orderByChild, limitToLast } from "firebase/database";
@@ -74,6 +77,7 @@ export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
   const susimInputRef = useRef<MainInputHandle>(null);
   const emailInputRef = useRef<MainInputHandle>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [level, setLevel] = useState(0);
   const [textLevel, setTextLevel] = useState(0);
@@ -138,12 +142,12 @@ export default function MainPage() {
     let v;
     const email_reg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
     switch (name) {
-      case "수심":
+      case "susim":
         v = text.length >= MIN_TEXT_SIZE;
         returnObj.result = v;
         returnObj.text = v ? "" : `${MIN_TEXT_SIZE}자 이상 작성해주세요.`;
         break;
-      case "이메일":
+      case "user_email":
         v = email_reg.test(text);
         returnObj.result = v;
         returnObj.text = v ? "" : "이메일 형식에 맞게 입력해주세요.";
@@ -203,11 +207,24 @@ export default function MainPage() {
   const handleEmail = useCallback(() => {
     const { result, value, text } = validate(emailInputRef.current);
 
-    if (result) {
+    if (result && formRef.current) {
       // 이메일 전송 하기
 
-      console.log(imageData);
-      console.log("이메일 전송 완료", value);
+      emailjs
+        .send(
+          VITE_EMAIL_SERVICE_ID as string,
+          VITE_EMAIL_TEMPLATE_ID as string,
+          { user_email: value, content: imageData },
+          VITE_EMAIL_PUBLIC_KEY as string
+        )
+        .then(
+          (result) => {
+            console.log(result.text);
+          },
+          (error) => {
+            console.error(error.text);
+          }
+        );
 
       setLevel(4);
     } else {
@@ -293,7 +310,7 @@ export default function MainPage() {
             <AnimationDiv style={{ opacity: level === 1 ? 1 : 0, visibility: level === 1 ? "visible" : "hidden" }}>
               <MainP>당신의 수심을 적어주세요</MainP>
               <MainInput
-                name="수심"
+                name="susim"
                 ref={susimInputRef}
                 max={MAX_TEXT_SIZE}
                 visibleCount={true}
@@ -316,20 +333,33 @@ export default function MainPage() {
             </AnimationDiv>
             <AnimationDiv style={{ opacity: level === 3 ? 1 : 0, visibility: level === 3 ? "visible" : "hidden" }}>
               <MainP>당신의 숨의 기록을 전송하시겠습니까 ?</MainP>
-              <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." visibleCount={false} />
-              <div>
-                <MainButton
-                  className="gradient-btn"
-                  onClick={() => {
-                    setLevel(4);
-                  }}
-                >
-                  아니요
-                </MainButton>
-                <MainButton className="gradient-btn" onClick={handleEmail}>
-                  전송하기
-                </MainButton>
-              </div>
+              <form
+                ref={formRef}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleEmail();
+                }}
+              >
+                <MainInput
+                  name="user_email"
+                  ref={emailInputRef}
+                  placeholder="이메일을 입력해주세요."
+                  visibleCount={false}
+                />
+                <div>
+                  <MainButton
+                    className="gradient-btn"
+                    onClick={() => {
+                      setLevel(4);
+                    }}
+                  >
+                    아니요
+                  </MainButton>
+                  <MainButton className="gradient-btn" type="submit">
+                    전송하기
+                  </MainButton>
+                </div>
+              </form>
             </AnimationDiv>
             {level === 1 && (
               <button

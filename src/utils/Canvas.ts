@@ -76,6 +76,13 @@ export default class Canvas {
     this.ctx?.clearRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
   }
 
+  public setBackground(color: string): void {
+    if(this.ctx) {
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    }
+  }
+
   public setFrame(v: number): void {
     this.frame = v;
     this.interval = 1000 / v;
