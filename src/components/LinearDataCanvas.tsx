@@ -242,9 +242,9 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       const merge_ratio = getCanvasRatio({ width: mergeInfo.width, height: mergeInfo.height });
       const count = canvas.getAnimCount();
       const width = canvas.CANVAS_WIDTH;
-      const value = canvas.CANVAS_WIDTH / (10 * 20); // 10프레임 * 20초
+      const value = canvas.CANVAS_WIDTH / (10 * 25); // 10프레임 * 20초
 
-      if (count >= 10 * 20) {
+      if (count >= 10 * 25) {
         afterFunc();
         stopAnimation();
       }
@@ -263,9 +263,8 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       const lastValue = lastArr.length > 0 ? lastArr[lastArr.length - 1].y : firstArr[0].y;
       const firstValue = firstArr.length > 0 ? firstArr[0].y : lastArr[lastArr.length - 1].y;
       const sub = lastValue * base_ratio.y - firstValue * merge_ratio.y;
-      // const div = Math.floor(Math.abs(sub)) || 1;
-      // const diff = Number((Math.abs(sub) / (div % 2 === 0 ? div : div -1)).toFixed(2));
-      const diff = Number((Math.abs(sub) / 30).toFixed(2));
+      const diff = Math.abs(sub) / 2;
+      const rad = Math.PI / 30;
 
       for (let i = 0; i < merge_filtered.length; i++) {
         const base_result: lineType = [];
@@ -277,28 +276,32 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
           const data = { ...v, y: v.y * base_ratio.y };
 
           if (i === 2) {
-            // if (base_filtered[i].length - Math.floor(div / 2) - 1 < idx) {
             if (base_filtered[i].length - 16 < idx) {
-              baseSum += diff;
-              if (sub > 0) data.y -= baseSum;
-              else data.y += baseSum;
+              if (sub > 0) {
+                data.y -= diff + Math.cos(baseSum) * diff * -1;
+              } else {
+                data.y += diff - Math.cos(baseSum) * diff;
+              }
+
+              baseSum += rad;
             }
           }
 
           base_result.push(data);
         });
 
-        // mergeSum = Math.floor(div / 2) * diff;
-        mergeSum = 15 * diff;
+        mergeSum = Math.PI / 2;
         merge_filtered[i].forEach((v, idx) => {
           const data = { ...v, y: v.y * merge_ratio.y };
 
           if (i === 2) {
-            // if (idx < Math.floor(div / 2)) {
             if (idx < 15) {
-              mergeSum -= diff;
-              if (sub > 0) data.y += mergeSum;
-              else data.y -= mergeSum;
+              if (sub > 0) {
+                data.y += diff - (Math.cos(mergeSum) * diff * -1);
+              } else {
+                data.y -= diff + Math.cos(mergeSum) * diff;
+              }
+              mergeSum += rad;
             }
           }
 
@@ -306,8 +309,6 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
         });
 
         // 화면에 그리기
-        // drawDot(base_filtered[i], lineInfoArr[i], { x: base_ratio.x, y: 1 });
-        // drawDot(merge_filtered[i], lineInfoArr[i], { x: merge_ratio.x, y: 1 });
         drawDot(base_result, lineInfoArr[i], { x: base_ratio.x, y: 1 });
         drawDot(merge_result, lineInfoArr[i], { x: merge_ratio.x, y: 1 });
       }
