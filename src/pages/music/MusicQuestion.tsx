@@ -3,26 +3,8 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import background_card from "../../assets/images/background_card.png";
-// import background_img_2 from "../../assets/images/background_2.png";
-
-import LineDiv from "../../components/LineDiv";
 
 import { questionList, questionType } from "../../constant/Data";
-
-// const BackgroundDiv = styled.div<{ $background: string }>`
-//   width: 90%;
-//   min-height: 90%;
-//   position: absolute;
-//   top: 50%;
-//   left: 50%;
-//   transform: translate(-50%, -50%);
-//   background-image: url(${(props) => props.$background});
-//   background-position: center;
-//   background-size: contain;
-//   background-repeat: no-repeat;
-//   filter: blur(8px);
-//   z-index: 0;
-// `;
 
 const ContentInner = styled.div`
   width: inherit;
@@ -106,57 +88,34 @@ export default function MusicQuestion() {
   }, []);
 
   const handleButton = useCallback(() => {
-    if (level < 0) {
-      userChoiceList = [];
-      setLevel((v) => v + 1);
+    if (!userChoice) {
+      alert("카드 중 하나를 선택해주세요.");
     } else {
-      if (!userChoice) {
-        alert("카드 중 하나를 선택해주세요.");
-      } else {
-        userChoiceList.push(userChoice);
-        setUserChoice(null);
-        setLevel((v) => v + 1);
-      }
+      userChoiceList.push(userChoice);
+      setUserChoice(null);
+      setLevel((v) => v + 1);
     }
-  }, [level, userChoice]);
+  }, [userChoice]);
 
   useEffect(() => {
     setQuestion(questionList[level]);
 
     if (level > questionList.length - 1) {
       navigate(`/main/${userChoiceList.join("")}`);
-      // handleMusicList(userChoiceList);
     }
   }, [level, navigate]);
 
-  // useEffect(() => {
-  //   setQuestion(questionList[level]);
-
-  //   if (level > questionList.length - 1) {
-  //     handleMusicList(userChoiceList);
-  //   }
-  // }, [level, handleMusicList]);
-
-  // useEffect(() => {
-  //   handleMusicList(null);
-  // }, [handleMusicList])
+  useEffect(() => {
+    return () => {
+      userChoiceList = [];
+    };
+  }, []);
 
   return (
     <div className="content background-img">
-      {/* <BackgroundDiv $background={background_img_2} /> */}
       <ContentInner>
-        {level < 0 && (
-          <div className="w-full h-full flex justify-center items-center">
-            <div className="w-full">
-              <LineDiv left={{ text: "당신의 대답을 들려주세요" }} right={{ text: "0" }} />
-              <LineDiv left={{ text: "당신만의 음악으로 답해드립니다." }} right={{ text: "." }} />
-            </div>
-          </div>
-        )}
         {question && (
           <>
-            {/* <LineDiv left={{ text: question.question[0] }} right={{ text: String(question.id) }} /> */}
-            {/* <LineDiv left={{ text: question.question[1] }} right={{ text: "." }} /> */}
             <QuestionP>{question.question}</QuestionP>
             <CardLayout>
               {question.answerList.map((answer, idx) => {
@@ -191,21 +150,11 @@ export default function MusicQuestion() {
             </CardLayout>
           </>
         )}
-        {level > questionList.length - 1 && (
-          <div className="w-full h-full flex justify-center items-center">
-            <div className="w-full">
-              <LineDiv left={{ text: "답변이 도착했습니다." }} right={{ text: "0" }} />
-              <LineDiv left={{ text: "당신의 선택으로 만들어진 곡입니다." }} right={{ text: "." }} />
-            </div>
-          </div>
-        )}
-        {level < questionList.length && (
-          <div className="footer">
-            <button className="gradient-btn" onClick={handleButton}>
-              넘어가기
-            </button>
-          </div>
-        )}
+        <div className="footer">
+          <button className="gradient-btn" onClick={handleButton}>
+            넘어가기
+          </button>
+        </div>
       </ContentInner>
     </div>
   );
