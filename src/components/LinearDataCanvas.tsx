@@ -53,7 +53,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
         const base = getLinearData();
         const merge: linearDataType = { data: JSON.parse(v), ...JSON.parse(canvasInfo) };
 
-        canvas.setFrame(10);
+        canvas.setFrame(5);
         canvas.animate(() => animationMerge(base, merge, func));
       }
     },
@@ -242,9 +242,9 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
       const merge_ratio = getCanvasRatio({ width: mergeInfo.width, height: mergeInfo.height });
       const count = canvas.getAnimCount();
       const width = canvas.CANVAS_WIDTH;
-      const value = canvas.CANVAS_WIDTH / (10 * 25); // 10프레임 * 20초
+      const value = canvas.CANVAS_WIDTH / (5 * 25); // 5프레임 * 25초
 
-      if (count >= 10 * 25) {
+      if (count >= 5 * 25) {
         afterFunc();
         stopAnimation();
       }
@@ -272,10 +272,17 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
         let baseSum = 0;
         let mergeSum = 0;
 
+        const baseRandomCount = getRandomNum(40, 60, true);
+        let baseIsUp = true;
         base_filtered[i].forEach((v, idx) => {
           const data = { ...v, y: v.y * base_ratio.y };
 
           if (i === 2) {
+            if (idx % baseRandomCount === 0) baseIsUp = !baseIsUp;
+
+            if (baseIsUp) data.y += 3;
+            else data.y += -3;
+
             if (base_filtered[i].length - 16 < idx) {
               if (sub > 0) {
                 data.y -= diff + Math.cos(baseSum) * diff * -1;
@@ -285,24 +292,39 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
               baseSum += rad;
             }
+          } else {
+            data.x += getRandomNum(-3, 3);
+            data.y += getRandomNum(-2, 2);
+            data.opacity = getRandomNum(0, 1);
           }
 
           base_result.push(data);
         });
 
         mergeSum = Math.PI / 2;
+        const mergeRandomCount = getRandomNum(40, 60, true);
+        let mergeIsUp = true;
         merge_filtered[i].forEach((v, idx) => {
           const data = { ...v, y: v.y * merge_ratio.y };
 
           if (i === 2) {
+            if (idx % mergeRandomCount === 0) mergeIsUp = !mergeIsUp;
+
+            if (mergeIsUp) data.y += 3;
+            else data.y -= 3;
+
             if (idx < 15) {
               if (sub > 0) {
-                data.y += diff - (Math.cos(mergeSum) * diff * -1);
+                data.y += diff - Math.cos(mergeSum) * diff * -1;
               } else {
                 data.y -= diff + Math.cos(mergeSum) * diff;
               }
               mergeSum += rad;
             }
+          } else {
+            data.x += getRandomNum(-2, 2);
+            data.y += getRandomNum(-1, 1);
+            data.opacity = getRandomNum(0, 1);
           }
 
           merge_result.push(data);
