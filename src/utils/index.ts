@@ -2,8 +2,8 @@ type hexToRgb_ReturnType = { r: number; g: number; b: number } | null;
 
 export const getRandomNum = (min: number, max: number, isInt = false): number => {
   const num = Math.random() * (max - min) + min;
-  if (isInt) Math.floor(num);
-  return Number(num.toFixed(2));
+  if (isInt) return Math.floor(num);
+  else return Number(num.toFixed(2));
 };
 
 export const hexToRgb = (hex: string): hexToRgb_ReturnType => {
