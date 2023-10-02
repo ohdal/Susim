@@ -179,7 +179,7 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
 
     const width = canvas.CANVAS_WIDTH;
     const height = canvas.CANVAS_HEIGHT;
-    canvasResize(500, 350);
+    canvasResize(1024, 720);
     currentDraw(lineArr, { width, height }, true);
     const data = canvas.element.toDataURL();
 
