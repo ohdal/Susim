@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
+    "animate.css": "^4.1.1",
     "aos": "^2.3.4",
     "firebase": "^10.3.0",
     "localforage": "^1.10.0",
@@ -24,7 +25,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.1",
     "sort-by": "^1.2.0",
-    "styled-components": "^6.0.5"
+    "styled-components": "^6.0.5",
+    "sweetalert2": "^11.7.31"
   },
   "devDependencies": {
     "@firebase/firestore-types": "^3.0.0",
