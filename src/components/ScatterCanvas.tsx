@@ -11,10 +11,6 @@ import font_ttf from "../assets/fonts/GowunBatang-Regular.ttf";
 // import text_img from "../assets/text_test.png";
 
 const PointerDiv = styled.div<{ $width: number; $height: number }>`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: ${(props) => props.$width}px;
   height: ${(props) => props.$height}px;
   cursor: pointer;
@@ -115,22 +111,6 @@ export default function ScatterCanvas(props: Props) {
   const [pointerDiv, setPointerDiv] = useState<PointerDiv | null>(null);
   const [mouse, setMouse] = useState<Mouse | null>(null);
 
-  const getFontSize = useCallback((width: number) => {
-    if (width > 1200) {
-      return canvasFontSize["xl"];
-    } else if (width > 992) {
-      return canvasFontSize["lg"];
-    } else if (width > 768) {
-      return canvasFontSize["md"];
-    } else if (width > 576) {
-      return canvasFontSize["sm"];
-    } else if (width > 300) {
-      return 10;
-    } else {
-      return 6;
-    }
-  }, []);
-
   const createParticle = useCallback(
     (textInfo: PointerDiv, xPos: number, yPos: number) => {
       if (!canvas || !canvas.ctx) return;
@@ -173,7 +153,7 @@ export default function ScatterCanvas(props: Props) {
   const drawText = useCallback(() => {
     if (!canvas) return;
 
-    const FONT_SIZE = getFontSize(canvas.CANVAS_WIDTH);
+    const FONT_SIZE = canvasFontSize(canvas.CANVAS_WIDTH);
     const LINE_VALUE = 5; // 줄 간격 값 5px
     const ctx = canvas.ctx as CanvasRenderingContext2D;
     const totalHeight = text.length * FONT_SIZE + (LINE_VALUE * text.length - 1);
@@ -207,7 +187,7 @@ export default function ScatterCanvas(props: Props) {
       .catch((err: string) => {
         console.log(`font 에러 발생: ${err}`);
       });
-  }, [canvas, text, getFontSize]);
+  }, [canvas, text]);
 
   const animation = useCallback(
     (isFirst: boolean): void => {
@@ -308,6 +288,7 @@ export default function ScatterCanvas(props: Props) {
       <canvas ref={canvasRef}></canvas>
       {pointerDiv && (
         <PointerDiv
+          className="align-center"
           onMouseDown={onMouseDownPointerDiv}
           onMouseUp={onMouseUpPointerDiv}
           $width={pointerDiv.width}

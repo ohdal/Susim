@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState, useRef, useContext } from "react";
 import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import { ContextType } from "../layouts/MusicLayout";
 import styled from "styled-components";
@@ -10,17 +10,16 @@ import { susim } from "../constant/Susim.ts";
 import database from "../utils/firebase";
 import { push, get, query, orderByChild, limitToLast } from "firebase/database";
 
+import { canvasFontSize } from "../constant/Data.ts";
+import { ServiceContext, mySynth } from "../utils/speechService.ts";
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import ScatterCanvas from "../components/ScatterCanvas";
+import { debounce } from "../utils/index.ts";
 
 const AnimationDiv = styled.div`
   width: 60%;
   min-height: 200px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   transition: all 1.5s ease-out;
 
   &.overlay {
@@ -62,6 +61,10 @@ const text = [
   ],
 ];
 
+const handleSynsthInput = debounce((text: string, event: { end: () => void; start: () => void }) => {
+  mySynth.speak(text, event);
+}, 500);
+
 // const AudioContext = window.AudioContext || window.webkitAudioContext;
 type typeSusim = { date: number; data: string; canvasInfo: string; text: string };
 const AudioContext = window.AudioContext;
@@ -72,17 +75,20 @@ const MAX_TEXT_SIZE = 200;
 const MIN_TEXT_SIZE = 10;
 const db = database("susims");
 let userSusim: typeSusim | null = null;
+let errorCount = 0;
 
 export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
   const susimInputRef = useRef<MainInputHandle>(null);
   const emailInputRef = useRef<MainInputHandle>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [synthSpeak, setSynthSpeak] = useState(false);
   const [level, setLevel] = useState(0);
   const [textLevel, setTextLevel] = useState(0);
   const [imageData, setImageData] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const service = useContext(ServiceContext);
 
   const { musicPause, musicPlay } = useOutletContext<ContextType>();
 
@@ -91,38 +97,6 @@ export default function MainPage() {
 
     return { bufferLength, dataArray };
   }, [analyser]);
-
-  const getMediaStream = useCallback(async () => {
-    try {
-      // https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      if (mediaStream) {
-        console.log("success get mediastream");
-        audioCtx = new AudioContext();
-
-        const analyser = audioCtx.createAnalyser();
-
-        setAnalyser(analyser);
-
-        analyser.fftSize = 512;
-        analyser.smoothingTimeConstant = 0.85;
-        bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        analyser.getByteTimeDomainData(dataArray);
-
-        // 마이크로 소리를 받아와 source 생성
-        const source = audioCtx.createMediaStreamSource(mediaStream);
-        // 해당소스 분석노드와 연결
-        source.connect(analyser);
-      }
-    } catch (err) {
-      console.log(`에러발생 ${err as string}`);
-
-      alert("원활한 온라인도우 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요.");
-      navigate("/");
-    }
-  }, [navigate]);
 
   const validate = useCallback((cur: MainInputHandle | null): { result: boolean; value: string; text: string } => {
     const returnObj = { result: false, value: "", text: "" };
@@ -171,6 +145,17 @@ export default function MainPage() {
     }
   }, []);
 
+  const getDefaultSynthEvent = useCallback((): { end: () => void; start: () => void } => {
+    return {
+      end: () => {
+        setSynthSpeak(false);
+      },
+      start: () => {
+        setSynthSpeak(true);
+      },
+    };
+  }, []);
+
   const handleSusim = useCallback(async () => {
     const { result, value, text } = validate(susimInputRef.current);
 
@@ -199,9 +184,15 @@ export default function MainPage() {
 
       setLevel(2);
     } else {
-      alert(text);
+      if (service.tts)
+        mySynth.speak(text, {
+          end: () => {
+            susimInputRef.current?.focus();
+          },
+        });
+      else alert(text);
     }
-  }, [validate]);
+  }, [validate, service]);
 
   const handleEmail = useCallback(() => {
     const { result, value, text } = validate(emailInputRef.current);
@@ -225,25 +216,126 @@ export default function MainPage() {
 
       setLevel(4);
     } else {
-      alert(text);
+      if (service.tts)
+        mySynth.speak(text, {
+          end: () => {
+            emailInputRef.current?.focus();
+          },
+        });
+      else alert(text);
     }
-  }, [validate, imageData]);
+  }, [validate, imageData, service]);
 
   const handleText = useCallback(() => {
     switch (textLevel) {
       case 1:
-        setLevel((v) => v + 1);
+        if (service.tts)
+          mySynth.speak("답변이 도착했습니다. 당신의 선택으로 만들어진 곡입니다.", {
+            end: () => {
+              setLevel((v) => v + 1);
+            },
+          });
+        else setLevel((v) => v + 1);
         break;
       case 2:
-        setLevel((v) => v + 1);
+        if (service.tts)
+          mySynth.speak(
+            "당신이 적은 수심은 사라졌습니다. 배수된 감정과 물은 모두 섞여 어딘가로 흘렀습니다. 하지만, 당신이 수심을 적을때 남긴 숨의 기록은 당신에게 전송되었습니다.",
+            {
+              end: () => {
+                setLevel((v) => v + 1);
+              },
+            }
+          );
+        else setLevel((v) => v + 1);
         break;
       case 3:
-        setLevel(1);
-        musicPlay();
+        if (service.tts)
+          mySynth.speak(
+            "이 사이트에는 24시간 동안은 당신의 수심이 기록되지만, 그 이후에는 영구적으로 삭제됩니다. 다른이들의 수심을 보고 싶다면 아카아브 버튼을 클릭하세요. ",
+            {
+              end: () => {
+                setLevel(1);
+                musicPlay();
+              },
+            }
+          );
+        else {
+          setLevel(1);
+          musicPlay();
+        }
         break;
     }
-    setTextLevel(0);
-  }, [textLevel, musicPlay]);
+  }, [textLevel, musicPlay, service]);
+
+  const handleInput = useCallback(
+    (v: string) => {
+      if (service.tts) {
+        if (synthSpeak) {
+          mySynth.cancel();
+          setSynthSpeak(false);
+        } else {
+          handleSynsthInput(v, getDefaultSynthEvent());
+        }
+      }
+      canvasRef.current?.fillUp(v);
+    },
+    [service, synthSpeak, getDefaultSynthEvent]
+  );
+
+  const getMediaStream = useCallback(async () => {
+    try {
+      // https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      if (mediaStream) {
+        if (service.tts && textLevel > 0) {
+          handleText();
+        }
+
+        audioCtx = new AudioContext();
+
+        const analyser = audioCtx.createAnalyser();
+
+        setAnalyser(analyser);
+
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.85;
+        bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        analyser.getByteTimeDomainData(dataArray);
+
+        // 마이크로 소리를 받아와 source 생성
+        const source = audioCtx.createMediaStreamSource(mediaStream);
+        // 해당소스 분석노드와 연결
+        source.connect(analyser);
+      }
+    } catch (err) {
+      errorCount++;
+      console.log(`에러발생 ${err as string}`);
+
+      if (errorCount > 1) return;
+
+      if (service.tts) {
+        mySynth.speak(
+          "원활한 온라인도우 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요. 카드 선택 화면으로 돌아갑니다.",
+          {
+            end: () => {
+              navigate("/question");
+            },
+          }
+        );
+      } else {
+        alert("원활한 온라인도우 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요.");
+        navigate("/question");
+      }
+      musicPause();
+    }
+
+    return () => {
+      errorCount = 0;
+    };
+  }, [navigate, service, handleText, textLevel, musicPause]);
 
   useEffect(() => {
     void getMediaStream();
@@ -256,6 +348,13 @@ export default function MainPage() {
         else setTextLevel(1);
         break;
       case 1:
+        setTextLevel(0);
+
+        if (service.tts)
+          mySynth.speak(
+            "당신의 수심을 적어주세요. 중앙에 수심을 적는 바. 바 우측 하단에 전송하기. 페이지 우측 하단에 고 아카이브. ",
+            getDefaultSynthEvent()
+          );
         break;
       case 2:
         setTimeout(() => {
@@ -263,12 +362,16 @@ export default function MainPage() {
         }, 2000);
         break;
       case 3:
+        if (service.tts)
+          mySynth.speak(
+            "당신의 숨의 기록이 나타난다. 당신의 숨의 기록을 전송하시겠습니까? 중앙에 이메일을 입력하는 바. 바 우측하단 좌측에 전송하기, 우측에 아니요. ",
+            getDefaultSynthEvent()
+          );
         break;
       case 4:
         getLastSusim()
           .then((result) => {
             if (result) {
-              console.log(result.text);
               canvasRef.current?.mergeAnimation(result.data, result.canvasInfo, () => {
                 setLevel((v) => v + 1);
               });
@@ -277,6 +380,9 @@ export default function MainPage() {
                 setLevel((v) => v + 1);
               });
             }
+
+            if (service.tts)
+              mySynth.speak("25초 동안 당신의 숨의 기록과 웹페이지를 이용한 이전 사람들의 기록이 섞여 나타남.");
           })
           .catch((err) => {
             console.error(err);
@@ -289,13 +395,30 @@ export default function MainPage() {
         setTextLevel(3);
         break;
     }
-  }, [level, navigate, location, getLastSusim]);
+  }, [level, navigate, location, getLastSusim, service, getDefaultSynthEvent]);
 
   return (
     <>
       {textLevel ? (
         <div className="w-full h-full background-img">
-          <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
+          {service.tts ? (
+            <div className="text-center align-center">
+              {text[textLevel - 1].map((v, idx) => {
+                if (v)
+                  return (
+                    <p
+                      key={`${textLevel}-${idx}`}
+                      className="last:mb-0"
+                      style={{ fontSize: `${canvasFontSize(window.innerWidth)}px`, marginBottom: "10px" }}
+                    >
+                      {v}
+                    </p>
+                  );
+              })}
+            </div>
+          ) : (
+            <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
+          )}
         </div>
       ) : (
         <>
@@ -304,21 +427,33 @@ export default function MainPage() {
             {level === 3 && (
               <div className="w-full h-full absolute top-0 left-0" style={{ background: "rgba(0,0,0,0.5)" }} />
             )}
-            <AnimationDiv style={{ opacity: level === 1 ? 1 : 0, visibility: level === 1 ? "visible" : "hidden" }}>
+            <AnimationDiv
+              className="align-center"
+              style={{ opacity: level === 1 ? 1 : 0, visibility: level === 1 ? "visible" : "hidden" }}
+            >
               <MainP>당신의 수심을 적어주세요</MainP>
               <MainInput
                 name="수심"
                 ref={susimInputRef}
                 max={MAX_TEXT_SIZE}
                 visibleCount={true}
+                mouseEventHandle={() => {
+                  if (service.tts && !synthSpeak) mySynth.speak("수심 입력 바. 클릭 후 수심을 적어주세요.");
+                }}
+                blurEventHandle={() => {
+                  if (service.tts) mySynth.cancel();
+                }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
-                  canvasRef.current?.fillUp(v as string);
+                  handleInput(v as string);
                 }}
               />
               <div>
                 <MainButton
                   className="gradient-btn px-5 py-2.5"
+                  onMouseEnter={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
+                  }}
                   onClick={() => {
                     void handleSusim();
                     musicPause();
@@ -328,19 +463,46 @@ export default function MainPage() {
                 </MainButton>
               </div>
             </AnimationDiv>
-            <AnimationDiv style={{ opacity: level === 3 ? 1 : 0, visibility: level === 3 ? "visible" : "hidden" }}>
+            <AnimationDiv
+              className="align-center"
+              style={{ opacity: level === 3 ? 1 : 0, visibility: level === 3 ? "visible" : "hidden" }}
+            >
               <MainP>당신의 숨의 기록을 전송하시겠습니까 ?</MainP>
-              <MainInput name="이메일" ref={emailInputRef} placeholder="이메일을 입력해주세요." visibleCount={false} />
+              <MainInput
+                name="이메일"
+                ref={emailInputRef}
+                placeholder="이메일을 입력해주세요."
+                visibleCount={false}
+                mouseEventHandle={() => {
+                  if (service.tts && !synthSpeak) mySynth.speak("이메일 입력 바. 클릭 후 이메일을 적어주세요.");
+                }}
+                blurEventHandle={() => {
+                  mySynth.cancel();
+                }}
+                changeEventHandle={(...args) => {
+                  const [v] = args;
+                  handleInput(v as string);
+                }}
+              />
               <div>
                 <MainButton
                   className="gradient-btn"
+                  onMouseEnter={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("아니요 버튼");
+                  }}
                   onClick={() => {
                     setLevel(4);
                   }}
                 >
                   아니요
                 </MainButton>
-                <MainButton className="gradient-btn" onClick={handleEmail}>
+                <MainButton
+                  className="gradient-btn"
+                  onMouseEnter={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
+                  }}
+                  onClick={handleEmail}
+                >
                   전송하기
                 </MainButton>
               </div>
@@ -348,7 +510,11 @@ export default function MainPage() {
             {level === 1 && (
               <button
                 className="fixed right-4 bottom-4 gradient-btn"
+                onMouseEnter={() => {
+                  if (service.tts && !synthSpeak) mySynth.speak("Go Archive 버튼");
+                }}
                 onClick={() => {
+                  if (service.tts) mySynth.cancel();
                   navigate("archive");
                 }}
               >

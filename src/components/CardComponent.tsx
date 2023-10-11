@@ -8,11 +8,12 @@ import LinearDataCanvas, { lineGroupType, LinearDataCanvasHandle } from "../comp
 import { debounce } from "../utils";
 
 type CardProps = {
-  // data: lineType;
   data: string;
-  // canvasInfo: { width: number; height: number };
   canvasInfo: string;
   text: string;
+  clickHandler?: () => void;
+  mouseEnterHandler?: () => void;
+  mouseLeaveHandler?: () => void;
 };
 
 const CardLayout = styled.div<{ $src: string }>`
@@ -77,7 +78,7 @@ const CardLayout = styled.div<{ $src: string }>`
 `;
 
 const CardComponent = (props: CardProps) => {
-  const { data, text, canvasInfo } = props;
+  const { data, text, canvasInfo, mouseEnterHandler, mouseLeaveHandler, clickHandler } = props;
   const layoutRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<LinearDataCanvasHandle | null>(null);
   const [clicked, setClicked] = useState<boolean | null>(null);
@@ -113,7 +114,10 @@ const CardComponent = (props: CardProps) => {
       data-aos-anchor="bottom"
       data-aos-once="true"
       className={clicked === null ? "" : clicked ? "clicked" : "not-clicked"}
+      onMouseEnter={mouseEnterHandler}
+      onMouseLeave={mouseLeaveHandler}
       onClick={() => {
+        if (clickHandler) clickHandler();
         setClicked((v) => {
           return v === null ? true : !v;
         });

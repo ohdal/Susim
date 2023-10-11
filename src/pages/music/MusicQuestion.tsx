@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import background_card from "../../assets/images/background_card.png";
 
+import { ServiceContext, mySynth } from "../../utils/speechService";
 import { questionList, questionType } from "../../constant/Data";
 
 const ContentInner = styled.div`
@@ -14,10 +15,6 @@ const ContentInner = styled.div`
 `;
 
 const CardLayout = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: 100%;
   margin: 0 auto;
 `;
@@ -79,31 +76,70 @@ const QuestionP = styled.p`
 let userChoiceList: number[] = [];
 export default function MusicQuestion() {
   const [level, setLevel] = useState(0);
+  const [questionSpeak, setQuestionSpeak] = useState(false);
   const [question, setQuestion] = useState<questionType | null>(null);
   const [userChoice, setUserChoice] = useState<number | null>(null);
   const navigate = useNavigate();
+  const service = useContext(ServiceContext);
 
-  const handleCard = useCallback((v: number) => {
-    setUserChoice(v);
-  }, []);
+  const handleCard = useCallback(
+    (v: number) => {
+      if (questionSpeak) return;
+
+      setUserChoice(v);
+    },
+    [questionSpeak]
+  );
 
   const handleButton = useCallback(() => {
+    if (questionSpeak) return;
+
     if (!userChoice) {
-      alert("카드 중 하나를 선택해주세요.");
+      if (service.tts)
+        mySynth.speak("카드 중 하나를 클릭하여 선택한 뒤, 넘어가기 버튼을 클릭해주세요.", {
+          end: () => {
+            setQuestionSpeak(false);
+          },
+          start: () => {
+            setQuestionSpeak(true);
+          },
+        });
+      else alert("카드 중 하나를 선택해주세요.");
     } else {
       userChoiceList.push(userChoice);
       setUserChoice(null);
       setLevel((v) => v + 1);
     }
-  }, [userChoice]);
+  }, [userChoice, service, questionSpeak]);
+
+  const handleSynthSub = useCallback(
+    (text: string) => {
+      if (service.tts && !questionSpeak) {
+        mySynth.speak(text);
+      }
+    },
+    [service, questionSpeak]
+  );
 
   useEffect(() => {
-    setQuestion(questionList[level]);
+    const question = questionList[level];
+    setQuestion(question);
 
     if (level > questionList.length - 1) {
       navigate(`/main/${userChoiceList.join("")}`);
+    } else {
+      // if (service.tts) {
+      //   mySynth.speak(question.ttsText, {
+      //     end: () => {
+      //       setQuestionSpeak(false);
+      //     },
+      //     start: () => {
+      //       setQuestionSpeak(true);
+      //     },
+      //   });
+      // }
     }
-  }, [level, navigate]);
+  }, [level, navigate, service]);
 
   useEffect(() => {
     return () => {
@@ -117,7 +153,7 @@ export default function MusicQuestion() {
         {question && (
           <>
             <QuestionP>{question.question}</QuestionP>
-            <CardLayout>
+            <CardLayout className="align-center">
               {question.answerList.map((answer, idx) => {
                 if (question.answerType === "text") {
                   return (
@@ -126,6 +162,7 @@ export default function MusicQuestion() {
                       $count={question.answerList.length}
                       className={idx + 1 === userChoice ? "selected" : ""}
                       onClick={() => {
+                        handleSynthSub(answer + "카드 클릭");
                         handleCard(idx + 1);
                       }}
                     >
@@ -142,6 +179,7 @@ export default function MusicQuestion() {
                       $count={question.answerList.length}
                       className={idx + 1 === userChoice ? "selected" : ""}
                       onClick={() => {
+                        if (question.ttsAnswer) handleSynthSub(question.ttsAnswer[idx] + "카드 클릭");
                         handleCard(idx + 1);
                       }}
                     />
@@ -150,8 +188,15 @@ export default function MusicQuestion() {
             </CardLayout>
           </>
         )}
+
         <div className="footer">
-          <button className="gradient-btn" onClick={handleButton}>
+          <button
+            className="gradient-btn"
+            onClick={handleButton}
+            onMouseEnter={() => {
+              handleSynthSub("넘어가기 버튼");
+            }}
+          >
             넘어가기
           </button>
         </div>

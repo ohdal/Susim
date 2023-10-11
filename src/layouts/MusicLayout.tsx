@@ -1,8 +1,9 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useContext, useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { musicFileList } from "../constant/Data";
+import { ServiceContext, mySynth } from "../utils/speechService";
 
 const Container = styled.div`
   width: 100%;
@@ -14,9 +15,12 @@ export type ContextType = { musicPause: () => void; musicPlay: () => void };
 
 let audioList: HTMLAudioElement[] = [];
 let loadedCount = 0;
+let errorCount = 0;
 export default function MusicLayout() {
+  const [isAllowMusic, setIsAllowMusic] = useState(false);
   const navigate = useNavigate();
   const { list } = useParams();
+  const service = useContext(ServiceContext);
 
   const handleAllMusic = useCallback((type: boolean) => {
     if (audioList.length > 0) {
@@ -52,6 +56,7 @@ export default function MusicLayout() {
         testAudio
           .play()
           .then(() => {
+            setIsAllowMusic(true);
             testAudio.pause();
 
             for (let i = 0; i < musicList.length; i++) {
@@ -70,27 +75,45 @@ export default function MusicLayout() {
             // };
           })
           .catch((err) => {
-            const errorText = err.toString();
-            if (errorText.includes("document first")) {
-              alert("카드를 다시 선택해주세요.");
-            } else {
+            errorCount++;
+            console.log(`에러발생 ${err as string}`);
+
+            if (errorCount > 1) return;
+
+            if (service.tts)
+              mySynth.speak(
+                "설정에서 해당 브라우저 음악재생을 허용해준 뒤, 카드를 다시 선택해주세요. 카드 선택 화면으로 돌아갑니다. ",
+                {
+                  end: () => {
+                    navigate("/question");
+                  },
+                }
+              );
+            else {
               alert("설정에서 해당 브라우저 음악재생을 허용해준 뒤, 다시 카드를 선택해주세요.");
+              navigate("/question");
             }
-            navigate("/question");
           });
       }
     },
-    [loadedEvent, navigate]
+    [loadedEvent, navigate, service]
   );
 
   useEffect(() => {
     if (list) {
       const reg = new RegExp("^[0-9]{5}$");
       const result = reg.test(list);
-      console.log(result);
       if (result) musicPlay(list.split("").map((v) => Number(v)));
       else {
-        alert("잘못된 접근입니다.");
+        if (service.tts) {
+          mySynth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
+            end: () => {
+              navigate("/question");
+            },
+          });
+          return;
+        } else alert("잘못된 접근입니다.");
+
         navigate("/question");
       }
     }
@@ -99,20 +122,22 @@ export default function MusicLayout() {
       handleAllMusic(false);
       audioList = [];
     };
-  }, [handleAllMusic, list, musicPlay, navigate]);
+  }, [handleAllMusic, list, musicPlay, navigate, service]);
 
   return (
     <Container>
-      <Outlet
-        context={{
-          musicPause: () => {
-            handleAllMusic(false);
-          },
-          musicPlay: () => {
-            handleAllMusic(true);
-          },
-        }}
-      />
+      {isAllowMusic && (
+        <Outlet
+          context={{
+            musicPause: () => {
+              handleAllMusic(false);
+            },
+            musicPlay: () => {
+              handleAllMusic(true);
+            },
+          }}
+        />
+      )}
     </Container>
   );
 }

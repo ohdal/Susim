@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle } from "react";
+import { useState, forwardRef, useImperativeHandle, useRef } from "react";
 import styled from "styled-components";
 
 const InputComp = styled.input`
@@ -27,20 +27,27 @@ type Props = {
   min?: number;
   visibleCount: boolean;
   changeEventHandle?: <Params extends any[]>(...args: Params) => void;
+  mouseEventHandle?: () => void;
+  blurEventHandle?: () => void;
 };
 
 export interface MainInputHandle {
   name: string;
   getText: () => string;
+  focus: () => void;
 }
 
 const MAX_DEFAULT = 100;
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
-  const { name, placeholder, changeEventHandle, max, visibleCount } = props;
+  const { name, placeholder, changeEventHandle, blurEventHandle, mouseEventHandle, max, visibleCount } = props;
   const [text, setText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useImperativeHandle(ref, () => ({
     name,
+    focus: () => {
+      if (inputRef.current) inputRef.current.focus();
+    },
     getText: () => {
       return text;
     },
@@ -49,9 +56,16 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
   return (
     <div className="my-3 relative">
       <InputComp
+        ref={inputRef}
         name={name}
         placeholder={placeholder}
         value={text}
+        onMouseEnter={() => {
+          if (mouseEventHandle) mouseEventHandle();
+        }}
+        onBlur={() => {
+          if (blurEventHandle) blurEventHandle();
+        }}
         onChange={(e) => {
           const text = e.target.value;
           const size = max ? max : MAX_DEFAULT;

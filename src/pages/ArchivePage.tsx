@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import database from "../utils/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
@@ -7,6 +7,7 @@ import { Scrollbars, positionValues } from "react-custom-scrollbars";
 import AOS from "aos";
 import "aos/dist/aos.css"; // You can also use <link> for styles
 
+import { ServiceContext, mySynth } from "../utils/speechService";
 import CardComponent from "../components/CardComponent";
 
 type listType = {
@@ -19,6 +20,7 @@ type listType = {
 const PAGE_SIZE = 5;
 export default function ArchivePage() {
   const navigate = useNavigate();
+  const service = useContext(ServiceContext);
   const innerRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<listType[] | null>(null);
   const [isLast, setIsLast] = useState(false);
@@ -96,6 +98,8 @@ export default function ArchivePage() {
                 }
               } else {
                 if (!list) setList([]);
+                if (service.tts)
+                  mySynth.speak("24시간 이내에 작성된 수심이 존재하지 않습니다. 우측 상단에 나가기 버튼");
 
                 setIsLast(true);
               }
@@ -108,7 +112,7 @@ export default function ArchivePage() {
         }
       }
     },
-    [getStartDate, getEqualData, isLast, list]
+    [getStartDate, getEqualData, isLast, list, service]
   );
 
   const handleScroll = useCallback(
@@ -149,6 +153,9 @@ export default function ArchivePage() {
     <div className="p-20 w-full h-full">
       <button
         className="gradient-btn fixed right-4 top-4"
+        onMouseEnter={() => {
+          if (service.tts) mySynth.speak("나가기 버튼");
+        }}
         onClick={() => navigate("..", { relative: "path", state: "archive" })}
       >
         나가기
@@ -162,7 +169,20 @@ export default function ArchivePage() {
               ref={innerRef}
             >
               {list.map((v, idx) => {
-                return <CardComponent data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />;
+                return (
+                  <CardComponent
+                    data={v.data}
+                    text={v.text}
+                    canvasInfo={v.canvasInfo}
+                    key={idx}
+                    mouseEnterHandler={() => {
+                      if (service.tts) mySynth.speak(v.text);
+                    }}
+                    mouseLeaveHandler={() => {
+                      if (service.tts) mySynth.cancel();
+                    }}
+                  />
+                );
               })}
             </div>
           ) : (
