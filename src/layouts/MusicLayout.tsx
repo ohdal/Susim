@@ -11,13 +11,14 @@ const Container = styled.div`
 `;
 
 type MusicListType = number[] | null;
-export type ContextType = { musicPause: () => void; musicPlay: () => void };
+export type ContextType = { musicPause: () => void; musicPlay: () => void; getMusicInfo: () => string[] };
 
 let audioList: HTMLAudioElement[] = [];
 let loadedCount = 0;
 let errorCount = 0;
 export default function MusicLayout() {
   const [isAllowMusic, setIsAllowMusic] = useState(false);
+  const [musicInfoList, setMusicInfoList] = useState<string[]>([]);
   const navigate = useNavigate();
   const { list } = useParams();
   const service = useContext(ServiceContext);
@@ -50,7 +51,7 @@ export default function MusicLayout() {
       if (musicList) {
         let long = 0;
         const firstMusic = musicList[0] - 1;
-        const testAudio = new Audio(musicFileList[0][firstMusic]);
+        const testAudio = new Audio(musicFileList[0][firstMusic].file);
 
         testAudio.loop = false;
         testAudio
@@ -59,10 +60,13 @@ export default function MusicLayout() {
             setIsAllowMusic(true);
             testAudio.pause();
 
+            const tempInfoList = [];
             for (let i = 0; i < musicList.length; i++) {
               const num = musicList[i] - 1;
-              const audio = new Audio(musicFileList[i][num]);
+              const { file, desc } = musicFileList[i][num];
+              const audio = new Audio(file);
 
+              tempInfoList.push(desc);
               audioList.push(audio);
               audio.loop = true;
               audio.onloadeddata = loadedEvent;
@@ -70,6 +74,7 @@ export default function MusicLayout() {
               long = audioList[long].duration < audio.duration ? i : long;
             }
 
+            setMusicInfoList(tempInfoList);
             // audioList[long].onended = () => {
             //   navigate("/result");
             // };
@@ -103,8 +108,10 @@ export default function MusicLayout() {
     if (list) {
       const reg = new RegExp("^[0-9]{5}$");
       const result = reg.test(list);
-      if (result) musicPlay(list.split("").map((v) => Number(v)));
-      else {
+      if (result) {
+        musicPlay(list.split("").map((v) => Number(v)));
+        // 여기서 MusicInfo 작업 - stt 기능
+      } else {
         if (service.tts) {
           mySynth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
             end: () => {
@@ -129,6 +136,9 @@ export default function MusicLayout() {
       {isAllowMusic && (
         <Outlet
           context={{
+            getMusicInfo: () => {
+              return musicInfoList;
+            },
             musicPause: () => {
               handleAllMusic(false);
             },

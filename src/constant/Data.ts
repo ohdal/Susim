@@ -34,7 +34,8 @@ export const questionList: questionType[] = [
     question: "3. 나의 수심을 물로 표현한다면 어떤 형태 또는 소리를 띄고 있나요?",
     answerType: "text",
     answerList: ["고여있는", "똑똑떨어진", "졸졸흐르는", "쏟아지는", "잔잔한", "파도치는"],
-    ttsText: "3. 나의 수심을 물로 표현한다면 어떤 형태 또는 소리를 띄고 있나요? 고여있는 똑똑떨어진 졸졸흐르는 쏟아지는 잔잔한 파도치는 넘어가기",
+    ttsText:
+      "3. 나의 수심을 물로 표현한다면 어떤 형태 또는 소리를 띄고 있나요? 고여있는 똑똑떨어진 졸졸흐르는 쏟아지는 잔잔한 파도치는 넘어가기",
   },
   {
     id: 4,
@@ -62,11 +63,46 @@ export const questionList: questionType[] = [
 ];
 
 export const musicFileList = [
-  [music.Q1_1, music.Q1_2, music.Q1_3, music.Q1_4, music.Q1_5, music.Q1_6],
-  [music.Q2_1, music.Q2_2, music.Q2_3, music.Q2_4, music.Q2_5, music.Q2_6],
-  [music.Q3_1, music.Q3_2, music.Q3_3, music.Q3_4, music.Q3_5, music.Q3_6],
-  [music.Q4_1, music.Q4_2, music.Q4_3, music.Q4_4, music.Q4_5, music.Q4_6],
-  [music.Q5_1, music.Q5_2, music.Q5_3, music.Q5_4, music.Q5_5, music.Q5_6],
+  [
+    { file: music.Q1_1, desc: "낮고 잔잔하며 반복되는 음" },
+    { file: music.Q1_2, desc: "어둡고 무거운 음" },
+    { file: music.Q1_3, desc: "매우 어둡고 무거운 음의 울림" },
+    { file: music.Q1_4, desc: "비규칙적으로 통통튀는 음" },
+    { file: music.Q1_5, desc: "어둡게 울리는 소리" },
+    { file: music.Q1_6, desc: "매우 어둡고 무거운 음이 잔잔하게 울림" },
+  ],
+  [
+    { file: music.Q2_1, desc: "상승하는 밝은 음" },
+    { file: music.Q2_2, desc: "높은 음이 종소리 같이 반복" },
+    { file: music.Q2_3, desc: "중간 높이 음으로 이뤄진 화음이 빠르게 반복" },
+    { file: music.Q2_4, desc: "화음이 중간 속도로 반복" },
+    { file: music.Q2_5, desc: "화음이 비규칙적으로 반복" },
+    { file: music.Q2_6, desc: "매우 높은 음이 규칙적으로 반복 " },
+  ],
+  [
+    { file: music.Q3_1, desc: "물 안에 들어간 듯 먹먹한 소리" },
+    { file: music.Q3_2, desc: "똑똑 물방울이 떨어지는 소리" },
+    { file: music.Q3_3, desc: "시냇물이 졸졸 흐르는 소리" },
+    { file: music.Q3_4, desc: "비가 내리는 소리" },
+    { file: music.Q3_5, desc: "잔잔하게 큰 물이 흘러가는 소리 " },
+    { file: music.Q3_6, desc: "파도치는 소리" },
+  ],
+  [
+    { file: music.Q4_1, desc: "숲속에서 새가 지저귀는 소리" },
+    { file: music.Q4_2, desc: "귀뚜라미가 우는 소리" },
+    { file: music.Q4_3, desc: "차분한 바람 소리 " },
+    { file: music.Q4_4, desc: "키보드 타자 치는 소리" },
+    { file: music.Q4_5, desc: "새가 지저귀는 소리와 바람소리" },
+    { file: music.Q4_6, desc: "시계 초침 소리" },
+  ],
+  [
+    { file: music.Q5_1, desc: "진동음" },
+    { file: music.Q5_2, desc: "바람 소리" },
+    { file: music.Q5_3, desc: "강한 바람 소리" },
+    { file: music.Q5_4, desc: "스쳐가는 바람 소리" },
+    { file: music.Q5_5, desc: "강한 진동음" },
+    { file: music.Q5_6, desc: "진동음 들리다 가끔식 끊어지는 소리" },
+  ],
 ];
 
 export const canvasFontSize = (width: number): number => {

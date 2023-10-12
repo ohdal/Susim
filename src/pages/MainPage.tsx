@@ -27,6 +27,21 @@ const AnimationDiv = styled.div`
   }
 `;
 
+const SttDiv = styled.p`
+  width: 60%;
+  position: fixed;
+  bottom: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  p {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 1.125rem;
+  }
+`;
+
 const MainP = styled.p`
   text-align: center;
   font-size: 1.625rem;
@@ -90,7 +105,7 @@ export default function MainPage() {
   const location = useLocation();
   const service = useContext(ServiceContext);
 
-  const { musicPause, musicPlay } = useOutletContext<ContextType>();
+  const { musicPause, musicPlay, getMusicInfo } = useOutletContext<ContextType>();
 
   const getDomainData = useCallback(() => {
     if (analyser) analyser.getByteTimeDomainData(dataArray);
@@ -507,6 +522,11 @@ export default function MainPage() {
                 </MainButton>
               </div>
             </AnimationDiv>
+            {level === 1 && service.stt && (
+              <SttDiv>
+                <p>{`[${getMusicInfo().join("] [")}]가 합쳐진 음악이 재생되는 중.`}</p>
+              </SttDiv>
+            )}
             {level === 1 && (
               <button
                 className="fixed right-4 bottom-4 gradient-btn"
