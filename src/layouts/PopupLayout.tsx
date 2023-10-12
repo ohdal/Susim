@@ -18,6 +18,9 @@ export default function PopupLayout({ children }: Props) {
       denyButtonColor: "#d76565",
       confirmButtonText: "예",
       denyButtonText: "아니요",
+      customClass: {
+        popup: "my-popup",
+      },
       showClass: {
         popup: "animate__animated animate__fadeInDown",
       },

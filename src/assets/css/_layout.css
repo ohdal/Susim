@@ -36,3 +36,9 @@ a {
   line-height: 1;
   color: #ffffff;
 }
+
+.my-popup {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
