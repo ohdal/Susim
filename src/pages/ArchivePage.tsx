@@ -26,8 +26,8 @@ export default function ArchivePage() {
   const [isLast, setIsLast] = useState(false);
 
   const getStartDate = useCallback((): number => {
-    // 2주전 데이터부터 가져오기
-    if (!list) return new Date().getTime() - 1000 * 60 * 60 * 24 * 14;
+    // 24시간 이내 데이터 가져오기
+    if (!list) return new Date().getTime() - 1000 * 60 * 60 * 24;
     else {
       const idx = list.length - 1;
       return list[idx].date;
