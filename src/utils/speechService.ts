@@ -21,7 +21,7 @@ class Synth {
   public speak(text: string, event?: { end?: () => void; start?: () => void }) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "ko";
-    utterance.rate = 0.8;
+    utterance.rate = 0.75;
     utterance.pitch = 0.98;
     utterance.onerror = (e) => {
       console.error(e.error);
