@@ -29,7 +29,9 @@ export default function PopupLayout({ children }: Props) {
       },
     };
 
-    const result_tts = await Swal.fire({ title: "음성해설 기능을 사용하시겠습니까?", ...popupProps });
+    const result_tts = window.speechSynthesis
+      ? await Swal.fire({ title: "음성해설 기능을 사용하시겠습니까?", ...popupProps })
+      : { value: false };
     const result_stt = await Swal.fire({ title: "자막 기능을 사용하시겠습니까?", ...popupProps });
     // const result_stt = { value: false };
 

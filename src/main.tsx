@@ -6,7 +6,7 @@ import "./index.css";
 import "./assets/fonts/font.css";
 import "animate.css";
 
-import PopupLayout from "./layouts/PopupLayout";
+import PopupLayout from "./layouts/TTSPopupLayout";
 import MusicLayout from "./layouts/MusicLayout";
 import MusicQuestion from "./pages/music/MusicQuestion";
 import IntroPage from "./pages/IntroPage";
