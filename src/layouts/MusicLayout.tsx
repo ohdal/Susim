@@ -15,7 +15,6 @@ export type ContextType = { musicPause: () => void; musicPlay: () => void; getMu
 
 let audioList: HTMLAudioElement[] = [];
 let loadedCount = 0;
-let errorCount = 0;
 export default function MusicLayout() {
   const [isAllowMusic, setIsAllowMusic] = useState(false);
   const [musicInfoList, setMusicInfoList] = useState<string[]>([]);
@@ -34,6 +33,7 @@ export default function MusicLayout() {
         }
       });
 
+      if (!type) audioList = [];
       loadedCount = 0;
     }
   }, []);
@@ -49,6 +49,7 @@ export default function MusicLayout() {
   const musicPlay = useCallback(
     (musicList: MusicListType) => {
       if (musicList) {
+        audioList = [];
         let long = 0;
         const firstMusic = musicList[0] - 1;
         const testAudio = new Audio(musicFileList[0][firstMusic].file);
@@ -80,12 +81,10 @@ export default function MusicLayout() {
             // };
           })
           .catch((err) => {
-            errorCount++;
             console.log(`에러발생 ${err as string}`);
+            testAudio.pause();
 
-            if (errorCount > 1) return;
-
-            if (service.tts)
+            if (service.tts && !mySynth.isSpeaking)
               mySynth.speak(
                 "설정에서 해당 브라우저 음악재생을 허용해준 뒤, 카드를 다시 선택해주세요. 카드 선택 화면으로 돌아갑니다. ",
                 {
@@ -110,7 +109,6 @@ export default function MusicLayout() {
       const result = reg.test(list);
       if (result) {
         musicPlay(list.split("").map((v) => Number(v)));
-        // 여기서 MusicInfo 작업 - stt 기능
       } else {
         if (service.tts) {
           mySynth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
@@ -128,8 +126,9 @@ export default function MusicLayout() {
     return () => {
       handleAllMusic(false);
       audioList = [];
+      loadedCount = 0;
     };
-  }, [handleAllMusic, list, musicPlay, navigate, service]);
+  }, [list]);
 
   return (
     <Container>

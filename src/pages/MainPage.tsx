@@ -90,7 +90,6 @@ const MAX_TEXT_SIZE = 200;
 const MIN_TEXT_SIZE = 10;
 const db = database("susims");
 let userSusim: typeSusim | null = null;
-let errorCount = 0;
 
 export default function MainPage() {
   const canvasRef = useRef<LinearDataCanvasHandle>(null);
@@ -326,15 +325,15 @@ export default function MainPage() {
         source.connect(analyser);
       }
     } catch (err) {
-      errorCount++;
       console.log(`에러발생 ${err as string}`);
 
-      if (errorCount > 1) return;
-
-      if (service.tts) {
+      if (service.tts && !synthSpeak) {
         mySynth.speak(
           "원활한 온라인도우 진행을 위해, 웹 브라우저 설정화면에서 마이크 사용 권한을 허용해주세요. 카드 선택 화면으로 돌아갑니다.",
           {
+            start: () => {
+              setSynthSpeak(true);
+            },
             end: () => {
               navigate("/question");
             },
@@ -346,15 +345,11 @@ export default function MainPage() {
       }
       musicPause();
     }
-
-    return () => {
-      errorCount = 0;
-    };
-  }, [navigate, service, handleText, textLevel, musicPause]);
+  }, [navigate, service, handleText, textLevel, musicPause, synthSpeak]);
 
   useEffect(() => {
     void getMediaStream();
-  }, [getMediaStream]);
+  }, []);
 
   useEffect(() => {
     switch (level) {
