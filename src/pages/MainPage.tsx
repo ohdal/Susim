@@ -287,20 +287,20 @@ export default function MainPage() {
     }
   }, [textLevel, musicPlay, service]);
 
-  const handleInput = useCallback(
-    (v: string) => {
-      if (service.tts) {
-        if (synthSpeak) {
-          mySynth.cancel();
-          setSynthSpeak(false);
-        } else {
-          handleSynsthInput(v, getDefaultSynthEvent());
-        }
-      }
-      canvasRef.current?.fillUp(v);
-    },
-    [service, synthSpeak, getDefaultSynthEvent]
-  );
+  // const handleInput = useCallback(
+  //   (v: string) => {
+  //     if (service.tts) {
+  //       if (synthSpeak) {
+  //         mySynth.cancel();
+  //         setSynthSpeak(false);
+  //       } else {
+  //         handleSynsthInput(v, getDefaultSynthEvent());
+  //       }
+  //     }
+  //     canvasRef.current?.fillUp(v);
+  //   },
+  //   [service, synthSpeak, getDefaultSynthEvent]
+  // );
 
   const getMediaStream = useCallback(async () => {
     try {
@@ -364,7 +364,7 @@ export default function MainPage() {
 
         if (service.tts)
           mySynth.speak(
-            "당신의 수심을 적어주세요. 중앙에 수심을 적는 바. 바 우측 하단에 전송하기. 페이지 우측 하단에 고 아카이브. ",
+            "당신의 수심을 적어주세요. 중앙에 수심을 적는 바. 바 우측 하단에 전송하기. 페이지 우측 하단에 고 아카이브. 작성한 수심을 듣고싶으시다면 에프일번키를 눌러주세요.",
             getDefaultSynthEvent()
           );
         break;
@@ -376,7 +376,7 @@ export default function MainPage() {
       case 3:
         if (service.tts)
           mySynth.speak(
-            "당신의 숨의 기록이 나타난다. 당신의 숨의 기록을 전송하시겠습니까? 중앙에 이메일을 입력하는 바. 바 우측하단 좌측에 전송하기, 우측에 아니요. ",
+            "당신의 숨의 기록이 나타난다. 당신의 숨의 기록을 전송하시겠습니까? 중앙에 이메일을 입력하는 바. 바 우측하단 좌측에 전송하기, 우측에 아니요. 작성한 이메일을 듣고싶으시다면 에프일번키를 눌러주세요.",
             getDefaultSynthEvent()
           );
         break;
@@ -453,15 +453,18 @@ export default function MainPage() {
                 ref={susimInputRef}
                 max={MAX_TEXT_SIZE}
                 visibleCount={true}
+                keydownHandle={(key, text) => {
+                  if (service.tts && !synthSpeak && key === "F1") {
+                    mySynth.speak(text, getDefaultSynthEvent());
+                  }
+                }}
                 focusHandle={() => {
                   if (service.tts && !synthSpeak) mySynth.speak("수심 입력 바");
                 }}
-                blurEventHandle={() => {
-                  if (service.tts && mySynth.isSpeaking) mySynth.cancel();
-                }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
-                  handleInput(v as string);
+                  // handleInput(v as string);
+                  canvasRef.current?.fillUp(v as string);
                 }}
               />
               <div>
@@ -474,8 +477,10 @@ export default function MainPage() {
                     if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
                   }}
                   onClick={() => {
-                    void handleSusim();
-                    musicPause();
+                    if (!service.tts || (service.tts && !synthSpeak)) {
+                      void handleSusim();
+                      musicPause();
+                    }
                   }}
                 >
                   전송하기
@@ -492,15 +497,18 @@ export default function MainPage() {
                 ref={emailInputRef}
                 placeholder="이메일을 입력해주세요."
                 visibleCount={false}
+                keydownHandle={(key, text) => {
+                  if (service.tts && !synthSpeak && key === "F1") {
+                    mySynth.speak(text, getDefaultSynthEvent());
+                  }
+                }}
                 focusHandle={() => {
                   if (service.tts && !synthSpeak) mySynth.speak("이메일 입력 바.");
                 }}
-                blurEventHandle={() => {
-                  if (service.tts && mySynth.isSpeaking) mySynth.cancel();
-                }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
-                  handleInput(v as string);
+                  // handleInput(v as string);
+                  canvasRef.current?.fillUp(v as string);
                 }}
               />
               <div>
@@ -514,7 +522,7 @@ export default function MainPage() {
                   }}
                   onClick={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("클릭");
-                    setLevel(4);
+                    if (!service.tts || (service.tts && !synthSpeak)) setLevel(4);
                   }}
                 >
                   아니요
@@ -527,7 +535,9 @@ export default function MainPage() {
                   onMouseEnter={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
                   }}
-                  onClick={handleEmail}
+                  onClick={() => {
+                    if (!service.tts || (service.tts && !synthSpeak)) handleEmail();
+                  }}
                 >
                   전송하기
                 </MainButton>
@@ -549,7 +559,7 @@ export default function MainPage() {
                 }}
                 onClick={() => {
                   if (service.tts && !synthSpeak) mySynth.speak("클릭");
-                  navigate("archive");
+                  if (!service.tts || (service.tts && !synthSpeak)) navigate("archive");
                 }}
               >
                 Go Archive

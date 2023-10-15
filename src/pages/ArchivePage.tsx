@@ -98,7 +98,7 @@ export default function ArchivePage() {
                 }
               } else {
                 if (!list) setList([]);
-                if (service.tts)
+                if (service.tts && isFirst)
                   mySynth.speak("24시간 이내에 작성된 수심이 존재하지 않습니다. 우측 상단에 나가기 버튼");
 
                 setIsLast(true);

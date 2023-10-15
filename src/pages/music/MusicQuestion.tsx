@@ -129,16 +129,16 @@ export default function MusicQuestion() {
     if (level > questionList.length - 1) {
       navigate(`/main/${userChoiceList.join("")}`);
     } else {
-      if (service.tts) {
-        mySynth.speak(question.ttsText, {
-          end: () => {
-            setQuestionSpeak(false);
-          },
-          start: () => {
-            setQuestionSpeak(true);
-          },
-        });
-      }
+      // if (service.tts) {
+      //   mySynth.speak(question.ttsText, {
+      //     end: () => {
+      //       setQuestionSpeak(false);
+      //     },
+      //     start: () => {
+      //       setQuestionSpeak(true);
+      //     },
+      //   });
+      // }
     }
   }, [level, navigate, service]);
 
@@ -199,7 +199,9 @@ export default function MusicQuestion() {
         <div className="footer">
           <button
             className="gradient-btn"
-            onClick={handleButton}
+            onClick={(e) => {
+              handleButton();
+            }}
             onFocus={() => {
               handleSynthSub("넘어가기 버튼");
             }}

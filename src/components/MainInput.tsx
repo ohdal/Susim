@@ -27,6 +27,7 @@ type Props = {
   min?: number;
   visibleCount: boolean;
   changeEventHandle?: <Params extends any[]>(...args: Params) => void;
+  keydownHandle?: (key: string, text: string) => void;
   focusHandle?: () => void;
   mouseEventHandle?: () => void;
   blurEventHandle?: () => void;
@@ -40,8 +41,17 @@ export interface MainInputHandle {
 
 const MAX_DEFAULT = 100;
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
-  const { name, placeholder, changeEventHandle, blurEventHandle, mouseEventHandle, focusHandle, max, visibleCount } =
-    props;
+  const {
+    name,
+    placeholder,
+    changeEventHandle,
+    blurEventHandle,
+    mouseEventHandle,
+    focusHandle,
+    keydownHandle,
+    max,
+    visibleCount,
+  } = props;
   const [text, setText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -62,6 +72,9 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
         name={name}
         placeholder={placeholder}
         value={text}
+        onKeyDown={(e) => {
+          if (keydownHandle) keydownHandle(e.key, text);
+        }}
         onFocus={() => {
           if (focusHandle) focusHandle();
         }}
