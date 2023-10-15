@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import styled from "styled-components";
 import { Scrollbars } from "react-custom-scrollbars";
 
@@ -6,17 +6,17 @@ import background_archive from "../assets/images/background_archive.png";
 
 import LinearDataCanvas, { lineGroupType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
+import { ServiceContext, mySynth } from "../utils/speechService";
 
 type CardProps = {
   data: string;
   canvasInfo: string;
   text: string;
   clickHandler?: () => void;
-  mouseEnterHandler?: () => void;
-  mouseLeaveHandler?: () => void;
+  focusHandler?: () => void;
 };
 
-const CardLayout = styled.div<{ $src: string }>`
+const CardLayout = styled.button<{ $src: string }>`
   cursor: pointer;
   display: inline-block;
   position: relative;
@@ -49,6 +49,7 @@ const CardLayout = styled.div<{ $src: string }>`
     z-index: -1;
     transform: rotateY(180deg);
     color: #FFFFFF;
+    text-align: left;
   }
 
   &.clicked, &.not-clicked {
@@ -78,10 +79,11 @@ const CardLayout = styled.div<{ $src: string }>`
 `;
 
 const CardComponent = (props: CardProps) => {
-  const { data, text, canvasInfo, mouseEnterHandler, mouseLeaveHandler, clickHandler } = props;
-  const layoutRef = useRef<HTMLDivElement | null>(null);
+  const { data, text, canvasInfo, focusHandler, clickHandler } = props;
+  const layoutRef = useRef<HTMLButtonElement | null>(null);
   const canvasRef = useRef<LinearDataCanvasHandle | null>(null);
   const [clicked, setClicked] = useState<boolean | null>(null);
+  const service = useContext(ServiceContext);
 
   useEffect(() => {
     if (!canvasRef.current || !layoutRef.current) return;
@@ -114,13 +116,23 @@ const CardComponent = (props: CardProps) => {
       data-aos-anchor="bottom"
       data-aos-once="true"
       className={clicked === null ? "" : clicked ? "clicked" : "not-clicked"}
-      onMouseEnter={mouseEnterHandler}
-      onMouseLeave={mouseLeaveHandler}
+      onFocus={() => {
+        if (focusHandler) focusHandler();
+        if (service.tts) {
+          setClicked(true);
+          mySynth.speak(text);
+        }
+      }}
+      onBlur={() => {
+        if (service.tts) setClicked(false);
+      }}
       onClick={() => {
         if (clickHandler) clickHandler();
-        setClicked((v) => {
-          return v === null ? true : !v;
-        });
+        if (!service.tts) {
+          setClicked((v) => {
+            return v === null ? true : !v;
+          });
+        }
       }}
     >
       <div className="front">

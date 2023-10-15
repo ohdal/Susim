@@ -27,6 +27,7 @@ type Props = {
   min?: number;
   visibleCount: boolean;
   changeEventHandle?: <Params extends any[]>(...args: Params) => void;
+  focusHandle?: () => void;
   mouseEventHandle?: () => void;
   blurEventHandle?: () => void;
 };
@@ -39,7 +40,8 @@ export interface MainInputHandle {
 
 const MAX_DEFAULT = 100;
 const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
-  const { name, placeholder, changeEventHandle, blurEventHandle, mouseEventHandle, max, visibleCount } = props;
+  const { name, placeholder, changeEventHandle, blurEventHandle, mouseEventHandle, focusHandle, max, visibleCount } =
+    props;
   const [text, setText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,6 +62,9 @@ const MainInput = forwardRef<MainInputHandle, Props>((props, ref) => {
         name={name}
         placeholder={placeholder}
         value={text}
+        onFocus={() => {
+          if (focusHandle) focusHandle();
+        }}
         onMouseEnter={() => {
           if (mouseEventHandle) mouseEventHandle();
         }}

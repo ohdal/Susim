@@ -32,8 +32,7 @@ export default function MusicLayout() {
           audio.currentTime = 0;
         }
       });
-
-      if (!type) audioList = [];
+      
       loadedCount = 0;
     }
   }, []);

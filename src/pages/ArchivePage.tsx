@@ -147,16 +147,23 @@ export default function ArchivePage() {
 
   useEffect(() => {
     AOS.init();
-  }, []);
+    if (service.tts) mySynth.speak("아카이브 페이지입니다. 우측 상단에 나가기 버튼.");
+  }, [service]);
 
   return (
     <div className="p-20 w-full h-full">
       <button
         className="gradient-btn fixed right-4 top-4"
+        onFocus={() => {
+          if (service.tts) mySynth.speak("나가기 버튼");
+        }}
         onMouseEnter={() => {
           if (service.tts) mySynth.speak("나가기 버튼");
         }}
-        onClick={() => navigate("..", { relative: "path", state: "archive" })}
+        onClick={() => {
+          if (service.tts) mySynth.speak("클릭");
+          navigate("..", { relative: "path", state: "archive" })
+        }}
       >
         나가기
       </button>
@@ -169,20 +176,7 @@ export default function ArchivePage() {
               ref={innerRef}
             >
               {list.map((v, idx) => {
-                return (
-                  <CardComponent
-                    data={v.data}
-                    text={v.text}
-                    canvasInfo={v.canvasInfo}
-                    key={idx}
-                    mouseEnterHandler={() => {
-                      if (service.tts) mySynth.speak(v.text);
-                    }}
-                    mouseLeaveHandler={() => {
-                      if (service.tts) mySynth.cancel();
-                    }}
-                  />
-                );
+                return <CardComponent data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />;
               })}
             </div>
           ) : (

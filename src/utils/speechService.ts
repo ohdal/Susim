@@ -23,9 +23,9 @@ class Synth {
     utterance.lang = "ko";
     utterance.rate = 0.75;
     utterance.pitch = 0.98;
-    utterance.onerror = (e) => {
-      console.error(e.error);
-    };
+    // utterance.onerror = (e) => {
+    //   console.error(e.error);
+    // };
 
     if (event) {
       const { end, start } = event;

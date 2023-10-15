@@ -173,6 +173,8 @@ export default function MainPage() {
   const handleSusim = useCallback(async () => {
     const { result, value, text } = validate(susimInputRef.current);
 
+    if (service.tts) mySynth.speak("클릭");
+
     if (result) {
       canvasRef.current?.stopAnimation();
       const linearData = canvasRef.current?.getLinearData();
@@ -211,6 +213,8 @@ export default function MainPage() {
   const handleEmail = useCallback(() => {
     const { result, value, text } = validate(emailInputRef.current);
 
+    if (service.tts) mySynth.speak("클릭");
+
     if (result) {
       emailjs
         .send(
@@ -233,6 +237,7 @@ export default function MainPage() {
       if (service.tts)
         mySynth.speak(text, {
           end: () => {
+            console.log("hihi");
             emailInputRef.current?.focus();
           },
         });
@@ -246,10 +251,10 @@ export default function MainPage() {
         if (service.tts)
           mySynth.speak("답변이 도착했습니다. 당신의 선택으로 만들어진 곡입니다.", {
             end: () => {
-              setLevel((v) => v + 1);
+              setLevel(1);
             },
           });
-        else setLevel((v) => v + 1);
+        else setLevel(1);
         break;
       case 2:
         if (service.tts)
@@ -257,11 +262,11 @@ export default function MainPage() {
             "당신이 적은 수심은 사라졌습니다. 배수된 감정과 물은 모두 섞여 어딘가로 흘렀습니다. 하지만, 당신이 수심을 적을때 남긴 숨의 기록은 당신에게 전송되었습니다.",
             {
               end: () => {
-                setLevel((v) => v + 1);
+                setLevel(6);
               },
             }
           );
-        else setLevel((v) => v + 1);
+        else setLevel(6);
         break;
       case 3:
         if (service.tts)
@@ -303,10 +308,7 @@ export default function MainPage() {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       if (mediaStream) {
-        if (service.tts && textLevel > 0) {
-          handleText();
-        }
-
+        if (service.tts) handleText();
         audioCtx = new AudioContext();
 
         const analyser = audioCtx.createAnalyser();
@@ -345,7 +347,7 @@ export default function MainPage() {
       }
       musicPause();
     }
-  }, [navigate, service, handleText, textLevel, musicPause, synthSpeak]);
+  }, [navigate, service, musicPause, synthSpeak, handleText]);
 
   useEffect(() => {
     void getMediaStream();
@@ -368,7 +370,7 @@ export default function MainPage() {
         break;
       case 2:
         setTimeout(() => {
-          setLevel((v) => v + 1);
+          setLevel(3);
         }, 2000);
         break;
       case 3:
@@ -383,11 +385,11 @@ export default function MainPage() {
           .then((result) => {
             if (result) {
               canvasRef.current?.mergeAnimation(result.data, result.canvasInfo, () => {
-                setLevel((v) => v + 1);
+                setLevel(5);
               });
             } else {
               canvasRef.current?.mergeAnimation(susim.data, susim.canvasInfo, () => {
-                setLevel((v) => v + 1);
+                setLevel(5);
               });
             }
 
@@ -406,6 +408,10 @@ export default function MainPage() {
         break;
     }
   }, [level, navigate, location, getLastSusim, service, getDefaultSynthEvent]);
+
+  useEffect(() => {
+    if (analyser && service.tts) handleText();
+  }, [handleText, service, analyser]);
 
   return (
     <>
@@ -447,11 +453,11 @@ export default function MainPage() {
                 ref={susimInputRef}
                 max={MAX_TEXT_SIZE}
                 visibleCount={true}
-                mouseEventHandle={() => {
-                  if (service.tts && !synthSpeak) mySynth.speak("수심 입력 바. 클릭 후 수심을 적어주세요.");
+                focusHandle={() => {
+                  if (service.tts && !synthSpeak) mySynth.speak("수심 입력 바");
                 }}
                 blurEventHandle={() => {
-                  if (service.tts) mySynth.cancel();
+                  if (service.tts && mySynth.isSpeaking) mySynth.cancel();
                 }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
@@ -461,6 +467,9 @@ export default function MainPage() {
               <div>
                 <MainButton
                   className="gradient-btn px-5 py-2.5"
+                  onFocus={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
+                  }}
                   onMouseEnter={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
                   }}
@@ -483,11 +492,11 @@ export default function MainPage() {
                 ref={emailInputRef}
                 placeholder="이메일을 입력해주세요."
                 visibleCount={false}
-                mouseEventHandle={() => {
-                  if (service.tts && !synthSpeak) mySynth.speak("이메일 입력 바. 클릭 후 이메일을 적어주세요.");
+                focusHandle={() => {
+                  if (service.tts && !synthSpeak) mySynth.speak("이메일 입력 바.");
                 }}
                 blurEventHandle={() => {
-                  mySynth.cancel();
+                  if (service.tts && mySynth.isSpeaking) mySynth.cancel();
                 }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
@@ -497,10 +506,14 @@ export default function MainPage() {
               <div>
                 <MainButton
                   className="gradient-btn"
+                  onFocus={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("아니요 버튼");
+                  }}
                   onMouseEnter={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("아니요 버튼");
                   }}
                   onClick={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("클릭");
                     setLevel(4);
                   }}
                 >
@@ -508,6 +521,9 @@ export default function MainPage() {
                 </MainButton>
                 <MainButton
                   className="gradient-btn"
+                  onFocus={() => {
+                    if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
+                  }}
                   onMouseEnter={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
                   }}
@@ -525,11 +541,14 @@ export default function MainPage() {
             {level === 1 && (
               <button
                 className="fixed right-4 bottom-4 gradient-btn"
+                onFocus={() => {
+                  if (service.tts && !synthSpeak) mySynth.speak("Go Archive 버튼");
+                }}
                 onMouseEnter={() => {
                   if (service.tts && !synthSpeak) mySynth.speak("Go Archive 버튼");
                 }}
                 onClick={() => {
-                  if (service.tts) mySynth.cancel();
+                  if (service.tts && !synthSpeak) mySynth.speak("클릭");
                   navigate("archive");
                 }}
               >

@@ -19,7 +19,7 @@ const CardLayout = styled.div`
   margin: 0 auto;
 `;
 
-const QuestionImgCard = styled.img<{ $count: number }>`
+const QuestionImgCard = styled.button<{ $count: number }>`
   width: ${(props) => (100 - (props.$count - 1) * 2) / props.$count}%;
   cursor: pointer;
   border-radius: 10px;
@@ -37,7 +37,7 @@ const QuestionImgCard = styled.img<{ $count: number }>`
   }
 `;
 
-const QuestionCard = styled.div<{ $count: number }>`
+const QuestionCard = styled.button<{ $count: number }>`
   cursor: pointer;
   position: relative;
   width: ${(props) => (100 - (props.$count - 1) * 2) / props.$count}%;
@@ -106,6 +106,7 @@ export default function MusicQuestion() {
         });
       else alert("카드 중 하나를 선택해주세요.");
     } else {
+      if (service.tts) mySynth.speak("클릭");
       userChoiceList.push(userChoice);
       setUserChoice(null);
       setLevel((v) => v + 1);
@@ -128,16 +129,16 @@ export default function MusicQuestion() {
     if (level > questionList.length - 1) {
       navigate(`/main/${userChoiceList.join("")}`);
     } else {
-      // if (service.tts) {
-      //   mySynth.speak(question.ttsText, {
-      //     end: () => {
-      //       setQuestionSpeak(false);
-      //     },
-      //     start: () => {
-      //       setQuestionSpeak(true);
-      //     },
-      //   });
-      // }
+      if (service.tts) {
+        mySynth.speak(question.ttsText, {
+          end: () => {
+            setQuestionSpeak(false);
+          },
+          start: () => {
+            setQuestionSpeak(true);
+          },
+        });
+      }
     }
   }, [level, navigate, service]);
 
@@ -161,8 +162,11 @@ export default function MusicQuestion() {
                       key={idx}
                       $count={question.answerList.length}
                       className={idx + 1 === userChoice ? "selected" : ""}
+                      onFocus={() => {
+                        handleSynthSub(answer + "카드");
+                      }}
                       onClick={() => {
-                        handleSynthSub(answer + "카드 클릭");
+                        handleSynthSub("선택");
                         handleCard(idx + 1);
                       }}
                     >
@@ -173,16 +177,19 @@ export default function MusicQuestion() {
                 } else
                   return (
                     <QuestionImgCard
-                      width="100%"
                       key={idx}
-                      src={answer}
                       $count={question.answerList.length}
                       className={idx + 1 === userChoice ? "selected" : ""}
+                      onFocus={() => {
+                        if (question.ttsAnswer) handleSynthSub(question.ttsAnswer[idx] + "카드");
+                      }}
                       onClick={() => {
-                        if (question.ttsAnswer) handleSynthSub(question.ttsAnswer[idx] + "카드 클릭");
+                        if (question.ttsAnswer) handleSynthSub("선택");
                         handleCard(idx + 1);
                       }}
-                    />
+                    >
+                      <img width="100%" src={answer} />
+                    </QuestionImgCard>
                   );
               })}
             </CardLayout>
@@ -193,6 +200,9 @@ export default function MusicQuestion() {
           <button
             className="gradient-btn"
             onClick={handleButton}
+            onFocus={() => {
+              handleSynthSub("넘어가기 버튼");
+            }}
             onMouseEnter={() => {
               handleSynthSub("넘어가기 버튼");
             }}
