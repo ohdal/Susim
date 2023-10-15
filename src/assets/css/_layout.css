@@ -42,3 +42,23 @@ a {
   color: #ffffff;
   border: 1px solid #ffffff;
 }
+
+.my-popup .popup-title {
+  font-size: 1.625rem !important;
+}
+
+.my-popup .popup-confirm-btn,
+.my-popup .popup-deny-btn {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3));
+  border-radius: 10px !important;
+}
+
+.my-popup .popup-confirm-btn:hover,
+.my-popup .popup-deny-btn:hover {
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.2)) !important;
+}
+
+.my-popup .popup-confirm-btn:focus,
+.my-popup .popup-deny-btn:focus {
+  box-shadow: none !important;
+}

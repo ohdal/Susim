@@ -14,12 +14,13 @@ export default function PopupLayout({ children }: Props) {
       allowEnterKey: false,
       showConfirmButton: true,
       showDenyButton: true,
-      confirmButtonColor: "#70acd3",
-      denyButtonColor: "#d76565",
       confirmButtonText: "예",
       denyButtonText: "아니요",
       customClass: {
         popup: "my-popup",
+        title: "popup-title",
+        confirmButton: "popup-confirm-btn",
+        denyButton: "popup-deny-btn",
       },
       showClass: {
         popup: "animate__animated animate__fadeInDown",
@@ -29,9 +30,10 @@ export default function PopupLayout({ children }: Props) {
       },
     };
 
-    const result_tts = window.speechSynthesis
-      ? await Swal.fire({ title: "음성해설 기능을 사용하시겠습니까?", ...popupProps })
-      : { value: false };
+    let result_tts;
+    if (window.speechSynthesis)
+      result_tts = await Swal.fire({ title: "음성해설 기능을 사용하시겠습니까?", ...popupProps });
+    else result_tts = { value: false };
     const result_stt = await Swal.fire({ title: "자막 기능을 사용하시겠습니까?", ...popupProps });
     // const result_stt = { value: false };
 
