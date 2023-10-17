@@ -15,7 +15,6 @@ import { ServiceContext, mySynth } from "../utils/speechService.ts";
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import ScatterCanvas from "../components/ScatterCanvas";
-import { debounce } from "../utils/index.ts";
 
 const AnimationDiv = styled.div`
   width: 60%;
@@ -75,10 +74,6 @@ const text = [
     "다른이들의 수심을 보고 싶다면 아카이브 버튼을 클릭하세요.",
   ],
 ];
-
-const handleSynsthInput = debounce((text: string, event: { end: () => void; start: () => void }) => {
-  mySynth.speak(text, event);
-}, 500);
 
 // const AudioContext = window.AudioContext || window.webkitAudioContext;
 type typeSusim = { date: number; data: string; canvasInfo: string; text: string };
@@ -287,21 +282,6 @@ export default function MainPage() {
     }
   }, [textLevel, musicPlay, service]);
 
-  // const handleInput = useCallback(
-  //   (v: string) => {
-  //     if (service.tts) {
-  //       if (synthSpeak) {
-  //         mySynth.cancel();
-  //         setSynthSpeak(false);
-  //       } else {
-  //         handleSynsthInput(v, getDefaultSynthEvent());
-  //       }
-  //     }
-  //     canvasRef.current?.fillUp(v);
-  //   },
-  //   [service, synthSpeak, getDefaultSynthEvent]
-  // );
-
   const getMediaStream = useCallback(async () => {
     try {
       // https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
@@ -473,9 +453,6 @@ export default function MainPage() {
                   onFocus={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
                   }}
-                  onMouseEnter={() => {
-                    if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
-                  }}
                   onClick={() => {
                     if (!service.tts || (service.tts && !synthSpeak)) {
                       void handleSusim();
@@ -517,9 +494,6 @@ export default function MainPage() {
                   onFocus={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("아니요 버튼");
                   }}
-                  onMouseEnter={() => {
-                    if (service.tts && !synthSpeak) mySynth.speak("아니요 버튼");
-                  }}
                   onClick={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("클릭");
                     if (!service.tts || (service.tts && !synthSpeak)) setLevel(4);
@@ -530,9 +504,6 @@ export default function MainPage() {
                 <MainButton
                   className="gradient-btn"
                   onFocus={() => {
-                    if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
-                  }}
-                  onMouseEnter={() => {
                     if (service.tts && !synthSpeak) mySynth.speak("전송하기 버튼");
                   }}
                   onClick={() => {
@@ -552,9 +523,6 @@ export default function MainPage() {
               <button
                 className="fixed right-4 bottom-4 gradient-btn"
                 onFocus={() => {
-                  if (service.tts && !synthSpeak) mySynth.speak("Go Archive 버튼");
-                }}
-                onMouseEnter={() => {
                   if (service.tts && !synthSpeak) mySynth.speak("Go Archive 버튼");
                 }}
                 onClick={() => {

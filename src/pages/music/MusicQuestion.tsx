@@ -199,13 +199,10 @@ export default function MusicQuestion() {
         <div className="footer">
           <button
             className="gradient-btn"
-            onClick={(e) => {
+            onClick={() => {
               handleButton();
             }}
             onFocus={() => {
-              handleSynthSub("넘어가기 버튼");
-            }}
-            onMouseEnter={() => {
               handleSynthSub("넘어가기 버튼");
             }}
           >

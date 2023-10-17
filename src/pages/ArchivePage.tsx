@@ -157,9 +157,6 @@ export default function ArchivePage() {
         onFocus={() => {
           if (service.tts) mySynth.speak("나가기 버튼");
         }}
-        onMouseEnter={() => {
-          if (service.tts) mySynth.speak("나가기 버튼");
-        }}
         onClick={() => {
           if (service.tts) mySynth.speak("클릭");
           navigate("..", { relative: "path", state: "archive" })
