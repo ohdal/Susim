@@ -102,7 +102,8 @@ class Particle {
 
 let particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
 let lastAnim = false,
-  firstLength = 0;
+  firstLength = 0,
+  timeout_id: NodeJS.Timeout | null = null;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
 
@@ -133,7 +134,7 @@ export default function ScatterCanvas(props: Props) {
       for (let i = 0; i < imgData.data.length; i += 4 * dpr) {
         count++;
 
-        if (imgData.data[i + 3] !== 0) {
+        if (imgData.data[i + 3] > 125) {
           if (count % 2 === 0) continue;
           const x = (count % (width / dpr)) + (xPos - met.width / 2);
           const y = Math.floor(count / width) + yPos;
@@ -199,12 +200,13 @@ export default function ScatterCanvas(props: Props) {
 
       for (const [key, value] of Object.entries(particles)) {
         if (isFirst) {
-          value.draw();
           lastAnim = false;
+          value.draw();
           value.firstUpdate();
-          setTimeout(() => {
-            lastAnim = true;
-          }, 3000);
+          if (!timeout_id)
+            timeout_id = setTimeout(() => {
+              lastAnim = true;
+            }, 3000);
         } else {
           if (!mouse) return;
 
@@ -230,6 +232,7 @@ export default function ScatterCanvas(props: Props) {
 
   const onMouseUpPointerDiv = useCallback(() => {
     if (!canvas) return;
+    if (canvas.isAnim) return;
 
     canvas.animate(() => {
       return animation(true);
@@ -240,6 +243,7 @@ export default function ScatterCanvas(props: Props) {
       canvas.animate(() => {
         animation(false);
       });
+      timeout_id = null;
     }, 1500);
 
     setPointerDiv(null);
@@ -291,6 +295,7 @@ export default function ScatterCanvas(props: Props) {
           className="align-center"
           onMouseDown={onMouseDownPointerDiv}
           onMouseUp={onMouseUpPointerDiv}
+          onMouseLeave={onMouseUpPointerDiv}
           $width={pointerDiv.width}
           $height={pointerDiv.height}
         />
