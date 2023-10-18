@@ -17,7 +17,7 @@ export default class Canvas {
 
   constructor(canvas: HTMLCanvasElement) {
     this.element = canvas;
-    this.ctx = this.element.getContext("2d");
+    this.ctx = this.element.getContext("2d", { willReadFrequently: true });
     this.CANVAS_WIDTH = innerWidth;
     this.CANVAS_HEIGHT = innerHeight;
 
@@ -45,6 +45,10 @@ export default class Canvas {
     this.ctx?.scale(this.dpr, this.dpr);
   }
 
+  get isAnim() {
+    return this.requestId !== null;
+  }
+
   public animate(anim: animationType): void {
     this.requestId = window.requestAnimationFrame(() => {
       this.animate(anim);
@@ -65,6 +69,7 @@ export default class Canvas {
     if (this.requestId) {
       this.animCount = 0;
       cancelAnimationFrame(this.requestId);
+      this.requestId = null;
     }
   }
 
@@ -77,7 +82,7 @@ export default class Canvas {
   }
 
   public setBackground(color: string): void {
-    if(this.ctx) {
+    if (this.ctx) {
       this.ctx.fillStyle = color;
       this.ctx.fillRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
     }
