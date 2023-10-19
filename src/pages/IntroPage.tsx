@@ -1,8 +1,5 @@
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { debounce } from "../utils";
-import { canvasFontSize } from "../constant/Data";
-import { ServiceContext, mySynth } from "../utils/speechService";
 import ScatterCanvas from "../components/ScatterCanvas";
 
 const text = [
@@ -14,53 +11,9 @@ const text = [
   ["다섯가지 질문에 당신의 대답을 들려주세요.", "", "음악으로 답해드립니다."],
 ];
 
-type Props = { level: number; endFunc: (value?: number) => void };
-const ServiceLayout = (props: Props) => {
-  const { level, endFunc } = props;
-  const [fontSize, setFontSize] = useState(canvasFontSize(window.innerWidth));
-
-  useEffect(() => {
-    const myResize = debounce(() => {
-      setFontSize(canvasFontSize(window.innerWidth));
-    }, 300);
-
-    window.addEventListener("resize", myResize);
-
-    return () => {
-      window.removeEventListener("resize", myResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    mySynth.speak(text[level].join(""), {
-      end: () => {
-        endFunc(level + 1);
-      },
-    });
-  }, [endFunc, level]);
-
-  return (
-    <div className="text-center align-center">
-      {text[level].map((v, idx) => {
-        if (v)
-          return (
-            <p
-              key={`${level}-${idx}`}
-              className="last:mb-0"
-              style={{ fontSize: `${fontSize}px`, marginBottom: "10px" }}
-            >
-              {v}
-            </p>
-          );
-      })}
-    </div>
-  );
-};
-
 export default function IntroPage() {
   const [level, setLevel] = useState(0);
   const navigate = useNavigate();
-  const service = useContext(ServiceContext);
 
   const afterFunc = useCallback(
     (value?: number) => {
@@ -74,11 +27,7 @@ export default function IntroPage() {
 
   return (
     <div className="w-full h-full background-img">
-      {service.tts ? (
-        <ServiceLayout level={level} endFunc={afterFunc} />
-      ) : (
-        <ScatterCanvas text={text[level]} afterAnimationFunc={afterFunc} />
-      )}
+      <ScatterCanvas text={text[level]} afterAnimationFunc={afterFunc} />
     </div>
   );
 }

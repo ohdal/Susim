@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 export type serviceDataType = { tts: boolean; stt: boolean };
-export const ServiceContext = createContext<serviceDataType>({ tts: true, stt: false });
+export const ServiceContext = createContext<serviceDataType>({ tts: false, stt: false });
 
 class Synth {
   private mySynth: SpeechSynthesis;
