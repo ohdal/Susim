@@ -198,7 +198,6 @@ export default function ScatterCanvas(props: Props) {
 
   const onMouseUpPointerDiv = useCallback(() => {
     if (!canvas) return;
-    if (canvas.isAnim) return;
 
     canvas.animate(() => {
       return animation(true);

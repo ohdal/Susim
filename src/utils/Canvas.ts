@@ -45,10 +45,6 @@ export default class Canvas {
     this.ctx?.scale(this.dpr, this.dpr);
   }
 
-  get isAnim() {
-    return this.requestId !== null;
-  }
-
   public animate(anim: animationType): void {
     this.requestId = window.requestAnimationFrame(() => {
       this.animate(anim);
