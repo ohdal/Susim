@@ -309,8 +309,10 @@ export default function MainPage() {
   useEffect(() => {
     switch (level) {
       case 0:
-        if (location.state === "archive") setLevel(1);
-        else setTextLevel(1);
+        if (analyser) {
+          if (location.state === "archive") setLevel(1);
+          else setTextLevel(1);
+        }
         break;
       case 1:
         setTextLevel(0);
@@ -360,7 +362,7 @@ export default function MainPage() {
         setTextLevel(3);
         break;
     }
-  }, [level, navigate, location, getLastSusim, service, getDefaultSynthEvent]);
+  }, [level, navigate, location, getLastSusim, service, getDefaultSynthEvent, analyser]);
 
   return (
     <>
