@@ -10,8 +10,7 @@
     "build_git": "tsc && cp -f ./index_git.html ./index.html && vite build --base /Susim --mode github",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "predeploy": "npm run build_git",
-    "deploy": "gh-pages -d dist"
+    "deploy_git": "npm run build_git && gh-pages -d dist"
   },
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
