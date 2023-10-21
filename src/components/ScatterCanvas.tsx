@@ -101,7 +101,7 @@ class Particle {
   }
 }
 
-let particles: { [key: string]: Particle } = {}; // 순서 x 객체 사용
+let particles: { [key: string]: Particle } | null = null; // 순서 x 객체 사용
 let lastAnim = false,
   firstLength = 0,
   timeout_id: NodeJS.Timeout | null = null;
@@ -118,6 +118,7 @@ export default function ScatterCanvas(props: Props) {
     (textInfo: PointerDiv, xPos: number, yPos: number) => {
       if (!canvas || !canvas.ctx) return;
 
+      if (!particles) particles = {};
       const ctx = canvas.ctx;
       const dpr = canvas.dpr;
       const met = textInfo;
@@ -155,30 +156,33 @@ export default function ScatterCanvas(props: Props) {
 
   const animation = useCallback(
     (isFirst: boolean): void => {
-      const length = Object.keys(particles).length;
+      const length = particles ? Object.keys(particles).length : 0;
       if (length === 0) {
         afterAnimationFunc();
         canvas?.cancelAnimation();
+        particles = null;
       }
 
-      for (const [key, value] of Object.entries(particles)) {
-        if (isFirst) {
-          lastAnim = false;
-          value.draw();
-          value.firstUpdate();
-          if (!timeout_id)
-            timeout_id = setTimeout(() => {
-              lastAnim = true;
-            }, 3000);
-        } else {
-          if (!mouse) return;
+      if (particles) {
+        for (const [key, value] of Object.entries(particles)) {
+          if (isFirst) {
+            lastAnim = false;
+            value.draw();
+            value.firstUpdate();
+            if (!timeout_id)
+              timeout_id = setTimeout(() => {
+                lastAnim = true;
+              }, 3000);
+          } else {
+            if (!mouse) return;
 
-          value.draw();
-          if (!lastAnim) value.update(mouse);
-          else value.update_opacity();
+            value.draw();
+            if (!lastAnim) value.update(mouse);
+            else value.update_opacity();
 
-          // if (value.opacity <= 0.2) delete particles[key];
-          if (value.opacity <= 0) delete particles[key];
+            // if (value.opacity <= 0.2) delete particles[key];
+            if (value.opacity <= 0 && particles) delete particles[key];
+          }
         }
       }
     },
@@ -292,7 +296,7 @@ export default function ScatterCanvas(props: Props) {
 
     return () => {
       canvas.cancelAnimation();
-      particles = {};
+      particles = null;
       firstLength = 0;
     };
   }, [canvas]);
