@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "build_git": "tsc && vite build --base /Susim --mode github",
+    "build": "tsc && cp -f ./index_base.html ./index.html && vite build && rm -f ./dist/404.html",
+    "build_git": "tsc && cp -f ./index_git.html ./index.html && vite build --base /Susim --mode github",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build_git",
