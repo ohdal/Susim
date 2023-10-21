@@ -106,7 +106,10 @@ export default function MusicQuestion() {
         });
       else alert("카드 중 하나를 선택해주세요.");
     } else {
-      if (service.tts) mySynth.speak("클릭");
+      if (service.tts) {
+        setQuestionSpeak(true);
+        mySynth.speak("클릭");
+      }
       userChoiceList.push(userChoice);
       setUserChoice(null);
       setLevel((v) => v + 1);
