@@ -10,7 +10,6 @@ import { susim } from "../constant/Susim.ts";
 import database from "../utils/firebase";
 import { push, get, query, orderByChild, limitToLast } from "firebase/database";
 
-import { canvasFontSize } from "../constant/Data.ts";
 import { ServiceContext, mySynth } from "../utils/speechService.ts";
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
@@ -172,6 +171,7 @@ export default function MainPage() {
 
     if (result) {
       canvasRef.current?.stopAnimation();
+      musicPause();
       const linearData = canvasRef.current?.getLinearData();
       setImageData(canvasRef.current?.getImageData() || null);
 
@@ -203,7 +203,7 @@ export default function MainPage() {
         });
       else alert(text);
     }
-  }, [validate, service]);
+  }, [validate, service, musicPause]);
 
   const handleEmail = useCallback(() => {
     const { result, value, text } = validate(emailInputRef.current);
@@ -243,44 +243,17 @@ export default function MainPage() {
   const handleText = useCallback(() => {
     switch (textLevel) {
       case 1:
-        if (service.tts)
-          mySynth.speak("답변이 도착했습니다. 당신의 선택으로 만들어진 곡입니다.", {
-            end: () => {
-              setLevel(1);
-            },
-          });
-        else setLevel(1);
+        setLevel(1);
         break;
       case 2:
-        if (service.tts)
-          mySynth.speak(
-            "당신이 적은 수심은 사라졌습니다. 배수된 감정과 물은 모두 섞여 어딘가로 흘렀습니다. 하지만, 당신이 수심을 적을때 남긴 숨의 기록은 당신에게 전송되었습니다.",
-            {
-              end: () => {
-                setLevel(6);
-              },
-            }
-          );
-        else setLevel(6);
+        setLevel(6);
         break;
       case 3:
-        if (service.tts)
-          mySynth.speak(
-            "이 사이트에는 24시간 동안은 당신의 수심이 기록되지만, 그 이후에는 영구적으로 삭제됩니다. 다른이들의 수심을 보고 싶다면 아카아브 버튼을 클릭하세요. ",
-            {
-              end: () => {
-                setLevel(1);
-                musicPlay();
-              },
-            }
-          );
-        else {
-          setLevel(1);
-          musicPlay();
-        }
+        setLevel(1);
+        musicPlay();
         break;
     }
-  }, [textLevel, musicPlay, service]);
+  }, [textLevel, musicPlay]);
 
   const getMediaStream = useCallback(async () => {
     try {
@@ -389,32 +362,11 @@ export default function MainPage() {
     }
   }, [level, navigate, location, getLastSusim, service, getDefaultSynthEvent]);
 
-  useEffect(() => {
-    if (analyser && service.tts) handleText();
-  }, [handleText, service, analyser]);
-
   return (
     <>
       {textLevel ? (
         <div className="w-full h-full background-img">
-          {service.tts ? (
-            <div className="text-center align-center">
-              {text[textLevel - 1].map((v, idx) => {
-                if (v)
-                  return (
-                    <p
-                      key={`${textLevel}-${idx}`}
-                      className="last:mb-0"
-                      style={{ fontSize: `${canvasFontSize(window.innerWidth)}px`, marginBottom: "10px" }}
-                    >
-                      {v}
-                    </p>
-                  );
-              })}
-            </div>
-          ) : (
-            <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
-          )}
+          <ScatterCanvas text={text[textLevel - 1]} afterAnimationFunc={handleText} />
         </div>
       ) : (
         <>
@@ -456,7 +408,6 @@ export default function MainPage() {
                   onClick={() => {
                     if (!service.tts || (service.tts && !synthSpeak)) {
                       void handleSusim();
-                      musicPause();
                     }
                   }}
                 >

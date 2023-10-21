@@ -1,5 +1,6 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useContext } from "react";
 import { getRandomNum, debounce } from "../utils";
+import { ServiceContext, mySynth } from "../utils/speechService";
 import Canvas from "../utils/Canvas";
 import Vector from "../utils/Vector";
 import Mouse from "../utils/Mouse";
@@ -106,6 +107,7 @@ let lastAnim = false,
   timeout_id: NodeJS.Timeout | null = null;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
+  const service = useContext(ServiceContext);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
@@ -151,45 +153,6 @@ export default function ScatterCanvas(props: Props) {
     [canvas]
   );
 
-  const drawText = useCallback(() => {
-    if (!canvas) return;
-
-    const FONT_SIZE = canvasFontSize(canvas.CANVAS_WIDTH);
-    const LINE_VALUE = 5; // 줄 간격 값 5px
-    const ctx = canvas.ctx as CanvasRenderingContext2D;
-    const totalHeight = text.length * FONT_SIZE + (LINE_VALUE * text.length - 1);
-    const x = canvas.CANVAS_WIDTH / 2;
-    const y = (canvas.CANVAS_HEIGHT - totalHeight) / 2 + FONT_SIZE;
-
-    let met;
-    let maxWidth = 0;
-    let lineHeight = 0;
-
-    const fontFile = new FontFace("KoPubWorld Medium", `url(${font_ttf}) format("truetype")`);
-    document.fonts.add(fontFile);
-    fontFile
-      .load()
-      .then(() => {
-        ctx.font = `${FONT_SIZE}px KoPubWorld Medium`;
-        ctx.fillStyle = "#FFFFFF";
-        ctx.textAlign = "center";
-
-        for (let i = 0; i < text.length; i++) {
-          ctx.fillText(text[i], x, y + FONT_SIZE * i + lineHeight);
-          lineHeight += LINE_VALUE;
-
-          met = ctx.measureText(text[i]);
-          if (!maxWidth) maxWidth = met.width;
-          else if (maxWidth < met.width) maxWidth = met.width;
-        }
-
-        setPointerDiv({ width: maxWidth, height: totalHeight });
-      })
-      .catch((err: string) => {
-        console.log(`font 에러 발생: ${err}`);
-      });
-  }, [canvas, text]);
-
   const animation = useCallback(
     (isFirst: boolean): void => {
       const length = Object.keys(particles).length;
@@ -222,13 +185,16 @@ export default function ScatterCanvas(props: Props) {
     [mouse, afterAnimationFunc, canvas]
   );
 
-  const onMouseDownPointerDiv = useCallback(() => {
-    if (!canvas || !pointerDiv) return;
+  const onMouseDownPointerDiv = useCallback(
+    (div: PointerDiv) => {
+      if (!canvas) return;
 
-    const x = canvas.CANVAS_WIDTH / 2;
-    const y = (canvas.CANVAS_HEIGHT - pointerDiv.height) / 2;
-    createParticle(pointerDiv, x, y);
-  }, [canvas, pointerDiv, createParticle]);
+      const x = canvas.CANVAS_WIDTH / 2;
+      const y = (canvas.CANVAS_HEIGHT - div.height) / 2;
+      createParticle(div, x, y);
+    },
+    [canvas, createParticle]
+  );
 
   const onMouseUpPointerDiv = useCallback(() => {
     if (!canvas) return;
@@ -245,14 +211,59 @@ export default function ScatterCanvas(props: Props) {
       });
       timeout_id = null;
     }, 1500);
-
-    setPointerDiv(null);
   }, [canvas, animation]);
+
+  const drawText = useCallback(() => {
+    if (!canvas) return;
+
+    const FONT_SIZE = canvasFontSize(canvas.CANVAS_WIDTH);
+    const LINE_VALUE = 5; // 줄 간격 값 5px
+    const ctx = canvas.ctx as CanvasRenderingContext2D;
+    const totalHeight = text.length * FONT_SIZE + (LINE_VALUE * text.length - 1);
+    const x = canvas.CANVAS_WIDTH / 2;
+    const y = (canvas.CANVAS_HEIGHT - totalHeight) / 2 + FONT_SIZE;
+
+    let met;
+    let maxWidth = 0;
+    let lineHeight = 0;
+
+    const fontFile = new FontFace("KoPubWorld Medium", `url(${font_ttf}) format("truetype")`);
+    document.fonts.add(fontFile);
+    fontFile
+      .load()
+      .then(() => {
+        ctx.font = `${FONT_SIZE}px KoPubWorld Medium`;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.textAlign = "center";
+
+        for (let i = 0; i < text.length; i++) {
+          ctx.fillText(text[i], x, y + FONT_SIZE * i + lineHeight);
+          lineHeight += LINE_VALUE;
+
+          met = ctx.measureText(text[i]);
+          if (!maxWidth) maxWidth = met.width;
+          else if (maxWidth < met.width) maxWidth = met.width;
+        }
+
+        if (service.tts)
+          mySynth.speak(text.join(""), {
+            end: () => {
+              onMouseDownPointerDiv({ width: maxWidth, height: totalHeight });
+              onMouseUpPointerDiv();
+            },
+          });
+        else setPointerDiv({ width: maxWidth, height: totalHeight });
+      })
+      .catch((err: string) => {
+        console.log(`font 에러 발생: ${err}`);
+      });
+  }, [canvas, text, service, onMouseDownPointerDiv, onMouseUpPointerDiv]);
 
   useEffect(() => {
     if (!canvas) return;
     canvas.init();
     canvas.setFrame(15);
+
     drawText();
 
     const myResize = debounce(() => {
@@ -267,18 +278,18 @@ export default function ScatterCanvas(props: Props) {
     return () => {
       window.removeEventListener("resize", myResize);
     };
-  }, [canvas, drawText, animation]);
+  }, [canvas, drawText]);
 
   useEffect(() => {
     if (canvasRef.current) {
-      setCanvas(new Canvas(canvasRef.current));
+      const canvas = new Canvas(canvasRef.current);
+      setCanvas(canvas);
+      setMouse(new Mouse(canvas));
     }
   }, []);
 
   useEffect(() => {
     if (!canvas) return;
-
-    setMouse(new Mouse(canvas));
 
     return () => {
       canvas.cancelAnimation();
@@ -290,12 +301,16 @@ export default function ScatterCanvas(props: Props) {
   return (
     <>
       <canvas ref={canvasRef}></canvas>
-      {pointerDiv && (
+      {pointerDiv && !service.tts && (
         <PointerDiv
           className="align-center"
-          onMouseDown={onMouseDownPointerDiv}
-          onMouseUp={onMouseUpPointerDiv}
-          onMouseLeave={onMouseUpPointerDiv}
+          onMouseDown={() => {
+            onMouseDownPointerDiv(pointerDiv);
+          }}
+          onMouseUp={() => {
+            onMouseUpPointerDiv();
+            setPointerDiv(null);
+          }}
           $width={pointerDiv.width}
           $height={pointerDiv.height}
         />
