@@ -76,53 +76,44 @@ const QuestionP = styled.p`
 let userChoiceList: number[] = [];
 export default function MusicQuestion() {
   const [level, setLevel] = useState(0);
-  const [questionSpeak, setQuestionSpeak] = useState(false);
   const [question, setQuestion] = useState<questionType | null>(null);
   const [userChoice, setUserChoice] = useState<number | null>(null);
   const navigate = useNavigate();
   const service = useContext(ServiceContext);
 
-  const handleCard = useCallback(
-    (v: number) => {
-      if (questionSpeak) return;
+  const handleCard = useCallback((v: number) => {
+    if (mySynth.isSpeaking) return;
 
-      setUserChoice(v);
-    },
-    [questionSpeak]
-  );
+    setUserChoice(v);
+  }, []);
 
   const handleButton = useCallback(() => {
-    if (questionSpeak) return;
+    if (mySynth.isSpeaking) return;
 
     if (!userChoice) {
       if (service.tts)
         mySynth.speak("카드 중 하나를 클릭하여 선택한 뒤, 넘어가기 버튼을 클릭해주세요.", {
-          end: () => {
-            setQuestionSpeak(false);
-          },
-          start: () => {
-            setQuestionSpeak(true);
-          },
+          blocking: true,
         });
       else alert("카드 중 하나를 선택해주세요.");
     } else {
       if (service.tts) {
-        setQuestionSpeak(true);
         mySynth.speak("클릭");
+        mySynth.isSpeaking = true;
       }
       userChoiceList.push(userChoice);
       setUserChoice(null);
       setLevel((v) => v + 1);
     }
-  }, [userChoice, service, questionSpeak]);
+  }, [userChoice, service]);
 
   const handleSynthSub = useCallback(
     (text: string) => {
-      if (service.tts && !questionSpeak) {
+      if (service.tts) {
         mySynth.speak(text);
       }
     },
-    [service, questionSpeak]
+    [service]
   );
 
   useEffect(() => {
@@ -130,16 +121,13 @@ export default function MusicQuestion() {
     setQuestion(question);
 
     if (level > questionList.length - 1) {
+      if (service.tts) mySynth.isSpeaking = false;
       navigate(`/main/${userChoiceList.join("")}`);
     } else {
       if (service.tts) {
         mySynth.speak(question.ttsText, {
-          end: () => {
-            setQuestionSpeak(false);
-          },
-          start: () => {
-            setQuestionSpeak(true);
-          },
+          blocking: true,
+          forced: true,
         });
       }
     }

@@ -87,7 +87,7 @@ export default function MusicLayout() {
               mySynth.speak(
                 "설정에서 해당 브라우저 음악재생을 허용해준 뒤, 카드를 다시 선택해주세요. 카드 선택 화면으로 돌아갑니다. ",
                 {
-                  end: () => {
+                  endEvent: () => {
                     navigate("/question");
                   },
                 }
@@ -111,7 +111,7 @@ export default function MusicLayout() {
       } else {
         if (service.tts) {
           mySynth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
-            end: () => {
+            endEvent: () => {
               navigate("/question");
             },
           });

@@ -147,7 +147,7 @@ export default function ArchivePage() {
 
   useEffect(() => {
     AOS.init();
-    if (service.tts) mySynth.speak("아카이브 페이지입니다. 우측 상단에 나가기 버튼.");
+    if (service.tts) mySynth.speak("아카이브 페이지입니다. 우측 상단에 나가기 버튼.", { blocking: true });
   }, [service]);
 
   return (
@@ -159,7 +159,7 @@ export default function ArchivePage() {
         }}
         onClick={() => {
           if (service.tts) mySynth.speak("클릭");
-          navigate("..", { relative: "path", state: "archive" })
+          navigate("..", { relative: "path", state: "archive" });
         }}
       >
         나가기

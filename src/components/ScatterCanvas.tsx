@@ -9,8 +9,6 @@ import styled from "styled-components";
 import { canvasFontSize } from "../constant/Data";
 import font_ttf from "../assets/fonts/GowunBatang-Regular.ttf";
 
-// import text_img from "../assets/text_test.png";
-
 const PointerDiv = styled.div<{ $width: number; $height: number }>`
   width: ${(props) => props.$width}px;
   height: ${(props) => props.$height}px;
@@ -180,7 +178,6 @@ export default function ScatterCanvas(props: Props) {
             if (!lastAnim) value.update(mouse);
             else value.update_opacity();
 
-            // if (value.opacity <= 0.2) delete particles[key];
             if (value.opacity <= 0 && particles) delete particles[key];
           }
         }
@@ -250,7 +247,7 @@ export default function ScatterCanvas(props: Props) {
 
         if (service.tts)
           mySynth.speak(text.join(""), {
-            end: () => {
+            endEvent: () => {
               onMouseDownPointerDiv({ width: maxWidth, height: totalHeight });
               onMouseUpPointerDiv();
             },
