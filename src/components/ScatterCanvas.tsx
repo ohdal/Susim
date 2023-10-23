@@ -1,12 +1,12 @@
 import { useRef, useEffect, useState, useCallback, useContext } from "react";
 import { debounce } from "../utils";
-import { ServiceContext, mySynth } from "../utils/speechService";
-import Canvas from "../utils/Canvas";
-import Particle from "../utils/Particle";
-import Mouse from "../utils/Mouse";
+import { ServiceContext, mySynth } from "../services/speechService";
+import Canvas from "../classes/Canvas";
+import Particle from "../classes/Particle";
+import Mouse from "../classes/Mouse";
 import styled from "styled-components";
 
-import { canvasFontSize } from "../constant/Data";
+import { canvasFontSize } from "../constants/Data";
 import font_ttf from "../assets/fonts/GowunBatang-Regular.ttf";
 
 const PointerDiv = styled.div<{ $width: number; $height: number }>`

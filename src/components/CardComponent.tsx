@@ -6,7 +6,7 @@ import background_archive from "../assets/images/background_archive.png";
 
 import LinearDataCanvas, { lineGroupType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
-import { ServiceContext, mySynth } from "../utils/speechService";
+import { ServiceContext, mySynth } from "../services/speechService";
 
 type CardProps = {
   data: string;

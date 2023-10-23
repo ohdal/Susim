@@ -4,8 +4,8 @@ import styled from "styled-components";
 
 import background_card from "../assets/images/background_card.png";
 
-import { ServiceContext, mySynth } from "../utils/speechService";
-import { questionList, questionType } from "../constant/Data";
+import { ServiceContext, mySynth } from "../services/speechService";
+import { questionList, questionType } from "../constants/Data";
 
 const ContentInner = styled.div`
   width: inherit;

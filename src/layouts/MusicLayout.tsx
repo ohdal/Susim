@@ -2,8 +2,8 @@ import { useEffect, useCallback, useContext, useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-import { musicFileList } from "../constant/Data";
-import { ServiceContext, mySynth } from "../utils/speechService";
+import { musicFileList } from "../constants/Data";
+import { ServiceContext, mySynth } from "../services/speechService";
 
 const Container = styled.div`
   width: 100%;

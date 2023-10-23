@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
 import { getRandomNum, hexToRgb, debounce } from "../utils";
-import Canvas from "../utils/Canvas";
+import Canvas from "../classes/Canvas";
 
 type Props = {
   getDomainData?: () => { bufferLength: number; dataArray: Uint8Array };

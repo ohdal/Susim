@@ -1,4 +1,4 @@
-import { getRandomNum } from ".";
+import { getRandomNum } from "../utils";
 import Vector from "./Vector";
 import Mouse from "./Mouse";
 

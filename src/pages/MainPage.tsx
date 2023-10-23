@@ -6,11 +6,11 @@ import styled from "styled-components";
 import emailjs from "@emailjs/browser";
 const { VITE_EMAIL_SERVICE_ID, VITE_EMAIL_TEMPLATE_ID, VITE_EMAIL_PUBLIC_KEY } = import.meta.env;
 
-import { susim } from "../constant/Susim.ts";
-import database from "../utils/firebase";
+import { susim } from "../constants/Susim.ts";
+import database from "../services/firebase";
 import { push, get, query, orderByChild, limitToLast } from "firebase/database";
 
-import { ServiceContext, mySynth } from "../utils/speechService.ts";
+import { ServiceContext, mySynth } from "../services/speechService.ts";
 import MainInput, { MainInputHandle } from "../components/MainInput";
 import LinearDataCanvas, { LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import ScatterCanvas from "../components/ScatterCanvas";

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ServiceContext, serviceDataType } from "../utils/speechService";
+import { ServiceContext, serviceDataType } from "../services/speechService";
 import Swal from "sweetalert2";
 
 type Props = { children: JSX.Element };

@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import database from "../utils/firebase";
+import database from "../services/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
 
 import { Scrollbars, positionValues } from "react-custom-scrollbars";
 import AOS from "aos";
 import "aos/dist/aos.css"; // You can also use <link> for styles
 
-import { ServiceContext, mySynth } from "../utils/speechService";
+import { ServiceContext, mySynth } from "../services/speechService";
 import CardComponent from "../components/CardComponent";
 
 type listType = {
