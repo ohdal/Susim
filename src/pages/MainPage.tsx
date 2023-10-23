@@ -382,7 +382,6 @@ export default function MainPage() {
                 }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
-                  // handleInput(v as string);
                   canvasRef.current?.fillUp(v as string);
                 }}
               />
@@ -422,7 +421,6 @@ export default function MainPage() {
                 }}
                 changeEventHandle={(...args) => {
                   const [v] = args;
-                  // handleInput(v as string);
                   canvasRef.current?.fillUp(v as string);
                 }}
               />

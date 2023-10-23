@@ -8,7 +8,7 @@ import "animate.css";
 
 import PopupLayout from "./layouts/TTSPopupLayout";
 import MusicLayout from "./layouts/MusicLayout";
-import MusicQuestion from "./pages/music/MusicQuestion";
+import QuestionPage from "./pages/QuestionPage";
 import IntroPage from "./pages/IntroPage";
 import MainPage from "./pages/MainPage";
 import ArchivePage from "./pages/ArchivePage";
@@ -44,7 +44,7 @@ const router_base = [
     children: [
       {
         path: "",
-        element: <MusicQuestion />,
+        element: <QuestionPage />,
       },
     ],
   },
