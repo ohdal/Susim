@@ -7,7 +7,7 @@ import emailjs from "@emailjs/browser";
 const { VITE_EMAIL_SERVICE_ID, VITE_EMAIL_TEMPLATE_ID, VITE_EMAIL_PUBLIC_KEY } = import.meta.env;
 
 import { susim } from "../constants/Susim.ts";
-import database from "../lib/firebase.ts";
+import database from "../services/firebase.ts";
 import { push, get, query, orderByChild, limitToLast } from "firebase/database";
 
 import { SpeechContext } from "../contexts/speechContext.ts";

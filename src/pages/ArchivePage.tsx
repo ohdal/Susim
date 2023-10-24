@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import database from "../lib/firebase";
+import database from "../services/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
 
 import { Scrollbars, positionValues } from "react-custom-scrollbars";
