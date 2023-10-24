@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback, useContext } from "react";
 import { debounce } from "../utils";
-import { ServiceContext, mySynth } from "../services/speechService";
+import { ServiceContext } from "../contexts/speechContext";
 import Canvas from "../classes/Canvas";
 import Particle from "../classes/Particle";
 import Mouse from "../classes/Mouse";
@@ -173,7 +173,7 @@ export default function ScatterCanvas(props: Props) {
         }
 
         if (service.tts)
-          mySynth.speak(text.join(""), {
+          service.synth.speak(text.join(""), {
             endEvent: () => {
               onMouseDownPointerDiv({ width: maxWidth, height: totalHeight });
               onMouseUpPointerDiv();

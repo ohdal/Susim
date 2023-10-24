@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { musicFileList } from "../constants/Data";
-import { ServiceContext, mySynth } from "../services/speechService";
+import { ServiceContext } from "../contexts/speechContext";
 
 const Container = styled.div`
   width: 100%;
@@ -32,7 +32,7 @@ export default function MusicLayout() {
           audio.currentTime = 0;
         }
       });
-      
+
       loadedCount = 0;
     }
   }, []);
@@ -83,8 +83,8 @@ export default function MusicLayout() {
             console.log(`에러발생 ${err as string}`);
             testAudio.pause();
 
-            if (service.tts && !mySynth.isSpeaking)
-              mySynth.speak(
+            if (service.tts && !service.synth.isSpeaking)
+              service.synth.speak(
                 "설정에서 해당 브라우저 음악재생을 허용해준 뒤, 카드를 다시 선택해주세요. 카드 선택 화면으로 돌아갑니다. ",
                 {
                   endEvent: () => {
@@ -110,7 +110,7 @@ export default function MusicLayout() {
         musicPlay(list.split("").map((v) => Number(v)));
       } else {
         if (service.tts) {
-          mySynth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
+          service.synth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
             endEvent: () => {
               navigate("/question");
             },

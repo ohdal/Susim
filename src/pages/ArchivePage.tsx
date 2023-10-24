@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import database from "../services/firebase";
+import database from "../lib/firebase";
 import { get, query, limitToFirst, startAfter, orderByChild, equalTo } from "firebase/database";
 
 import { Scrollbars, positionValues } from "react-custom-scrollbars";
 import AOS from "aos";
 import "aos/dist/aos.css"; // You can also use <link> for styles
 
-import { ServiceContext, mySynth } from "../services/speechService";
+import { ServiceContext } from "../contexts/speechContext";
 import CardComponent from "../components/CardComponent";
 
 type listType = {
@@ -99,7 +99,7 @@ export default function ArchivePage() {
               } else {
                 if (!list) setList([]);
                 if (service.tts && isFirst)
-                  mySynth.speak("24시간 이내에 작성된 수심이 존재하지 않습니다. 우측 상단에 나가기 버튼");
+                  service.synth.speak("24시간 이내에 작성된 수심이 존재하지 않습니다. 우측 상단에 나가기 버튼");
 
                 setIsLast(true);
               }
@@ -147,7 +147,7 @@ export default function ArchivePage() {
 
   useEffect(() => {
     AOS.init();
-    if (service.tts) mySynth.speak("아카이브 페이지입니다. 우측 상단에 나가기 버튼.", { blocking: true });
+    if (service.tts) service.synth.speak("아카이브 페이지입니다. 우측 상단에 나가기 버튼.", { blocking: true });
   }, [service]);
 
   return (
@@ -155,10 +155,10 @@ export default function ArchivePage() {
       <button
         className="gradient-btn fixed right-4 top-4"
         onFocus={() => {
-          if (service.tts) mySynth.speak("나가기 버튼");
+          if (service.tts) service.synth.speak("나가기 버튼");
         }}
         onClick={() => {
-          if (service.tts) mySynth.speak("클릭");
+          if (service.tts) service.synth.speak("클릭");
           navigate("..", { relative: "path", state: "archive" });
         }}
       >

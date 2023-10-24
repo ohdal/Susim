@@ -1,10 +1,6 @@
-import { createContext } from "react";
-
-export type serviceDataType = { tts: boolean; stt: boolean };
-export const ServiceContext = createContext<serviceDataType>({ tts: false, stt: false });
-
 type options = { blocking?: boolean; forced?: boolean; endEvent?: () => void | null; startEvent?: () => void | null };
-class Synth {
+
+export default class Synth {
   private mySynth: SpeechSynthesis;
   private synthSpeak: boolean;
 
@@ -46,5 +42,3 @@ class Synth {
     this.mySynth.speak(utterance);
   }
 }
-
-export const mySynth = new Synth();

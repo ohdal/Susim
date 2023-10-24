@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import background_card from "../assets/images/background_card.png";
 
-import { ServiceContext, mySynth } from "../services/speechService";
+import { ServiceContext } from "../contexts/speechContext";
 import { questionList, questionType } from "../constants/Data";
 
 const ContentInner = styled.div`
@@ -81,25 +81,28 @@ export default function MusicQuestion() {
   const navigate = useNavigate();
   const service = useContext(ServiceContext);
 
-  const handleCard = useCallback((v: number) => {
-    if (mySynth.isSpeaking) return;
+  const handleCard = useCallback(
+    (v: number) => {
+      if (service.synth.isSpeaking) return;
 
-    setUserChoice(v);
-  }, []);
+      setUserChoice(v);
+    },
+    [service]
+  );
 
   const handleButton = useCallback(() => {
-    if (mySynth.isSpeaking) return;
+    if (service.synth.isSpeaking) return;
 
     if (!userChoice) {
       if (service.tts)
-        mySynth.speak("카드 중 하나를 클릭하여 선택한 뒤, 넘어가기 버튼을 클릭해주세요.", {
+        service.synth.speak("카드 중 하나를 클릭하여 선택한 뒤, 넘어가기 버튼을 클릭해주세요.", {
           blocking: true,
         });
       else alert("카드 중 하나를 선택해주세요.");
     } else {
       if (service.tts) {
-        mySynth.speak("클릭");
-        mySynth.isSpeaking = true;
+        service.synth.speak("클릭");
+        service.synth.isSpeaking = true;
       }
       userChoiceList.push(userChoice);
       setUserChoice(null);
@@ -110,7 +113,7 @@ export default function MusicQuestion() {
   const handleSynthSub = useCallback(
     (text: string) => {
       if (service.tts) {
-        mySynth.speak(text);
+        service.synth.speak(text);
       }
     },
     [service]
@@ -121,11 +124,11 @@ export default function MusicQuestion() {
     setQuestion(question);
 
     if (level > questionList.length - 1) {
-      if (service.tts) mySynth.isSpeaking = false;
+      if (service.tts) service.synth.isSpeaking = false;
       navigate(`/main/${userChoiceList.join("")}`);
     } else {
       if (service.tts) {
-        mySynth.speak(question.ttsText, {
+        service.synth.speak(question.ttsText, {
           blocking: true,
           forced: true,
         });

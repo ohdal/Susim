@@ -6,7 +6,7 @@ import background_archive from "../assets/images/background_archive.png";
 
 import LinearDataCanvas, { lineGroupType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
-import { ServiceContext, mySynth } from "../services/speechService";
+import { ServiceContext } from "../contexts/speechContext";
 
 type CardProps = {
   data: string;
@@ -120,7 +120,7 @@ const CardComponent = (props: CardProps) => {
         if (focusHandler) focusHandler();
         if (service.tts) {
           setClicked(true);
-          mySynth.speak(text);
+          service.synth.speak(text);
         }
       }}
       onBlur={() => {
