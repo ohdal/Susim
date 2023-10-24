@@ -465,7 +465,7 @@ export default function MainPage() {
                 }}
                 onClick={() => {
                   if (speechService.tts) speechService.synth.speak("클릭");
-                  if (!speechService.tts || (speechService.tts && !speechService.synth.isSpeaking)) navigate("archive");
+                  if (!speechService.tts || (speechService.tts && !speechService.synth.isSpeaking)) navigate("../archive");
                 }}
               >
                 Go Archive

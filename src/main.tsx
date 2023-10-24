@@ -21,11 +21,11 @@ const router_base = [
     element: <IntroPage />,
   },
   {
-    path: "/main/:list",
+    path: "/:list",
     element: <MusicLayout />,
     children: [
       {
-        path: "",
+        path: "main",
         element: <MainPage />,
       },
       {
@@ -38,15 +38,9 @@ const router_base = [
     path: "/question",
     element: (
       <div className="music-page">
-        <Outlet />
+        <QuestionPage />
       </div>
     ),
-    children: [
-      {
-        path: "",
-        element: <QuestionPage />,
-      },
-    ],
   },
 ];
 

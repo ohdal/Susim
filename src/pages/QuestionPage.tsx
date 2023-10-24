@@ -125,7 +125,7 @@ export default function MusicQuestion() {
 
     if (level > questionList.length - 1) {
       if (speechService.tts) speechService.synth.isSpeaking = false;
-      navigate(`/main/${userChoiceList.join("")}`);
+      navigate(`/${userChoiceList.join("")}/main`);
     } else {
       if (speechService.tts) {
         speechService.synth.speak(question.ttsText, {

@@ -160,7 +160,7 @@ export default function ArchivePage() {
         }}
         onClick={() => {
           if (speechService.tts) speechService.synth.speak("클릭");
-          navigate("..", { relative: "path", state: "archive" });
+          navigate("../main", { relative: "path", state: "archive" });
         }}
       >
         나가기
