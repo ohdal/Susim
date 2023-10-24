@@ -33,6 +33,10 @@ export default class Canvas {
     this.animCount = 0;
   }
 
+  get isAnim() {
+    return this.requestId !== null;
+  }
+
   public init(width?: number, height?: number): void {
     this.CANVAS_WIDTH = width || innerWidth;
     this.CANVAS_HEIGHT = height || innerHeight;

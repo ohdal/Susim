@@ -238,6 +238,12 @@ export default function ScatterCanvas(props: Props) {
             onMouseUpPointerDiv();
             setPointerDiv(null);
           }}
+          onMouseLeave={() => {
+            if (particles && !canvas?.isAnim) {
+              onMouseUpPointerDiv();
+              setPointerDiv(null);
+            }
+          }}
           $width={pointerDiv.width}
           $height={pointerDiv.height}
         />
