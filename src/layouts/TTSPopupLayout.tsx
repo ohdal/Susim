@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
-import { ServiceContext, serviceDataType } from "../contexts/speechContext";
+import { SpeechContext, speechDataType } from "../contexts/speechContext";
 import Synth from "../classes/Synth";
 
 type Props = { children: JSX.Element };
 
 export default function PopupLayout({ children }: Props) {
-  const [data, setData] = useState<serviceDataType | null>(null);
+  const [data, setData] = useState<speechDataType | null>(null);
 
-  const checkUser = useCallback(async (): Promise<serviceDataType> => {
+  const checkUser = useCallback(async (): Promise<speechDataType> => {
     const popupProps = {
       allowOutsideClick: false,
       allowEscapeKey: false,
@@ -52,7 +52,7 @@ export default function PopupLayout({ children }: Props) {
 
   return (
     <div className="w-full h-full">
-      {data && <ServiceContext.Provider value={data}>{children}</ServiceContext.Provider>}
+      {data && <SpeechContext.Provider value={data}>{children}</SpeechContext.Provider>}
     </div>
   );
 }

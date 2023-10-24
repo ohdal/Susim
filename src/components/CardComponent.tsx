@@ -6,7 +6,7 @@ import background_archive from "../assets/images/background_archive.png";
 
 import LinearDataCanvas, { lineGroupType, LinearDataCanvasHandle } from "../components/LinearDataCanvas";
 import { debounce } from "../utils";
-import { ServiceContext } from "../contexts/speechContext";
+import { SpeechContext } from "../contexts/speechContext";
 
 type CardProps = {
   data: string;
@@ -83,7 +83,7 @@ const CardComponent = (props: CardProps) => {
   const layoutRef = useRef<HTMLButtonElement | null>(null);
   const canvasRef = useRef<LinearDataCanvasHandle | null>(null);
   const [clicked, setClicked] = useState<boolean | null>(null);
-  const service = useContext(ServiceContext);
+  const speechService = useContext(SpeechContext);
 
   useEffect(() => {
     if (!canvasRef.current || !layoutRef.current) return;
@@ -118,17 +118,17 @@ const CardComponent = (props: CardProps) => {
       className={clicked === null ? "" : clicked ? "clicked" : "not-clicked"}
       onFocus={() => {
         if (focusHandler) focusHandler();
-        if (service.tts) {
+        if (speechService.tts) {
           setClicked(true);
-          service.synth.speak(text);
+          speechService.synth.speak(text);
         }
       }}
       onBlur={() => {
-        if (service.tts) setClicked(false);
+        if (speechService.tts) setClicked(false);
       }}
       onClick={() => {
         if (clickHandler) clickHandler();
-        if (!service.tts) {
+        if (!speechService.tts) {
           setClicked((v) => {
             return v === null ? true : !v;
           });

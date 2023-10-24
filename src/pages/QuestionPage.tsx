@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import background_card from "../assets/images/background_card.png";
 
-import { ServiceContext } from "../contexts/speechContext";
+import { SpeechContext } from "../contexts/speechContext";
 import { questionList, questionType } from "../constants/Data";
 
 const ContentInner = styled.div`
@@ -79,44 +79,44 @@ export default function MusicQuestion() {
   const [question, setQuestion] = useState<questionType | null>(null);
   const [userChoice, setUserChoice] = useState<number | null>(null);
   const navigate = useNavigate();
-  const service = useContext(ServiceContext);
+  const speechService = useContext(SpeechContext);
 
   const handleCard = useCallback(
     (v: number) => {
-      if (service.synth.isSpeaking) return;
+      if (speechService.synth.isSpeaking) return;
 
       setUserChoice(v);
     },
-    [service]
+    [speechService]
   );
 
   const handleButton = useCallback(() => {
-    if (service.synth.isSpeaking) return;
+    if (speechService.synth.isSpeaking) return;
 
     if (!userChoice) {
-      if (service.tts)
-        service.synth.speak("카드 중 하나를 클릭하여 선택한 뒤, 넘어가기 버튼을 클릭해주세요.", {
+      if (speechService.tts)
+        speechService.synth.speak("카드 중 하나를 클릭하여 선택한 뒤, 넘어가기 버튼을 클릭해주세요.", {
           blocking: true,
         });
       else alert("카드 중 하나를 선택해주세요.");
     } else {
-      if (service.tts) {
-        service.synth.speak("클릭");
-        service.synth.isSpeaking = true;
+      if (speechService.tts) {
+        speechService.synth.speak("클릭");
+        speechService.synth.isSpeaking = true;
       }
       userChoiceList.push(userChoice);
       setUserChoice(null);
       setLevel((v) => v + 1);
     }
-  }, [userChoice, service]);
+  }, [userChoice, speechService]);
 
   const handleSynthSub = useCallback(
     (text: string) => {
-      if (service.tts) {
-        service.synth.speak(text);
+      if (speechService.tts) {
+        speechService.synth.speak(text);
       }
     },
-    [service]
+    [speechService]
   );
 
   useEffect(() => {
@@ -124,17 +124,17 @@ export default function MusicQuestion() {
     setQuestion(question);
 
     if (level > questionList.length - 1) {
-      if (service.tts) service.synth.isSpeaking = false;
+      if (speechService.tts) speechService.synth.isSpeaking = false;
       navigate(`/main/${userChoiceList.join("")}`);
     } else {
-      if (service.tts) {
-        service.synth.speak(question.ttsText, {
+      if (speechService.tts) {
+        speechService.synth.speak(question.ttsText, {
           blocking: true,
           forced: true,
         });
       }
     }
-  }, [level, navigate, service]);
+  }, [level, navigate, speechService]);
 
   useEffect(() => {
     return () => {

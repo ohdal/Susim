@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback, useContext } from "react";
 import { debounce } from "../utils";
-import { ServiceContext } from "../contexts/speechContext";
+import { SpeechContext } from "../contexts/speechContext";
 import Canvas from "../classes/Canvas";
 import Particle from "../classes/Particle";
 import Mouse from "../classes/Mouse";
@@ -32,7 +32,7 @@ let lastAnim = false,
   timeout_id: NodeJS.Timeout | null = null;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
-  const service = useContext(ServiceContext);
+  const speechService = useContext(SpeechContext);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
@@ -172,8 +172,8 @@ export default function ScatterCanvas(props: Props) {
           else if (maxWidth < met.width) maxWidth = met.width;
         }
 
-        if (service.tts)
-          service.synth.speak(text.join(""), {
+        if (speechService.tts)
+          speechService.synth.speak(text.join(""), {
             endEvent: () => {
               onMouseDownPointerDiv({ width: maxWidth, height: totalHeight });
               onMouseUpPointerDiv();
@@ -184,7 +184,7 @@ export default function ScatterCanvas(props: Props) {
       .catch((err: string) => {
         console.log(`font 에러 발생: ${err}`);
       });
-  }, [canvas, text, service, onMouseDownPointerDiv, onMouseUpPointerDiv]);
+  }, [canvas, text, speechService, onMouseDownPointerDiv, onMouseUpPointerDiv]);
 
   useEffect(() => {
     if (!canvas) return;
@@ -228,7 +228,7 @@ export default function ScatterCanvas(props: Props) {
   return (
     <>
       <canvas ref={canvasRef}></canvas>
-      {pointerDiv && !service.tts && (
+      {pointerDiv && !speechService.tts && (
         <PointerDiv
           className="align-center"
           onMouseDown={() => {

@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import { musicFileList } from "../constants/Data";
-import { ServiceContext } from "../contexts/speechContext";
+import { SpeechContext } from "../contexts/speechContext";
 
 const Container = styled.div`
   width: 100%;
@@ -20,7 +20,7 @@ export default function MusicLayout() {
   const [musicInfoList, setMusicInfoList] = useState<string[]>([]);
   const navigate = useNavigate();
   const { list } = useParams();
-  const service = useContext(ServiceContext);
+  const speechService = useContext(SpeechContext);
 
   const handleAllMusic = useCallback((type: boolean) => {
     if (audioList.length > 0) {
@@ -83,8 +83,8 @@ export default function MusicLayout() {
             console.log(`에러발생 ${err as string}`);
             testAudio.pause();
 
-            if (service.tts && !service.synth.isSpeaking)
-              service.synth.speak(
+            if (speechService.tts && !speechService.synth.isSpeaking)
+              speechService.synth.speak(
                 "설정에서 해당 브라우저 음악재생을 허용해준 뒤, 카드를 다시 선택해주세요. 카드 선택 화면으로 돌아갑니다. ",
                 {
                   endEvent: () => {
@@ -99,7 +99,7 @@ export default function MusicLayout() {
           });
       }
     },
-    [loadedEvent, navigate, service]
+    [loadedEvent, navigate, speechService]
   );
 
   useEffect(() => {
@@ -109,8 +109,8 @@ export default function MusicLayout() {
       if (result) {
         musicPlay(list.split("").map((v) => Number(v)));
       } else {
-        if (service.tts) {
-          service.synth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
+        if (speechService.tts) {
+          speechService.synth.speak("잘못된 접근입니다. 카드 선택 페이지로 돌아갑니다.", {
             endEvent: () => {
               navigate("/question");
             },
