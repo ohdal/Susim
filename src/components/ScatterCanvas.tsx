@@ -27,7 +27,6 @@ type PointerDiv = {
 };
 
 let particles: { [key: string]: Particle } | null = null; // 순서 x 객체 사용
-let firstLength = 0;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
   const speechService = useContext(SpeechContext);
@@ -71,8 +70,6 @@ export default function ScatterCanvas(props: Props) {
           particles[`${coordX}-${coordY}`].draw();
         }
       }
-
-      firstLength = Object.keys(particles).length;
     },
     [canvas]
   );
@@ -202,7 +199,7 @@ export default function ScatterCanvas(props: Props) {
     drawText();
 
     const myResize = debounce(() => {
-      if (firstLength !== 0) return;
+      if (canvas.isAnim) return;
 
       canvas.init();
       drawText();
@@ -229,7 +226,6 @@ export default function ScatterCanvas(props: Props) {
     return () => {
       canvas.cancelAnimation();
       particles = null;
-      firstLength = 0;
     };
   }, [canvas]);
 
