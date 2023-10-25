@@ -15,15 +15,11 @@ export default function IntroPage() {
   const [level, setLevel] = useState(0);
   const navigate = useNavigate();
 
-  const afterFunc = useCallback(
-    (value?: number) => {
-      if (level < text.length - 1) {
-        if (value) setLevel(value);
-        else setLevel((v) => (v += 1));
-      } else navigate("/question");
-    },
-    [level, navigate]
-  );
+  const afterFunc = useCallback(() => {
+    if (level < text.length - 1) {
+      setLevel(level + 1);
+    } else navigate("/question");
+  }, [level, navigate]);
 
   return (
     <div className="w-full h-full background-img">
