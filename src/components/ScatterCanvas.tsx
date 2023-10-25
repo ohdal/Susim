@@ -78,7 +78,7 @@ export default function ScatterCanvas(props: Props) {
   );
 
   const animation = useCallback(
-    (Sequence: string) => {
+    (sequence: string) => {
       const length = particles ? Object.keys(particles).length : 0;
       if (length === 0) {
         afterAnimationFunc();
@@ -88,7 +88,7 @@ export default function ScatterCanvas(props: Props) {
 
       if (particles) {
         for (const [key, value] of Object.entries(particles)) {
-          switch (Sequence) {
+          switch (sequence) {
             case "first":
               value.draw();
               value.firstUpdate();
