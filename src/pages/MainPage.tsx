@@ -67,7 +67,7 @@ const text = [
     "당신에게 전송되었습니다.",
   ],
   [
-    "이 사이트에는 24간 동안 당신의 수심이 기록되지만,",
+    "이 사이트에는 24시간 동안 당신의 수심이 기록되지만,",
     "그 이후에는 영구적으로 삭제됩니다.",
     "",
     "다른이들의 수심을 보고 싶다면 아카이브 버튼을 클릭하세요.",
@@ -465,7 +465,8 @@ export default function MainPage() {
                 }}
                 onClick={() => {
                   if (speechService.tts) speechService.synth.speak("클릭");
-                  if (!speechService.tts || (speechService.tts && !speechService.synth.isSpeaking)) navigate("../archive");
+                  if (!speechService.tts || (speechService.tts && !speechService.synth.isSpeaking))
+                    navigate("../archive");
                 }}
               >
                 Go Archive
