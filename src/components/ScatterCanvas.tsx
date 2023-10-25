@@ -27,9 +27,7 @@ type PointerDiv = {
 };
 
 let particles: { [key: string]: Particle } | null = null; // 순서 x 객체 사용
-let lastAnim = false,
-  firstLength = 0,
-  timeout_id: NodeJS.Timeout | null = null;
+let firstLength = 0;
 export default function ScatterCanvas(props: Props) {
   const { text, afterAnimationFunc } = props;
   const speechService = useContext(SpeechContext);
@@ -80,7 +78,7 @@ export default function ScatterCanvas(props: Props) {
   );
 
   const animation = useCallback(
-    (isFirst: boolean): void => {
+    (Sequence: string) => {
       const length = particles ? Object.keys(particles).length : 0;
       if (length === 0) {
         afterAnimationFunc();
@@ -90,22 +88,26 @@ export default function ScatterCanvas(props: Props) {
 
       if (particles) {
         for (const [key, value] of Object.entries(particles)) {
-          if (isFirst) {
-            lastAnim = false;
-            value.draw();
-            value.firstUpdate();
-            if (!timeout_id)
-              timeout_id = setTimeout(() => {
-                lastAnim = true;
-              }, 3000);
-          } else {
-            if (!mouse) return;
+          switch (Sequence) {
+            case "first":
+              value.draw();
+              value.firstUpdate();
+              break;
+            case "second":
+              if (!mouse) return;
 
-            value.draw();
-            if (!lastAnim) value.update(mouse);
-            else value.update_opacity();
+              value.draw();
+              value.update(mouse);
+              break;
+            case "third":
+              value.draw();
+              value.update_opacity();
 
-            if (value.opacity <= 0 && particles) delete particles[key];
+              if (value.opacity <= 0 && particles) delete particles[key];
+              break;
+            default:
+              canvas?.cancelAnimation();
+              break;
           }
         }
       }
@@ -128,16 +130,22 @@ export default function ScatterCanvas(props: Props) {
     if (!canvas) return;
 
     canvas.animate(() => {
-      return animation(true);
+      animation("first");
     });
 
     setTimeout(() => {
       canvas.cancelAnimation();
       canvas.animate(() => {
-        animation(false);
+        animation("second");
       });
-      timeout_id = null;
     }, 1500);
+
+    setTimeout(() => {
+      canvas.cancelAnimation();
+      canvas.animate(() => {
+        animation("third");
+      });
+    }, 3000);
   }, [canvas, animation]);
 
   const drawText = useCallback(() => {

@@ -52,7 +52,7 @@ export default class Particle {
     const dist_c = Math.sqrt(dx_c * dx_c + dy_c * dy_c); // 현재 파티클 위치와 마우스의 위치와의 거리 구하기
 
     const direction_m = new Vector(dx_m / dist_m, dy_m / dist_m); // 방향 벡터 구하기 - 마우스 방향대로 밀리는
-    const direction_c = new Vector(dx_c / dist_c, dy_c / dist_c); // 방향 벡터 구하기 - 마우스 위치에서 떨어져서 미리는
+    const direction_c = new Vector(dx_c / dist_c, dy_c / dist_c); // 방향 벡터 구하기 - 마우스 위치에서 떨어져서 밀리는
 
     // direction_c - 마우스 포인터 위치에서 떨어지게끔 밀려야하므로 마이너스 값을 곱해준다.
     const randomNum_m = getRandomNum(20, 40);
