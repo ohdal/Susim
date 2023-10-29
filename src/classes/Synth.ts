@@ -1,6 +1,6 @@
 type options = { blocking?: boolean; forced?: boolean; endEvent?: () => void | null; startEvent?: () => void | null };
 
-export default class Synth {
+class Synth {
   private mySynth: SpeechSynthesis;
   private synthSpeak: boolean;
 
@@ -42,3 +42,17 @@ export default class Synth {
     this.mySynth.speak(utterance);
   }
 }
+
+const singletone = (function () {
+  let instance: Synth | null = null;
+
+  return {
+    getInstance() {
+      if (!instance) instance = new Synth();
+      return instance;
+    },
+  };
+})();
+
+export type instanceType = Synth;
+export default singletone.getInstance();
