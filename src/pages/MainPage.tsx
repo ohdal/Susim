@@ -25,7 +25,7 @@ const AnimationDiv = styled.div`
   }
 `;
 
-const SttDiv = styled.p`
+const SttDiv = styled.div`
   width: 60%;
   position: fixed;
   bottom: 2%;
