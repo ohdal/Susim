@@ -216,12 +216,11 @@ const LinearDataCanvas = forwardRef<LinearDataCanvasHandle, Props>((props, ref) 
         for (let i = 0; i < lineInfoArr.length; i++) {
           lineArr.push([]);
         }
-      } else {
-        for (let i = 0; i < lineArr.length; i++) {
-          saveDot(lineArr[i], { x, y }, lineInfoArr[i]);
-        }
       }
 
+      for (let i = 0; i < lineArr.length; i++) {
+        saveDot(lineArr[i], { x, y }, lineInfoArr[i]);
+      }
       x += sliceWidth;
     }
 
