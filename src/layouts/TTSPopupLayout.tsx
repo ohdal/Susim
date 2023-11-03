@@ -32,11 +32,10 @@ export default function PopupLayout({ children }: Props) {
     };
 
     let result_tts;
-    // if (window.speechSynthesis && window.speechSynthesis.getVoices().length > 0)
-    if (window.speechSynthesis)
+    const result_stt = await Swal.fire({ title: "자막 기능을 사용하시겠습니까?", ...popupProps });
+    if (window.speechSynthesis && window.speechSynthesis.getVoices().length > 0)
       result_tts = await Swal.fire({ title: "음성해설 기능을 사용하시겠습니까?", ...popupProps });
     else result_tts = { value: false };
-    const result_stt = await Swal.fire({ title: "자막 기능을 사용하시겠습니까?", ...popupProps });
 
     return { tts: result_tts.value, stt: result_stt.value, synth: instance };
   }, []);
