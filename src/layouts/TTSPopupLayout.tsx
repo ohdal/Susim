@@ -31,6 +31,10 @@ export default function PopupLayout({ children }: Props) {
       },
     };
 
+    // 사이트 최초 접속시에 getVoices 메서드를 사용하면
+    // 사용가능한 목소리가 있어도 빈 배열이 반환됩니다.
+    // 때문에 자막 기능 사용여부를 먼저 물어봅니다.
+    // 순서를 변경하지 마세요!
     let result_tts;
     const result_stt = await Swal.fire({ title: "자막 기능을 사용하시겠습니까?", ...popupProps });
     if (window.speechSynthesis && window.speechSynthesis.getVoices().length > 0)
