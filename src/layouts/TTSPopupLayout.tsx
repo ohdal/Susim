@@ -8,6 +8,7 @@ type Props = { children: JSX.Element };
 export default function PopupLayout({ children }: Props) {
   const [data, setData] = useState<speechDataType | null>(null);
 
+  console.log("inin");
   const checkUser = useCallback(async (): Promise<speechDataType> => {
     const popupProps = {
       allowOutsideClick: false,
@@ -40,26 +41,19 @@ export default function PopupLayout({ children }: Props) {
     if (window.speechSynthesis && window.speechSynthesis.getVoices().length > 0)
       result_tts = await Swal.fire({ title: "음성해설 기능을 사용하시겠습니까?", ...popupProps });
     else result_tts = { value: false };
+    console.log("hihi");
 
     return { tts: result_tts.value, stt: result_stt.value, synth: instance };
   }, []);
 
   useEffect(() => {
-    const loadEvent = () => {
-      checkUser()
-        .then((result) => {
-          setData(result);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    };
-
-    window.onload = loadEvent;
-
-    return () => {
-      window.onload = null;
-    };
+    checkUser()
+      .then((result) => {
+        setData(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, [checkUser]);
 
   return (
