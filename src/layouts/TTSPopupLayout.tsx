@@ -8,7 +8,6 @@ type Props = { children: JSX.Element };
 export default function PopupLayout({ children }: Props) {
   const [data, setData] = useState<speechDataType | null>(null);
 
-  console.log("inin");
   const checkUser = useCallback(async (): Promise<speechDataType> => {
     const popupProps = {
       allowOutsideClick: false,
