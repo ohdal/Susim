@@ -9,6 +9,7 @@ import "aos/dist/aos.css"; // You can also use <link> for styles
 
 import { SpeechContext } from "../contexts/speechContext";
 import CardComponent from "../components/CardComponent";
+import LogoBox from "../components/LogoBox";
 
 type listType = {
   data: string;
@@ -152,62 +153,69 @@ export default function ArchivePage() {
   }, [speechService]);
 
   return (
-    <div className="p-20 w-full h-full">
-      <button
-        className="gradient-btn fixed right-4 top-4"
-        onFocus={() => {
-          if (speechService.tts) speechService.synth.speak("나가기 버튼");
-        }}
-        onClick={() => {
-          if (speechService.tts) speechService.synth.speak("클릭");
-          navigate("../main", { relative: "path", state: "archive" });
-        }}
-      >
-        나가기
-      </button>
-      <Scrollbars onScroll={handleScroll} onUpdate={getOutterHeight} style={{ width: "100%", height: "100%" }}>
-        {list ? (
-          list.length > 0 ? (
-            <div
-              className="grid xs_card:grid-cols-2 sm_card:grid-cols-3 md_card:grid-cols-4 lg_card:grid-cols-5 justify-items-center"
-              style={{ width: "clac(100% - 17px)", maxWidth: "1060px", margin: "0 auto" }}
-              ref={innerRef}
-            >
-              {list.map((v, idx) => {
-                return <CardComponent data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />;
-              })}
-            </div>
+    <div className="w-full h-full">
+      <div className="w-full relative" style={{ height: "4.625rem" }}>
+        <button
+          className="gradient-btn fixed right-4 top-4"
+          onFocus={() => {
+            if (speechService.tts) speechService.synth.speak("나가기 버튼");
+          }}
+          onClick={() => {
+            if (speechService.tts) speechService.synth.speak("클릭");
+            navigate("../main", { relative: "path", state: "archive" });
+          }}
+        >
+          나가기
+        </button>
+      </div>
+      <div className="pl-20 pr-20" style={{ height: "calc(100% - 9.25rem)" }}>
+        <Scrollbars onScroll={handleScroll} onUpdate={getOutterHeight} style={{ width: "100%", height: "100%" }}>
+          {list ? (
+            list.length > 0 ? (
+              <div
+                className="grid xs_card:grid-cols-2 sm_card:grid-cols-3 md_card:grid-cols-4 lg_card:grid-cols-5 justify-items-center"
+                style={{ width: "clac(100% - 17px)", maxWidth: "1060px", margin: "0 auto" }}
+                ref={innerRef}
+              >
+                {list.map((v, idx) => {
+                  return <CardComponent data={v.data} text={v.text} canvasInfo={v.canvasInfo} key={idx} />;
+                })}
+              </div>
+            ) : (
+              <div className="w-full h-full grid">
+                <p className="place-self-center">24시간내 작성된 수심이 존재하지 않습니다.</p>
+              </div>
+            )
           ) : (
             <div className="w-full h-full grid">
-              <p className="place-self-center">24시간내 작성된 수심이 존재하지 않습니다.</p>
+              <div className="place-self-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 inline-block"
+                  fill="#ffffff"
+                  height="200px"
+                  width="200px"
+                  version="1.1"
+                  id="Capa_1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 220 220"
+                  stroke="#ffffff"
+                >
+                  <g id="SVGRepo_bgCarrier"></g>
+                  <g id="SVGRepo_tracerCarrier"></g>
+                  <g id="SVGRepo_iconCarrier">
+                    {" "}
+                    <path d="M158.505,10.987l12.99,7.5L154.29,48.289l-12.99-7.5L158.505,10.987z M209.013,61.495l-7.5-12.99L171.711,65.71l7.5,12.99 L209.013,61.495z M185.59,117.5H220v-15h-34.41V117.5z M171.711,154.29l29.802,17.205l7.5-12.99L179.211,141.3L171.711,154.29z M141.3,179.211l17.205,29.802l12.99-7.5l-17.205-29.802L141.3,179.211z M102.5,220h15v-34.41h-15V220z M48.505,201.513l12.99,7.5 L78.7,179.211l-12.99-7.5L48.505,201.513z M10.987,158.505l7.5,12.99l29.802-17.205l-7.5-12.99L10.987,158.505z M0,117.5h34.41v-15 H0V117.5z M48.288,65.71L18.487,48.505l-7.5,12.99L40.788,78.7L48.288,65.71z M48.505,18.487L65.71,48.288l12.99-7.5L61.495,10.987 L48.505,18.487z M102.5,34.409h15V0h-15V34.409z"></path>{" "}
+                  </g>
+                </svg>
+                수심을 불러오는 중입니다...
+              </div>
             </div>
-          )
-        ) : (
-          <div className="w-full h-full grid">
-            <div className="place-self-center">
-              <svg
-                className="animate-spin h-5 w-5 mr-3 inline-block"
-                fill="#ffffff"
-                height="200px"
-                width="200px"
-                version="1.1"
-                id="Capa_1"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 220 220"
-                stroke="#ffffff"
-              >
-                <g id="SVGRepo_bgCarrier"></g>
-                <g id="SVGRepo_tracerCarrier"></g>
-                <g id="SVGRepo_iconCarrier">
-                  {" "}
-                  <path d="M158.505,10.987l12.99,7.5L154.29,48.289l-12.99-7.5L158.505,10.987z M209.013,61.495l-7.5-12.99L171.711,65.71l7.5,12.99 L209.013,61.495z M185.59,117.5H220v-15h-34.41V117.5z M171.711,154.29l29.802,17.205l7.5-12.99L179.211,141.3L171.711,154.29z M141.3,179.211l17.205,29.802l12.99-7.5l-17.205-29.802L141.3,179.211z M102.5,220h15v-34.41h-15V220z M48.505,201.513l12.99,7.5 L78.7,179.211l-12.99-7.5L48.505,201.513z M10.987,158.505l7.5,12.99l29.802-17.205l-7.5-12.99L10.987,158.505z M0,117.5h34.41v-15 H0V117.5z M48.288,65.71L18.487,48.505l-7.5,12.99L40.788,78.7L48.288,65.71z M48.505,18.487L65.71,48.288l12.99-7.5L61.495,10.987 L48.505,18.487z M102.5,34.409h15V0h-15V34.409z"></path>{" "}
-                </g>
-              </svg>
-              수심을 불러오는 중입니다...
-            </div>
-          </div>
-        )}
-      </Scrollbars>
+          )}
+        </Scrollbars>
+      </div>
+      <div className="w-full" style={{ height: "4.625rem" }}>
+        <LogoBox position="left"/>
+      </div>
     </div>
   );
 }

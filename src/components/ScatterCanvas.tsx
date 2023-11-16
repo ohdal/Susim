@@ -47,7 +47,7 @@ export default function ScatterCanvas(props: Props) {
       const width = Math.floor(met.width * dpr);
 
       const imgData = ctx.getImageData(
-        xPos * dpr - (met.width / 2) * dpr,
+        (xPos - (met.width / 2) )* dpr,
         yPos * dpr,
         met.width * dpr,
         met.height * dpr
@@ -60,6 +60,7 @@ export default function ScatterCanvas(props: Props) {
         count++;
 
         if (imgData.data[i + 3] > 125) {
+          // 성능향상을 위해 절반의 파티클만 생성하기
           if (count % 2 === 0) continue;
           const x = (count % (width / dpr)) + (xPos - met.width / 2);
           const y = Math.floor(count / width) + yPos;

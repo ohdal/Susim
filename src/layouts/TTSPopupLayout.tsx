@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import { SpeechContext, speechDataType } from "../contexts/speechContext";
 import instance from "../classes/Synth";
+import LogoBox from "../components/LogoBox";
 
 type Props = { children: JSX.Element };
 
@@ -57,7 +58,13 @@ export default function PopupLayout({ children }: Props) {
 
   return (
     <div className="w-full h-full">
-      {data && <SpeechContext.Provider value={data}>{children}</SpeechContext.Provider>}
+      {data ? (
+        <SpeechContext.Provider value={data}>{children}</SpeechContext.Provider>
+      ) : (
+        <div className="w-full fixed bottom-0 left-0" style={{ height: "4.625rem" }}>
+          <LogoBox position="center" />
+        </div>
+      )}
     </div>
   );
 }
