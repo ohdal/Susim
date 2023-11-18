@@ -8,9 +8,9 @@
     "dev": "cp -f ./index_base.html ./index.html && vite",
     "build": "tsc && cp -f ./index_base.html ./index.html && vite build && rm -f ./dist/404.html",
     "build_git": "tsc && cp -f ./index_git.html ./index.html && vite build --base /Susim --mode github",
+    "deploy_git": "npm run build_git && gh-pages -d dist",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "deploy_git": "npm run build_git && gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
