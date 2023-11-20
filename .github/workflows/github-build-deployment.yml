@@ -31,4 +31,4 @@ jobs:
         run: yarn install
         
       - name: Deploy
-        run: yarn deploy_git
+        run: yarn deploy_git -u "github-actions-bot <support+actions@github.com>"
