@@ -31,4 +31,11 @@ jobs:
         run: yarn install
         
       - name: Deploy
-        run: yarn deploy_git -u "github-actions-bot <support+actions@github.com>"
+        env:
+          MY_EMAIL: yoonhj97@naver.com
+          MY_NAME: ohdal
+        run: |
+          git config --global user.email $MY_EMAIL
+          git config --global user.name $MY_NAME
+          git remote set-url origin https://$MY_NAME:${{ secrets.ACCESS_TOKEN }}@github.com/ohdal/Susim.git
+          yarn deploy_git -u "github-actions-bot <support+actions@github.com>"
