@@ -32,8 +32,8 @@ export default function LogoBox(Props: Props) {
 
   return (
     <Container className="pl-4 pr-4" style={positonStyle[position]}>
-      {imgList.map((v) => {
-        return <img src={v} />;
+      {imgList.map((v, idx) => {
+        return <img src={v} key={idx} />;
       })}
     </Container>
   );
