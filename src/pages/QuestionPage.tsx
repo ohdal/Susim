@@ -165,7 +165,7 @@ export default function MusicQuestion() {
                       }}
                     >
                       <img width="100%" src={background_card} />
-                      <p>{answer}</p>
+                      <p className="w-full px-2.5">{answer}</p>
                     </QuestionCard>
                   );
                 } else
