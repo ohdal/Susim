@@ -15,7 +15,7 @@
 
 ![ezgif com-video-to-gif (1)](https://github.com/ohdal/Susim/assets/64900730/2d2fe46d-1692-4ad7-803b-beee26ab69c9)
 ##### 🔗 Site Link <https://www.susim.online>
-##### 🔗 Notion Link <https://ohdal.notion.site/Depth-of-water-ad392a443f574de395e933643adbbdd5?pvs=4>
+##### 🔗 Notion Link <https://ohdal.notion.site/Depth-of-water-2e18de88b09249b6b36d35e6c1d06e2f?pvs=4>
 
 
 <details>
@@ -63,7 +63,7 @@
 ## Development List
 
 
-- Canvas API를 활용하여 글자가 모래처럼 흩어지는 Mouse Interaction Effect 개발
+- Canvas API를 활용하여 글자가 모래처럼 흩어지는 Mouse Interaction Animtion 개발
 - Audio, Canvas API를 활용한 사용자 오디오 데이터 시각화
 - Firebase realtime-database를 사용한 serverless 프로젝트 구축
 - EmailJS 서비스를 이용한 이메일 전송
