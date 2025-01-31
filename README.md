@@ -14,7 +14,7 @@
 
 
 ![ezgif com-video-to-gif (1)](https://github.com/ohdal/Susim/assets/64900730/2d2fe46d-1692-4ad7-803b-beee26ab69c9)
-##### 🔗 Site Link <https://www.susim.online>
+##### 🔗 Site Link <https://www.susim.work>
 ##### 🔗 Notion Link <https://ohdal.notion.site/Depth-of-water-2e18de88b09249b6b36d35e6c1d06e2f?pvs=4>
 
 
